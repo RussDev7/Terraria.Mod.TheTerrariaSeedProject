@@ -10,11 +10,11 @@
 *.sln.docstates
 *.csproj
 *.user
-obj\*
-bin\*
-.vs\*
+obj/*
+bin/*
+.vs/*
 *.config
-.git\*
+.git/*
 
 
 # User-specific files (MonoDevelop/Xamarin Studio)
