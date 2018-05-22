@@ -1,0 +1,39 @@
+Your map seed search engine. You want a world with
+5 Pyramids or no evil in jungle? With this mod you can find a map seed which has both of it.
+Amaze your friends with playing maps you didn't thought they even can exist. Share your rare findings with the community.
+The seeds you found can also be used in the unmodded vanilla version.
+
+[c/BBDDBB:To enter the seed search mode] start either your world name or seed with "?" (question mark without quotes). 
+E.g. "?my Map name", or "?133742" as seed or just "?" (all without quotes) 
+
+Currently you can search for:
+
+-Number of Pyramids
+-Number of Clouds
+-Number of Living Trees
+-Specific Pyramid and Cloud items
+-Living Trees with Chest
+-If evil tiles can destroy your Jungle, Desert or Ice 
+-If you can get a Water Bolt before Skeletron        
+-or can you grab a Dungeon chest before Skeletron
+-The Color of the Dungeon
+-If it has all kind of Dungeon Walls
+-Can you get rare items like  Flower Boots, Seaweed or Fish pet
+-How many different paintings and statues
+-How good the beach looks, no cliff no gabs, no near evil
+-If you spawn on top of a cloud, in Snow or Jungle biome
+-How far you need to walk to Dungeon, Temple your first Boots
+-If it has an active Enchanted Sword Shrine                
+-other rare stuff like a Dungeon in Snow Biome
+          
+...And many many more (look linked page for full list)
+
+During world generation it checks if this map is suitable. If not it takes the next seed. Many conditions don't need the fully generated world. With this you can save much search time. You can check over 100 seed per minute.
+
+This mod does not change the generated World. It only evaluates what was done.
+
+More details at mod page or at in-game description.
+
+If you found some bugs, have some ideas for more features, want to help coding or found some nice seeds do not hesitate writing me in linked mod page.
+
+Good luck!
