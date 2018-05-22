@@ -4,8 +4,7 @@ During world generation it checks if this map is suitable. If not it takes the n
 
 This mod does not change the generated World. It only evaluates what was done.
 
-<br/><br/><br/>
-
+<br/>
 
 //the code was copied und merged from former projects, <br/>
 //has many quick coding fixes, repetitions, unused and unnecessary content <br/>
