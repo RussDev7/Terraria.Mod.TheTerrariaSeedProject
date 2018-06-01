@@ -25,6 +25,8 @@ using Terraria.UI;
 
 using Terraria.Map;
 
+using System.Drawing.Imaging;
+
 namespace TheTerrariaSeedProject
 {
 
@@ -99,6 +101,7 @@ namespace TheTerrariaSeedProject
 
         bool search4MoonOres = false;
         int localnumPyr = 0;
+        int storeMMImg = -1;
 
         public override void Initialize()
         {
@@ -189,14 +192,27 @@ namespace TheTerrariaSeedProject
                         worldName = currentConfiguration.FindConfigItemValue(OptionsDict.WorldInformation.worldName, 0);
                         Main.worldName = worldName;
                         string mapSize = currentConfiguration.FindConfigItemValue(OptionsDict.WorldInformation.worldSize, 0); //todo custom sizes
-                        Main.maxTilesX = mapSize.Equals("Small") ? 4200 : mapSize.Equals("Medium") ? 6400 : mapSize.Equals("Large") ? 8400 : 4200;
-                        Main.maxTilesY = mapSize.Equals("Small") ? 1200 : mapSize.Equals("Medium") ? 1800 : mapSize.Equals("Large") ? 2400 : 900;
+                        Main.maxTilesX = mapSize.Equals("Small") ? 4200 : mapSize.Equals("Medium") ? 6400 : mapSize.Equals("Large") ? 8400 : Main.maxTilesX;
+                        Main.maxTilesY = mapSize.Equals("Small") ? 1200 : mapSize.Equals("Medium") ? 1800 : mapSize.Equals("Large") ? 2400 : Main.maxTilesY;
+
+                        string storeMM = currentConfiguration.FindConfigItemValue(OptionsDict.Configuration.storeMMPic, 0);
+                        if (!storeMM.Equals("Off"))
+                        {                            
+                            storeMMImg = storeMM.Contains("phase") ? 0 : 2;
+                            storeMMImg += storeMM.Contains("info") ? 1 : 0;
+                            
+                        }
+                        else
+                            storeMMImg = -1;
+                        
 
                         looking4copperTin = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.copperTin, 1);
                         looking4ironLead = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.ironLead, 1);
                         looking4silverTung = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.silverTungsten, 1);
                         looking4goldPlation= currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.goldPlatin, 1);                        
                         looking4moonType = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.moonType, 1);
+
+                        
 
                         search4MoonOres = true;
                         if (looking4copperTin.Equals("Random") && looking4ironLead.Equals("Random") && looking4silverTung.Equals("Random") && looking4goldPlation.Equals("Random") && looking4moonType.Equals("Random")  )
@@ -426,7 +442,13 @@ namespace TheTerrariaSeedProject
 
                         //if (condsTrue > 1) { Main.PlaySound(8, -1, -1, 1, 1f, 0f); }
                         if (condsTrue > 2 || score.rare > 0) { passedStage[stage]++; stage = 42; }
-                        else { startNextSeed(); }
+                        else {
+                            if (storeMMImg == 0 || storeMMImg == 1) {
+                                createMapName(score, !tryAgain && trials < 2, currentConfiguration, worldName);
+                                StoreMapAsPNG(storeMMImg % 2 > 0); }
+
+                            startNextSeed();
+                        }
 
                         
                         //writeToDescList(seed+" left stage 3 next stage " + stage +" construe " + condsTrue);
@@ -516,6 +538,8 @@ namespace TheTerrariaSeedProject
                                     createMapName(score, !tryAgain && runs < 2, currentConfiguration, worldName);
                                     WorldFile.saveWorld(false, true);                                                                     
                                 }
+                                //else
+                                    //delete wrong map sed?
                             }
                             
                             if (generated)
@@ -530,8 +554,9 @@ namespace TheTerrariaSeedProject
 
                                 //foreach (var elem in score.hasOBjectOrParam)
                                 //    wrtei += elem.Key + ": " + elem.Value + Environment.NewLine;
-                                
+                                if(storeMMImg >= 0 ) StoreMapAsPNG(storeMMImg%2 > 0);
                                 writeToDescList( GenerateStatsText(), -2);
+                                
                             }
 
 
@@ -574,6 +599,7 @@ namespace TheTerrariaSeedProject
             numPyramidChanceTrue = 0;
             numPyramidChanceTrueComputed = 0;
 
+            
             startDate = DateTime.Now.ToString(@"yyyy\/MM\/dd HH\:mm\:ss");
                      
             runTime = new Stopwatch();
@@ -859,7 +885,7 @@ namespace TheTerrariaSeedProject
             else
                 times = Math.Round(ts.TotalMilliseconds) + "ms";
 
-            string sss = "seed " + seed + (stage==42? " builing stage": (" stage " + stage)) + " time: " + times;
+            string sss = "seed " + seed + (stage==42? " builing phase": (" phase " + stage)) + " time: " + times;
             return sss;
         }
 
@@ -1342,11 +1368,32 @@ namespace TheTerrariaSeedProject
                     if (chest.x < Main.offLimitBorderTiles || chest.x > Main.maxTilesX - Main.offLimitBorderTiles || chest.y < Main.offLimitBorderTiles || chest.y > Main.maxTilesX - Main.offLimitBorderTiles)
                         continue;
 
+
+                    if (chest.item[0] != null)
+                    {
+                        int iid = chest.item[0].type;
+                        //only store good one
+                        if (iid == ItemID.PharaohsMask || iid == ItemID.SandstorminaBottle || iid == ItemID.FlyingCarpet || iid == ItemID.StaffofRegrowth || iid == ItemID.IceSkates || iid == ItemID.LivingLoom ||
+                            iid == ItemID.FlowerBoots || iid==ItemID.Aglet || iid == ItemID.AnkletoftheWind || iid == ItemID.FiberglassFishingPole || iid == ItemID.Fish || iid == ItemID.Seaweed || iid == ItemID.BlizzardinaBottle
+                            || iid == ItemID.SnowballCannon || iid == ItemID.WaterWalkingBoots || iid == ItemID.LavaCharm)
+                            if (score.itemLocation.ContainsKey(chest.item[0].type))
+                                score.itemLocation[chest.item[0].type].Add(new Tuple<int, int>(cx, cy));
+                            else
+                                score.itemLocation.Add(chest.item[0].type, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
+                    }
+
+
                     //double glitch detector might not work
                     if (chest.item[0] != null &&
                         (Main.tile[cx, cy - 1].active() && Main.tile[cx, cy - 1].type == TileID.ClosedDoor) ||
                         (Main.tile[cx + 1, cy - 1].active() && Main.tile[cx + 1, cy - 1].type == TileID.ClosedDoor)
-                        ) { hasOBjectOrParam["Chest Doub Glitch"] += 1; writeDebugFile("maybe found doubglitch (buggy) at " + cx + " " + cy + " in seed " + Main.ActiveWorldFileData.Seed + " can get overridden: "+ (!doFull)); }
+                        ) { hasOBjectOrParam["Chest Doub Glitch"] += 1; writeDebugFile("maybe found doubglitch (buggy) at " + cx + " " + cy + " in seed " + Main.ActiveWorldFileData.Seed + " can get overridden: "+ (!doFull));
+                        if (score.itemLocation.ContainsKey(ItemID.WoodenDoor))
+                            score.itemLocation[ItemID.WoodenDoor].Add(new Tuple<int, int>(cx, cy));
+                        else
+                            score.itemLocation.Add(ItemID.WoodenDoor, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
+
+                    }
                     
 
                     //TODO Grab distance trough walls not included yet
@@ -1366,7 +1413,12 @@ namespace TheTerrariaSeedProject
                         //chest in dungeon                     
                         if (canGrabDungeonItem(cx, cy))
                         {
+                            if (score.itemLocation.ContainsKey(chest.item[0].type))
+                                score.itemLocation[chest.item[0].type].Add(new Tuple<int, int>(cx, cy));
+                            else
+                                score.itemLocation.Add(chest.item[0].type, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
                             
+
                             if (Main.tile[cx, cy].frameX == 72)
                             {
                                 hasOBjectOrParam["Pre Skeletron Dungeon Chest Grab"] += 1;
@@ -1382,6 +1434,11 @@ namespace TheTerrariaSeedProject
                         else
                         if (canGetDungeonItem(cx, cy - 1, 15, 15))
                         {
+                            if (score.itemLocation.ContainsKey(chest.item[0].type))
+                                score.itemLocation[chest.item[0].type].Add(new Tuple<int, int>(cx, cy));
+                            else
+                                score.itemLocation.Add(chest.item[0].type, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
+
                             if (Main.tile[cx, cy].frameX == 72)
                             {
                                 hasOBjectOrParam["Pre Skeletron Dungeon Chest Risky"] += 1;
@@ -1421,7 +1478,15 @@ namespace TheTerrariaSeedProject
                         {
                             int bootsDist = getDistanceToSpawn(chest.x, chest.y);
                             if (bootsDist < hasOBjectOrParam["Hermes Flurry Boots Distance"])
+                            {
                                 hasOBjectOrParam["Hermes Flurry Boots Distance"] = bootsDist;
+
+                                if (score.itemLocation.ContainsKey(ItemID.HermesBoots))
+                                    score.itemLocation[ItemID.HermesBoots] = new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) };//only one elemenet
+                                else
+                                    score.itemLocation.Add(ItemID.HermesBoots, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
+
+                            }
                             
                         }
                         else if (item.type == ItemID.MeteoriteBar)
@@ -1429,7 +1494,14 @@ namespace TheTerrariaSeedProject
 
                             //frameX look in text file in terrariao folder
                             if (Main.tile[chest.x, chest.y].frameX != 144)
+                            {
                                 hasOBjectOrParam["Meteorite Bar unlocked"] += 1;
+
+                                if (score.itemLocation.ContainsKey(ItemID.MeteoriteBar ))
+                                    score.itemLocation[ItemID.MeteoriteBar].Add(new Tuple<int, int>(cx, cy));
+                                else
+                                    score.itemLocation.Add(ItemID.MeteoriteBar, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
+                            }
 
 
                         }
@@ -1572,7 +1644,14 @@ namespace TheTerrariaSeedProject
                         else if ((tile.type == TileID.Books) && (tile.frameX == (short)90) && (tile.frameY == (short)0))
                         {
                             if (y <= Main.worldSurface + 2)
+                            {
                                 hasOBjectOrParam["Water Bolt before Skeletron"] += 1;
+
+                                if (score.itemLocation.ContainsKey(ItemID.WaterBolt))
+                                    score.itemLocation[ItemID.WaterBolt].Add(new Tuple<int, int>(x, y));
+                                else
+                                    score.itemLocation.Add(ItemID.WaterBolt, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
+                            }
                             
                             hasOBjectOrParam["Water Bolt"] += 1;
                         }
@@ -1808,6 +1887,12 @@ namespace TheTerrariaSeedProject
                             //ESS                    
                             if ((tile.type == (ushort)187) && (tile.frameX == (short)918) && (tile.frameY == (short)0))
                             {
+                                
+                                if (score.itemLocation.ContainsKey(ItemID.EnchantedSword))
+                                    score.itemLocation[ItemID.EnchantedSword].Add(new Tuple<int, int>(x, y));
+                                else
+                                    score.itemLocation.Add(ItemID.EnchantedSword, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
+
                                 //Enchanted sword                             
                                 if (tile.wall == 68)
                                 {
@@ -2350,6 +2435,7 @@ namespace TheTerrariaSeedProject
         private class ScoreWorld
         {
             public Dictionary<string, int> hasOBjectOrParam;
+            public Dictionary<int, List<Tuple<int,int>>> itemLocation;
             public int points;
             public int maxPyramidCountChance;
 
@@ -2402,6 +2488,7 @@ namespace TheTerrariaSeedProject
                 trees = 0;
                 scoreAsText = "";
                 hasOBjectOrParam = new Dictionary<string, int>();
+                itemLocation = new Dictionary<int, List<Tuple<int, int> >>();
                 missingCount = 0;
                 missingCountNot = 0;
             }
@@ -3681,7 +3768,7 @@ namespace TheTerrariaSeedProject
             string nextDigit = "0";
             if (hasOBjectOrParam["Pyramid Mask"] > 0 && hasOBjectOrParam["Pyramid Bottle"] > 0 && hasOBjectOrParam["Pyramid Carpet"] > 0)
             {
-                nextDigit = (hasOBjectOrParam["Pyramid Carpet"] + hasOBjectOrParam["Pyramid Bottle"] > 2) ? "O" : "o";
+                nextDigit = (hasOBjectOrParam["Pyramid Carpet"] + hasOBjectOrParam["Pyramid Bottle"] > 2) ? "O" : "o";                
             }
             else if (hasOBjectOrParam["Pyramid Carpet"] > 0 && hasOBjectOrParam["Pyramid Bottle"] > 0)
             {
@@ -4271,11 +4358,157 @@ namespace TheTerrariaSeedProject
         }
 
 
+        public void StoreMapAsPNG(bool includeInfo)  
+        {
+            
+            int dimX = Main.maxTilesX;
+            int dimY = Main.maxTilesY;
+            int scale = 1;
+            /*while (dimX > 6200)
+            {
+                dimX /= 2;
+                dimY /= 2;
+                scale *= 2;
+            }*/
+            
+            //https://msdn.microsoft.com/en-us/library/system.drawing.imaging.bitmapdata(v=vs.110).aspx
+            System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(dimX, dimY, PixelFormat.Format32bppArgb);
+                
+
+            System.Drawing.Rectangle rect = new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height);
+            System.Drawing.Imaging.BitmapData bmpData =
+                bmp.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadWrite,
+                bmp.PixelFormat);
+
+    
+            // Get the address of the first line.
+            IntPtr ptr = bmpData.Scan0;
+
+            // Declare an array to hold the bytes of the bitmap.
+            int bytes = Math.Abs(bmpData.Stride) * bmp.Height;
+            byte[] rgbValues = new byte[bytes];
+            
+            // Copy the RGB values into the array.
+            System.Runtime.InteropServices.Marshal.Copy(ptr, rgbValues, 0, bytes);
+            
+            int indx = 0;
+            for (int y = 0; y < Main.maxTilesY; y += scale)
+                for (int x = 0; x < Main.maxTilesX; x += scale)
+                {              
+                    MapTile cur = MapHelper.CreateMapTile(x, y, 255);
+                    Color cc = MapHelper.GetMapTileXnaColor(ref cur);
+                    rgbValues[indx++] = cc.B;
+                    rgbValues[indx++] = cc.G; 
+                    rgbValues[indx++] = cc.R; 
+                    rgbValues[indx++] = cc.A;
+                }
+
+            //draw Spawm
+            int aw = 0;
+
+            for (int y = Main.spawnTileY-1; y > Main.spawnTileY-36; y--)
+            {
+                int x = Main.spawnTileX;
+                int off = y * 4 * Main.maxTilesX + x * 4;
+
+                rgbValues[off + 0] = 0;
+                rgbValues[off + 1] = 80;
+                rgbValues[off + 2] = 50;
+                rgbValues[off + 3] = 255;
+
+                for (int awi = 0; awi < (aw<18?aw:4); awi++) {
+                    rgbValues[off + 0 + 4 * (awi / 3)] = 0;
+                    rgbValues[off + 1 + 4 * (awi / 3)] = 80;
+                    rgbValues[off + 2 + 4 * (awi / 3)] = 50;
+                    rgbValues[off + 3 + 4 * (awi / 3)] = 255;
+
+                    rgbValues[off + 0 - 4 * (awi / 3)] = 0;
+                    rgbValues[off + 1 - 4 * (awi / 3)] = 80;
+                    rgbValues[off + 2 - 4 * (awi / 3)] = 50;
+                    rgbValues[off + 3 - 4 * (awi / 3)] = 255;                    
+                }
+                aw++;
+            }
+
+            if(includeInfo)
+            foreach(var itemloclist in score.itemLocation)
+            {
+                foreach (var itemloc in itemloclist.Value)
+                {
+                    DrawItemImage(ref rgbValues, itemloclist.Key , itemloc , scale);
+                }
+            }
+
+            
 
 
-        //##############################
-        // legacy, need to update
-        public struct generatorInfo
+            // Copy the RGB values back to the bitmap
+            System.Runtime.InteropServices.Marshal.Copy(rgbValues, 0, ptr, bytes);
+
+            // Unlock the bits.
+            bmp.UnlockBits(bmpData);
+            bmp.Save(Main.worldPathName.Substring(0, Main.worldPathName.Length - 4) + ".png");
+            
+                        
+
+        }
+
+
+        public void DrawItemImage(ref byte[] rgbValues, int itemID, Tuple<int, int> where, int scale)
+        {
+
+
+            Microsoft.Xna.Framework.Graphics.Texture2D cit = ModLoader.GetTexture("Terraria/Item_" + itemID);
+            
+            Color[] tc = new Color[cit.Width * cit.Height];
+            cit.GetData<Color>(tc);
+
+            const int iconbgs = 48;
+            for (int h = 0; h < iconbgs; h++)
+                for (int w = 0; w < iconbgs; w++)
+                {
+                    int offt = (where.Item2 / scale + h + 4) * Main.maxTilesX * 4 / scale + where.Item1 * 4 / scale + w * 4 - iconbgs / 2 * 4;
+                    int imgof = h * iconbgs + w;
+
+                    bool isWhite = ( (h- iconbgs / 2)* (h - iconbgs / 2) + (w- iconbgs / 2)* (w - iconbgs / 2) ) > (iconbgs * iconbgs / 4 );
+
+                    rgbValues[offt + 0] = isWhite ? rgbValues[offt + 0] : (byte)255;
+                    rgbValues[offt + 1] = isWhite ? rgbValues[offt + 1] : (byte)255;
+                    rgbValues[offt + 2] = isWhite ? rgbValues[offt + 2] : (byte)255;
+                    rgbValues[offt + 3] = isWhite ? rgbValues[offt + 3] : (byte)255;
+                }
+
+            int yoff = iconbgs/2 - cit.Height / 2;
+            for (int h = 0; h < cit.Height; h++)
+                for (int w = 0; w < cit.Width; w++)
+                {
+                    int offt = (where.Item2 / scale + yoff+ h + 4) * Main.maxTilesX * 4 / scale + where.Item1 * 4 / scale + w * 4 - cit.Width / 2 * 4;
+                    int imgof = h * cit.Width + w;
+
+                    bool isWhite = (tc[imgof].B == 0); //;&& ( (h- cit.Height/2)* (h - cit.Height / 2) + (w-cit.Width/2)* (w - cit.Width / 2) ) > (cit.Width* cit.Height / 4 );
+
+                    rgbValues[offt + 0] = isWhite ? rgbValues[offt + 0] : tc[imgof].B;
+                    rgbValues[offt + 1] = isWhite ? rgbValues[offt + 1] : tc[imgof].G;
+                    rgbValues[offt + 2] = isWhite ? rgbValues[offt + 2] : tc[imgof].R;
+                    rgbValues[offt + 3] = isWhite ? rgbValues[offt + 3] : tc[imgof].A;
+                }
+
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+    //##############################
+    // legacy, need to update
+    public struct generatorInfo
         {
             public int numPyrChance;
             public int numIsland;
