@@ -1321,6 +1321,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Dungeon has good Pos", 0);
             hasOBjectOrParam.Add("Dungeon in Snow Biome", 0);
             hasOBjectOrParam.Add("Dungeon has strange Pos", 0);
+            hasOBjectOrParam.Add("Floating island cabin in Dungeon", 0);
             hasOBjectOrParam.Add("Pre Skeletron Dungeon Chest Risky", 0);
             hasOBjectOrParam.Add("Pre Skeletron Dungeon Chest Grab", 0);
             hasOBjectOrParam.Add("Pre Skeletron Golden Key Risky", 0);
@@ -1989,7 +1990,6 @@ namespace TheTerrariaSeedProject
                                     else
                                     {
                                         statuesFunctionalCount.Add(statIdent, 1);
-
                                     }
                                 }
 
@@ -2078,6 +2078,16 @@ namespace TheTerrariaSeedProject
                                 }*/
 
                             }
+                            //floating island dungeon
+                            else if(tile.type == TileID.Sunplate)
+                            {
+                                if (IsDungeonBrick(x + 1, y) || IsDungeonBrick(x - 1, y) || IsDungeonBrick(x, y + 1) || IsDungeonBrick(x, y - 1))                                    
+                                    hasOBjectOrParam["Floating island cabin in Dungeon"] = 1;
+                            }
+
+
+
+
 
                             //Web
                             if (tile.wall == 62)
@@ -2626,9 +2636,8 @@ namespace TheTerrariaSeedProject
                 for (int y = yheadLeft; y < yheadLeft + ysize; y++)
                 {
                     if (Main.tile[x, y].active())
-                    {
-                        ushort type = Main.tile[x, y].type;
-                        if (type == 41 || type == 43 || type == 44)
+                    {                        
+                        if (IsDungeonBrick(x, y))
                             return false;
                     }
                     if (checkWallAsWell)
@@ -2642,6 +2651,16 @@ namespace TheTerrariaSeedProject
 
             return true;
         }
+
+        private static bool IsDungeonBrick(int x, int y)
+        {
+            ushort type = Main.tile[x, y].type;
+            if (type == 41 || type == 43 || type == 44)
+                return true;
+            else
+                return false;
+        }
+
 
         private static bool isInDungeon(int x, int y)
         {
@@ -3554,9 +3573,13 @@ namespace TheTerrariaSeedProject
 
             score += hasOBjectOrParam["Dungeon in Snow Biome"] > 0 ? 420 : 0;            
             score += hasOBjectOrParam["Dungeon far above surface"] > 0 ? 42 : 0;            
-            score += hasOBjectOrParam["Dungeon below ground"] > 0 ? 420 : 0;
+            score += hasOBjectOrParam["Dungeon below ground"] > 0 ? 420 : 0;            
             if(hasOBjectOrParam["Dungeon has strange Pos"] > 0)allScoreText += System.Environment.NewLine + "Score Dungeon has strange Pos " + (int)score;
-            
+
+            score += hasOBjectOrParam["Floating island cabin in Dungeon"] > 0 ? 420 : 0;
+            if (hasOBjectOrParam["Floating island cabin in Dungeon"] > 0) allScoreText += System.Environment.NewLine + "Score Floating cabin in Dungeon " + (int)score;
+
+
             score += hasOBjectOrParam["Pre Skeletron Dungeon Chest Risky"] > 0 ? 100 * hasOBjectOrParam["Pre Skeletron Dungeon Chest Risky"] : 0;
             score += hasOBjectOrParam["Pre Skeletron Dungeon Chest Grab"] > 0 ? 200 * hasOBjectOrParam["Pre Skeletron Dungeon Chest Grab"] : 0;
             if (hasOBjectOrParam["Pre Skeletron Dungeon Chest Grab"] > 0 || hasOBjectOrParam["Pre Skeletron Dungeon Chest Risky"] > 0)
@@ -3939,6 +3962,7 @@ namespace TheTerrariaSeedProject
 
             if (hasOBjectOrParam["Biome Item in normal Chest"] > 0) strares += "_" + "BiomeChestNormal";
             if (hasOBjectOrParam["Dungeon has strange Pos"] > 0) strares += "_" + "DungeonStrange";
+            if (hasOBjectOrParam["Floating island cabin in Dungeon"] > 0) strares += "_" + "FloatingCabinDungeon";
             if (hasOBjectOrParam["Pre Skeletron Dungeon Chest Risky"] > 0) strares += "_" + "DungeonPreSkelChestRisky";
             if (hasOBjectOrParam["Pre Skeletron Dungeon Chest Grab"] > 0) strares += "_" + "DungeonPreSkelChestGrab";
 
@@ -4074,6 +4098,7 @@ namespace TheTerrariaSeedProject
                     rares += checkAdd("All chest items you can't craft or fish");
 
                     rares += checkAdd("Floating Island without chest"); //bugged if you do large map first and small after they are forced to create
+                    rares += checkAdd("Floating island cabin in Dungeon");
                 }
 
 
