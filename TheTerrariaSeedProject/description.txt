@@ -38,4 +38,5 @@ If you found some bugs, have some ideas for more features, want to help coding o
 
 Good luck!
 
-Update: you can store world as minimap picture
+Update: bug fix
+you can store world as minimap picture
