@@ -712,6 +712,7 @@ namespace TheTerrariaSeedProject
                 gotoCreation = true;
                 searchForSeed = false;
                 uiss.writeText = true;
+                inSearch = false; //added 
 
 
             }
@@ -1264,18 +1265,25 @@ namespace TheTerrariaSeedProject
 
             hasOBjectOrParam.Add("Temple Distance", 0);
 
+            hasOBjectOrParam.Add("Near Sunflower", 0);
             hasOBjectOrParam.Add("Near Altar", 0);
             hasOBjectOrParam.Add("Near Spider Web count", 0);
             hasOBjectOrParam.Add("Near Mushroom Biome count", 0);
-            hasOBjectOrParam.Add("Near Chest", 0);
-
-
-
-
+            hasOBjectOrParam.Add("Near Chest", 0);                       
 
             hasOBjectOrParam.Add("Near Cloud", 0);
 
+            hasOBjectOrParam.Add("Nearest Teleportation Potion count", 0);
+            hasOBjectOrParam.Add("Pathlength to Teleport Potion", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Iron/Lead Bar", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Boots", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Enchanted Sword", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Bee Hive", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Temple Door", 1000000);
+            hasOBjectOrParam.Add("Pathlength to free ShadowOrb/Heart", 1000000);
+            hasOBjectOrParam.Add("Free ShadowOrb/Heart", 0);
 
+            
             hasOBjectOrParam.Add("High Hive", 0);
 
 
@@ -1301,7 +1309,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Hermes Flurry Boots Distance", 100000);
 
 
-
+            
 
             hasOBjectOrParam.Add("Beach penalty left", 0);
             hasOBjectOrParam.Add("Beach penalty right", 0);
@@ -1351,10 +1359,150 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Spear Trap", 0);
             hasOBjectOrParam.Add("Geyser", 0);
             hasOBjectOrParam.Add("Detonator", 0);
+                        
             
+           
 
             hasOBjectOrParam.Add("Score", 0);
 
+            //pathfinding
+            TimeSpan ts = stopWatch.Elapsed;
+            string elapsedTime;
+            ts = stopWatch.Elapsed;
+            elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+            ts.Hours, ts.Minutes, ts.Seconds,
+            ts.Milliseconds / 10);
+            //writeDebugFile(" analyze time before pathfinding " + elapsedTime);
+
+            int maxsize = (Main.maxTilesX * 5 + Main.maxTilesY * 3); // values can be creater!
+            List<Tuple<int, int>>[] waypoints = new List<Tuple<int, int>>[maxsize];
+            int[,] pathLength = new int[Main.maxTilesX, Main.maxTilesY];
+            int[,] travelCost = new int[Main.maxTilesX, Main.maxTilesY];
+
+            for (int x = 0; x < Main.maxTilesX; x++)
+                for (int y = 0; y < Main.maxTilesY; y++)
+                    pathLength[x, y] = Int32.MaxValue;
+            for (int x = 0; x < Main.maxTilesX; x++)
+                for (int y = 0; y < Main.maxTilesY; y++)
+                    travelCost[x, y] = TravelCost(x, y);
+
+
+            pathLength[Main.spawnTileX, Main.spawnTileY - 1] = 0;
+            waypoints[0] = new List<Tuple<int, int>> { new Tuple<int, int>(Main.spawnTileX, Main.spawnTileY - 1) };
+
+            for (int l = 0; l < maxsize; l++)
+            {
+                if (waypoints[l] != null)
+                    foreach (Tuple<int, int> p in waypoints[l])
+                        AddWayPoints(ref pathLength, ref waypoints, ref travelCost, p.Item1, p.Item2, l);
+            }
+
+            //norm to ~tiles num
+            for (int x = 0; x < Main.maxTilesX; x++)
+                for (int y = 0; y < Main.maxTilesY; y++)
+                    if (pathLength[x, y] != Int32.MaxValue)
+                        pathLength[x, y] = (int)(0.2 * pathLength[x, y]);
+
+            travelCost = null;
+            waypoints = null;
+
+            ts = stopWatch.Elapsed;
+            elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+            ts.Hours, ts.Minutes, ts.Seconds,
+            ts.Milliseconds / 10);
+            //writeDebugFile(" analyze time after pathfinding " + elapsedTime);
+
+            //only for debug
+            if (1==42)
+            {
+                int dimX = Main.maxTilesX;
+                int dimY = Main.maxTilesY;
+                int scale = 1;
+                /*while (dimX > 6200)
+                {
+                    dimX /= 2;
+                    dimY /= 2;
+                    scale *= 2;
+                }*/
+
+                //https://msdn.microsoft.com/en-us/library/system.drawing.imaging.bitmapdata(v=vs.110).aspx
+                System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(dimX, dimY, PixelFormat.Format32bppArgb);
+
+
+                System.Drawing.Rectangle rect = new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height);
+                System.Drawing.Imaging.BitmapData bmpData =
+                    bmp.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadWrite,
+                    bmp.PixelFormat);
+
+
+                // Get the address of the first line.
+                IntPtr ptr = bmpData.Scan0;
+
+                // Declare an array to hold the bytes of the bitmap.
+                int bytes = Math.Abs(bmpData.Stride) * bmp.Height;
+                byte[] rgbValues = new byte[bytes];
+
+                // Copy the RGB values into the array.
+                System.Runtime.InteropServices.Marshal.Copy(ptr, rgbValues, 0, bytes);
+
+                int indx = 0;
+                for (int y = 0; y < Main.maxTilesY; y += scale)
+                    for (int x = 0; x < Main.maxTilesX; x += scale)
+                    {
+                        //MapTile cur = MapHelper.CreateMapTile(x, y, 255);
+                        //Color cc = MapHelper.GetMapTileXnaColor(ref cur);
+                        //int cv = (int)(((float)pathLength[x, y]) / Main.maxTilesX/7 * 255.0);                            
+                        int cv = (int)(((float)pathLength[x, y]) / (0.2*maxsize) * 255.0);
+                        cv = cv > 255 ? 255 : cv;
+                        rgbValues[indx++] = (byte)(255 - cv);
+                        rgbValues[indx++] = (byte)(255 - cv);
+                        rgbValues[indx++] = (byte)(255 - cv);
+                        rgbValues[indx++] = 255;
+
+                    }
+
+                //draw Spawm
+                int aw = 0;
+
+                for (int y = Main.spawnTileY - 1; y > Main.spawnTileY - 36; y--)
+                {
+                    int x = Main.spawnTileX;
+                    int off = y * 4 * Main.maxTilesX + x * 4;
+
+                    rgbValues[off + 0] = 0;
+                    rgbValues[off + 1] = 80;
+                    rgbValues[off + 2] = 50;
+                    rgbValues[off + 3] = 255;
+
+                    for (int awi = 0; awi < (aw < 18 ? aw : 4); awi++)
+                    {
+                        rgbValues[off + 0 + 4 * (awi / 3)] = 0;
+                        rgbValues[off + 1 + 4 * (awi / 3)] = 80;
+                        rgbValues[off + 2 + 4 * (awi / 3)] = 50;
+                        rgbValues[off + 3 + 4 * (awi / 3)] = 255;
+
+                        rgbValues[off + 0 - 4 * (awi / 3)] = 0;
+                        rgbValues[off + 1 - 4 * (awi / 3)] = 80;
+                        rgbValues[off + 2 - 4 * (awi / 3)] = 50;
+                        rgbValues[off + 3 - 4 * (awi / 3)] = 255;
+                    }
+                    aw++;
+                }
+
+
+                // Copy the RGB values back to the bitmap
+                System.Runtime.InteropServices.Marshal.Copy(rgbValues, 0, ptr, bytes);
+
+                // Unlock the bits.
+                bmp.UnlockBits(bmpData);
+                bmp.Save(Main.WorldPath + @"\" + seed + "_paths.png");
+
+
+            }
+
+            
+
+            
 
             //check chests
             for (int i = 0; i < 1000; i++)
@@ -1397,7 +1545,7 @@ namespace TheTerrariaSeedProject
                     }
                     
 
-                    //TODO Grab distance trough walls not included yet
+                    //TODO Grab distance trough walls not included yet,, edit: still not?
                     ushort chestWall = Main.tile[cx, cy].wall;
                     if (chest.y > Main.worldSurface + 2 && (Main.tile[cx, cy].frameX==72 || (chest.item[0].type == ItemID.GoldenKey && Main.tile[cx, cy].frameX == 0) ) && Main.tile[cx, cy].frameY == 0 && Main.tile[cx, cy].type == 21)
                     {
@@ -1458,6 +1606,7 @@ namespace TheTerrariaSeedProject
 
                     }
 
+                    int pathl = FindShortestPathInRange(ref pathLength, cx, cy);
 
 
                     for (int l = 0; l < 40; l++)
@@ -1475,20 +1624,32 @@ namespace TheTerrariaSeedProject
                         hasOBjectOrParam[item.type.ToString()] += 1;
 
 
-                        if (item.type == ItemID.HermesBoots || item.type == ItemID.FlurryBoots)
+                        if (doFull && (item.type == ItemID.HermesBoots || item.type == ItemID.FlurryBoots))
                         {
+                            if (pathl < hasOBjectOrParam["Pathlength to Boots"])
+                            {
+                                hasOBjectOrParam["Pathlength to Boots"] = pathl;
+
+                                if (score.itemLocation.ContainsKey(ItemID.HermesBoots))
+                                    score.itemLocation[ItemID.HermesBoots] = new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) };//flurry shortest path
+                                else
+                                    score.itemLocation.Add(ItemID.HermesBoots, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });                                
+                            }
+
+
                             int bootsDist = getDistanceToSpawn(chest.x, chest.y);
                             if (bootsDist < hasOBjectOrParam["Hermes Flurry Boots Distance"])
                             {
                                 hasOBjectOrParam["Hermes Flurry Boots Distance"] = bootsDist;
 
-                                if (score.itemLocation.ContainsKey(ItemID.HermesBoots))
-                                    score.itemLocation[ItemID.HermesBoots] = new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) };//only one elemenet
+                                if (score.itemLocation.ContainsKey(ItemID.FlurryBoots))
+                                    score.itemLocation[ItemID.FlurryBoots] = new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) };//only one elemenet, hermes shortes distance
                                 else
-                                    score.itemLocation.Add(ItemID.HermesBoots, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
-
+                                    score.itemLocation.Add(ItemID.FlurryBoots, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
                             }
+                                                        
                             
+
                         }
                         else if (item.type == ItemID.MeteoriteBar)
                         {
@@ -1513,17 +1674,46 @@ namespace TheTerrariaSeedProject
                                 hasOBjectOrParam["Biome Item in normal Chest"] += 1;
                                 //without tileid == 21(chest), 798807821 small expert random 1353 gets true here but has no chest there, destroyed by evil biome
                             }
-                        }                        
+                        }
+                        else if (item.type == ItemID.AngelStatue)
+                        {
+                            hasOBjectOrParam["Angel Statue chest"] += 1;
+
+                        }
+                        else if (doFull && item.type == ItemID.TeleportationPotion)
+                        {
+                            if (pathl < hasOBjectOrParam["Pathlength to Teleport Potion"]) {
+
+                                hasOBjectOrParam["Pathlength to Teleport Potion"] = pathl;
+                                hasOBjectOrParam["Nearest Teleportation Potion count"] = item.stack;
+                                
+                                if (score.itemLocation.ContainsKey(ItemID.TeleportationPotion))
+                                    score.itemLocation[ItemID.TeleportationPotion] = new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) };
+                                else
+                                    score.itemLocation.Add(ItemID.TeleportationPotion, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
+                            }
+
+                        }
+                        else if (doFull && (item.type == ItemID.IronBar || item.type == ItemID.LeadBar))
+                        {
+                            if (pathl < hasOBjectOrParam["Pathlength to Iron/Lead Bar"]) {
+
+                                hasOBjectOrParam["Pathlength to Iron/Lead Bar"] =  pathl;
+                                if (score.itemLocation.ContainsKey(item.type))
+                                    score.itemLocation[item.type] = new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) };
+                                else
+                                    score.itemLocation.Add(item.type, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
+                            }
+
+                        }
                         else if(cy <= Main.worldSurface +2 && item.type == ItemID.GoldenKey)
                         {
                             hasOBjectOrParam["Pre Skeletron Golden Key Grab"] += 1;
                         }
 
-                        if( item.Name.Equals("Angel Statue"))
-                        {                            
-                            hasOBjectOrParam["Angel Statue chest"] += 1;
-                            
-                        }
+
+
+
 
 
 
@@ -1552,8 +1742,8 @@ namespace TheTerrariaSeedProject
             
            
 
-            TimeSpan ts = stopWatch.Elapsed;
-            string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+            ts = stopWatch.Elapsed;
+            elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
             ts.Hours, ts.Minutes, ts.Seconds,
             ts.Milliseconds / 10);
             //writeDebugFile(" analyze basice took " + elapsedTime);
@@ -1839,46 +2029,55 @@ namespace TheTerrariaSeedProject
 
 
                         //high hives
-                        else if (tile.type == TileID.Larva && tile.frameX == 18 && tile.frameY == 18 && (y - Main.worldSurface) < 200)
+                        else if (tile.type == TileID.Larva && tile.frameX == 18 && tile.frameY == 18 )
                         {
-                            int yoff = 0;
-                            for (yoff = 0; yoff < 200; yoff++)
-                            {
-                                if (Main.tile[x, y - yoff].wall != 86 && ((Main.tile[x, y - yoff].active() && Main.tile[x, y - yoff].type != TileID.Hive) || !Main.tile[x, y - yoff].active()))
-                                    break;
+                            
 
-                            }
-
-                            int yi = y - yoff;
-                            for (; y - yi < 200; yi--)
+                            int pathl = FindShortestPathInRange(ref pathLength, x, y, 2, 2, 2, 2);
+                            if (pathl < hasOBjectOrParam["Pathlength to Bee Hive"])
+                                hasOBjectOrParam["Pathlength to Bee Hive"] = pathl;
+                            
+                            
+                            if ((y - Main.worldSurface) < 200)
                             {
-                                int countTiles = 0;
-                                int i = 0;
-                                for (; i < 100; i++)
+                                int yoff = 0;
+                                for (yoff = 0; yoff < 200; yoff++)
                                 {
-                                    if (x - i < 0 || x + i >= Main.maxTilesX)
-                                        continue;
-                                    //191 && 192 exclude living tree
-                                    if ((Main.tile[x + i, yi].active() || Main.tile[x + i, yi].wall > 0) && Main.tile[x + i, yi].type != TileID.LivingWood && Main.tile[x + i, yi].type != TileID.LeafBlock)
-                                        countTiles++;
-                                    if ((Main.tile[x - i, yi].active() || Main.tile[x - i, yi].wall > 0) && Main.tile[x + i, yi].type != TileID.LivingWood && Main.tile[x + i, yi].type != TileID.LeafBlock)
-                                        countTiles++;
-                                    if (countTiles > 20)
+                                    if (Main.tile[x, y - yoff].wall != 86 && ((Main.tile[x, y - yoff].active() && Main.tile[x, y - yoff].type != TileID.Hive) || !Main.tile[x, y - yoff].active()))
                                         break;
-                                    //check if tiles above
+
                                 }
-                                if (countTiles <= 20)
-                                    break;
+
+                                int yi = y - yoff;
+                                for (; y - yi < 200; yi--)
+                                {
+                                    int countTiles = 0;
+                                    int i = 0;
+                                    for (; i < 100; i++)
+                                    {
+                                        if (x - i < 0 || x + i >= Main.maxTilesX)
+                                            continue;
+                                        //191 && 192 exclude living tree
+                                        if ((Main.tile[x + i, yi].active() || Main.tile[x + i, yi].wall > 0) && Main.tile[x + i, yi].type != TileID.LivingWood && Main.tile[x + i, yi].type != TileID.LeafBlock)
+                                            countTiles++;
+                                        if ((Main.tile[x - i, yi].active() || Main.tile[x - i, yi].wall > 0) && Main.tile[x + i, yi].type != TileID.LivingWood && Main.tile[x + i, yi].type != TileID.LeafBlock)
+                                            countTiles++;
+                                        if (countTiles > 20)
+                                            break;
+                                        //check if tiles above
+                                    }
+                                    if (countTiles <= 20)
+                                        break;
+                                }
+
+
+                                var digDist = y - yi;
+                                if (digDist < 200)
+                                {
+                                    hasOBjectOrParam["High Hive"] += 1;
+                                }
+
                             }
-
-
-                            var digDist = y - yi;
-                            if (digDist < 200)
-                            {
-                                hasOBjectOrParam["High Hive"] += 1;
-                            }
-
-
 
                         }
 
@@ -1936,12 +2135,32 @@ namespace TheTerrariaSeedProject
                                 }
 
 
+                                int pathl = FindShortestPathInRange(ref pathLength, x, y, 2, 4, 1, 3);
+                                if (pathl < hasOBjectOrParam["Pathlength to Enchanted Sword"])
+                                {
+                                    hasOBjectOrParam["Pathlength to Enchanted Sword"] = pathl;
+                                }
+
+
+
+
                             }
 
                             //Temple Door
-                            if (tile.type == TileID.ClosedDoor && tile.frameY == 594)
+                            if (tile.type == TileID.ClosedDoor && tile.frameY == 612)
                             {
                                 hasOBjectOrParam["Temple Distance"] = getDistanceToSpawn(x, y);
+
+                                int pathl = FindShortestPathInRange(ref pathLength, x, y, 1, 1, 1, 1);
+                                if (pathl < hasOBjectOrParam["Pathlength to Temple Door"])
+                                {
+                                    hasOBjectOrParam["Pathlength to Temple Door"] = pathl;
+                                    //writeDebugFile(" temple door at " + x + " " + y + " " + pathl);
+
+                                }
+                                                                
+                                
+
                             }
 
                             //Altar
@@ -1952,7 +2171,14 @@ namespace TheTerrariaSeedProject
                                     hasOBjectOrParam["Near Altar"] += 1;
                                 }
                             }
-
+                            //Sunflower
+                            else if (tile.type == TileID.Sunflower && tile.frameX == (short)0 && tile.frameY == (short)0)
+                            {
+                                if (checkIfNearSpawn(x, y, 200, 100))
+                                {
+                                    hasOBjectOrParam["Near Sunflower"] += 1;
+                                }
+                            }
                             //Statues
                             else if (tile.type == TileID.Statues || tile.type == TileID.MushroomStatue)
                             {
@@ -2022,7 +2248,7 @@ namespace TheTerrariaSeedProject
 
 
                             }
-
+                            
                             //Traps
                             else if (tile.type == TileID.Traps)
                             {
@@ -2078,6 +2304,27 @@ namespace TheTerrariaSeedProject
                                 }*/
 
                             }
+                            else if (tile.type == TileID.ShadowOrbs && (tile.frameX == 0 || tile.frameX == 36) && tile.frameY == 0)
+                            {
+                                int pathL = FindShortestPathInRange(ref pathLength, x, y);
+
+                                if( pathL < Main.maxTilesX)
+                                {
+                                    hasOBjectOrParam["Free ShadowOrb/Heart"] += 1;
+
+                                    if (pathL < hasOBjectOrParam["Pathlength to free ShadowOrb/Heart"])
+                                        hasOBjectOrParam["Pathlength to free ShadowOrb/Heart"] = pathL;
+
+                                    int itemid = WorldGen.crimson ? ItemID.TheUndertaker : ItemID.Musket;
+
+                                    if (score.itemLocation.ContainsKey(itemid))
+                                        score.itemLocation[itemid].Add(new Tuple<int, int>(x, y));
+                                    else
+                                        score.itemLocation.Add(itemid, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
+
+                                }                                                                                               
+                            }
+
                             //floating island dungeon
                             else if(tile.type == TileID.Sunplate)
                             {
@@ -2419,9 +2666,10 @@ namespace TheTerrariaSeedProject
                                                                                 hasOBjectOrParam["Flurry Boots"] > 0 &&
                                                                                 hasOBjectOrParam["Hermes Boots"] > 0 &&
                                                                                 hasOBjectOrParam["Angel Statue placed"] + hasOBjectOrParam["Angel Statue chest"]  > 0                                                                                
-                                                                                ? 1 : 0); // it misses angle statue
+                                                                                ? 1 : 0);
                 //hasOBjectOrParam.Add("Has Alchemy, Sharpening, Enchanted",  );
                 
+
 
             }
 
@@ -2438,8 +2686,205 @@ namespace TheTerrariaSeedProject
             
         }
 
+        private void AddWayPoints(ref int[,] pathLength, ref List<Tuple<int, int>>[] waypoints, ref int[,] travelCost, int x, int y, int l)
+        {
+            if (pathLength[x, y] < l || x< 42 || y<10 || x>Main.maxTilesX-43 || y>Main.maxTilesY-11) return;
+            
+
+            const int costLR = 5;
+            const int costU = 5;
+            const int costD = 3;
+            const int costDLR = 6;
+            const int costULR = 7;
+                        
+            int tcl = travelCost[x - 1, y] + travelCost[x - 1, y + 1] + travelCost[x - 1, y - 1];
+            int tcr = travelCost[x + 1, y] + travelCost[x + 1, y + 1] + travelCost[x + 1, y - 1];
+            int tcu = travelCost[x , y - 1] + travelCost[x + 1, y - 1];
+            int tcd = travelCost[x, y + 1] + travelCost[x + 1, y + 1];
+            
+
+            if (pathLength[x - 1,y] > l )
+                AddPoint(ref pathLength, ref waypoints, ref travelCost, x-1, y, l, costLR , tcl);
+            if (pathLength[x + 1, y] > l)
+                AddPoint(ref pathLength, ref waypoints, ref travelCost, x + 1, y, l, costLR , tcr);
+            if (pathLength[x, y + 1] > l)
+                AddPoint(ref pathLength, ref waypoints, ref travelCost, x , y+1 , l, costD , tcd);
+            if (pathLength[x, y -1] > l)
+                AddPoint(ref pathLength, ref waypoints, ref travelCost, x, y - 1, l, costU , tcu, true);
+            if (pathLength[x - 1, y - 1] > l)
+                AddPoint(ref pathLength, ref waypoints, ref travelCost, x - 1, y - 1, l, costULR , tcu + tcl, true);
+            if (pathLength[x + 1, y - 1] > l)
+                AddPoint(ref pathLength, ref waypoints, ref travelCost, x +1 , y - 1, l, costULR , tcu + tcr, true);
+            if (pathLength[x - 1, y + 1] > l)
+                AddPoint(ref pathLength, ref waypoints, ref travelCost, x - 1, y + 1, l, costDLR , tcd + tcl);
+            if (pathLength[x + 1, y + 1] > l)
+                AddPoint(ref pathLength, ref waypoints, ref travelCost, x + 1, y + 1, l, costDLR , tcd + tcr);
+
+        }
 
 
+        
+        private int TravelCost(int x, int y)
+        {
+            //ignores stuff not generated in vanilla world gen
+            
+            ushort type = Main.tile[x, y].type;
+
+            if (Main.tile[x, y].liquid > 0)
+                return 40 + (Main.tile[x, y].honey() ? 90 : 0) + (Main.tile[x, y].lava() ? 800 : 0);
+
+
+
+            bool val=  ( (!Main.tile[x, y].active()                               
+                || type == TileID.Plants
+                || type == TileID.Plants2
+                || type == TileID.Trees
+                || type == TileID.PalmTree                               
+                || type == TileID.CorruptPlants
+                || type == TileID.WaterCandle
+                || type == TileID.Bottles
+                || type == TileID.Books
+                || type == TileID.Books
+                || type == TileID.JunglePlants
+                || type == TileID.JunglePlants2
+                || type == TileID.JungleVines
+                || type == TileID.MushroomPlants
+                || type == TileID.MushroomTrees
+                || type == TileID.SmallPiles
+                || type == TileID.LargePiles
+                || type == TileID.LargePiles2
+                || type == TileID.Coral
+                || type == TileID.BloomingHerbs
+                || type == TileID.ImmatureHerbs
+                || type == TileID.MatureHerbs
+                || type == TileID.Vines
+                || type == TileID.VineFlowers
+                || type == TileID.Cactus
+                || type == TileID.Banners
+                || type == TileID.Lamps
+                || type == TileID.PressurePlates
+                || type == TileID.Stalactite
+                || type == TileID.Explosives
+                || type == TileID.FleshWeeds
+                || type == TileID.CrimsonVines
+                || type == TileID.DyePlants
+                || type == TileID.DyePlants
+                || type == TileID.LongMoss
+                || type == TileID.Pots
+                || type == TileID.WorkBenches
+                || type == TileID.Tables
+                || type == TileID.Tables2
+                || type == TileID.Bookcases
+                || type == TileID.Anvils
+                || type == TileID.Statues
+                || type == TileID.Chairs
+                || type == TileID.Containers
+                || type == TileID.Containers2
+                || type == TileID.Sunflower
+                || type == TileID.ShadowOrbs
+                || type == TileID.DemonAltar
+                || type == TileID.LihzahrdAltar
+                || type == TileID.SharpeningStation
+                || type == TileID.AlchemyTable
+                || type == TileID.Larva
+                || (type == TileID.ClosedDoor && Main.tile[x, y].frameY != 594 && Main.tile[x, y].frameY != 612 && Main.tile[x, y].frameY != 620)  //temple door not allowed
+                ));
+            if (val)
+                return 0;
+
+            if (type == TileID.Cobweb || type == TileID.CorruptThorns || type == TileID.CrimtaneThorns || type == TileID.JungleThorns || type == TileID.Hive)
+                return 70;
+
+            if (type == TileID.Platforms)
+                return 1;
+
+            if (type == TileID.MinecartTrack)
+                return -17;
+
+            if (type == TileID.Dirt || type == TileID.Grass || type == TileID.FleshGrass || type == TileID.CorruptGrass || type == TileID.JungleGrass || type == TileID.MushroomGrass || type == TileID.Sand || type == TileID.ClayBlock || type == TileID.Mud || type == TileID.Silt || type == TileID.Ash || type == TileID.SnowBlock || type == TileID.Slush || type == TileID.HardenedSand || type == TileID.CrimsonHardenedSand || type == TileID.CorruptHardenedSand)
+                return 150;
+
+            if (type == TileID.BlueDungeonBrick || type == TileID.GreenDungeonBrick || type == TileID.PinkDungeonBrick || type == TileID.Obsidian || type == TileID.Ebonstone || type == TileID.Crimstone || type == TileID.Hellstone || type == TileID.LihzahrdBrick || type == TileID.Demonite || type == TileID.Crimtane || (type == TileID.ClosedDoor && (Main.tile[x, y].frameY == 594 || Main.tile[x, y].frameY == 612 || Main.tile[x, y].frameY == 620)) )
+                return 100000;
+
+
+            //stone, ores, mossstone, gemstone
+            return 300;
+        }
+
+        private int checkInAir(ref int[,] travelCost, int x, int y)
+        {
+            int air = 0;
+            const int inAirCost = 25;
+            const int noWallCost = 30;
+
+            air = (travelCost[x, y + 2] > 100 && Main.tile[x, y].liquid == 0) || (travelCost[x + 1, y + 2] > 100 && Main.tile[x, y].liquid == 0) ? 0 : inAirCost;
+            air = Main.tile[x, y + 2].type == TileID.Platforms || Main.tile[x + 1, y + 2].type == TileID.Platforms ? 0 : air;
+
+            if (air > 0 && Main.tile[x, y + 2].wall == 0 && Main.tile[x + 1, y + 2].wall == 0)
+                air += noWallCost;
+
+            return air;
+        }
+
+        private void AddPoint(ref int[,] pathLength, ref List<Tuple<int, int>>[] waypoints, ref int[,] travelCost, int x, int y, int l, int newLengthAdd, int tileCost, bool countInAir = false)
+        {
+            int air = 0;
+            if (countInAir)
+            {
+                air = checkInAir(ref travelCost, x, y);
+                /*int val = checkInAir(ref travelCost, x, y);
+                if (val > 0)
+                {
+                    bool inAir = true;
+                    //sloooooow
+                    int xi = 0;
+                    for (xi = -6; xi <= 6 && inAir; xi+=2)
+                        for (int yi = -6; yi <= 6 && inAir; yi++)
+                            inAir &= (checkInAir(ref travelCost, x + xi, y + yi) > 0);
+
+                    if (inAir)
+                        air = val;
+
+                }*/
+
+                
+            }
+
+
+
+            int add = Math.Max(2, newLengthAdd + tileCost + air);
+
+
+            if (add > 1000)
+                return;
+
+            int npl = l + add;
+
+            if(pathLength[x,y] > npl)
+            {
+                pathLength[x, y] = npl;
+                if (npl < waypoints.Length)
+                {
+                    if (waypoints[npl] == null)
+                        waypoints[npl] = new List<Tuple<int, int>>();
+                    waypoints[npl].Add(new Tuple<int, int>(x, y)); //can be in more than on list, remove from old?
+                }
+            }
+
+        }
+
+        //e.g. you can also access stuff through walls
+        private int FindShortestPathInRange(ref int[,] pathLength, int x, int y, int mx=2, int px=3, int my=2, int py=3)
+        {
+            int minVal = Int32.MaxValue;
+
+            for (int xi = x - mx; xi <= x + px; xi++)
+                for (int yi = y - my; yi <= y + py; yi++)
+                    minVal = pathLength[xi, yi] < minVal ? pathLength[xi, yi] : minVal;
+            
+            return minVal;
+        }
 
 
         private class ScoreWorld
@@ -2853,10 +3298,10 @@ namespace TheTerrariaSeedProject
             return (int)Math.Sqrt((Main.spawnTileX - curX) * (Main.spawnTileX - curX) + (Main.spawnTileY - curY) * (Main.spawnTileY - curY));
         }
 
-        public static void writeDebugFile(string content)
+        public static void writeDebugFile(string content, bool newFile=false)
         {
             using (System.IO.StreamWriter file =
-             new System.IO.StreamWriter(Main.SavePath + OptionsDict.Paths.debugPath+@".\debug.txt", true))
+             new System.IO.StreamWriter(Main.SavePath + OptionsDict.Paths.debugPath+@".\debug.txt", !newFile))
             {
                 file.WriteLine(content);
             }
@@ -2957,7 +3402,7 @@ namespace TheTerrariaSeedProject
             //191 == living wood, 78 wall, 192 leaf
             //32 = corruption thorns
             //352 = crimtane thorns
-            //fffffffffff   in Terrarai schienen die nicht olid zu sein, in Tedit jedoch wohl
+            //fffffffffff   in Terrarai schienen die nicht solid zu sein, in Tedit jedoch wohl
 
 
             //hier vines sind nicht solid aber schlimm wenn man nach oben geht?
@@ -3761,8 +4206,8 @@ namespace TheTerrariaSeedProject
         {
             bool allTrue = true;
 
-            writeDebugFile(genInfo.moonType + " " + genInfo.copperOrTin + " " + genInfo.ironOrLead + " " + genInfo.silverOrTung + " " + genInfo.goldOrPlat + " ");
-            writeDebugFile("lookfor: " + looking4moonType + " " + looking4copperTin + " " + looking4ironLead + " " + looking4silverTung + " " + looking4goldPlation + " ");
+            //writeDebugFile(genInfo.moonType + " " + genInfo.copperOrTin + " " + genInfo.ironOrLead + " " + genInfo.silverOrTung + " " + genInfo.goldOrPlat + " ");
+            //writeDebugFile("lookfor: " + looking4moonType + " " + looking4copperTin + " " + looking4ironLead + " " + looking4silverTung + " " + looking4goldPlation + " ");
 
             allTrue = (looking4moonType.Equals("Random") || genInfo.moonType.Equals(looking4moonType)) &&
                       (looking4copperTin.Equals("Random") || genInfo.copperOrTin.Equals(looking4copperTin)) &&
@@ -3770,7 +4215,7 @@ namespace TheTerrariaSeedProject
                       (looking4silverTung.Equals("Random") || genInfo.silverOrTung.Equals(looking4silverTung)) &&
                       (looking4goldPlation.Equals("Random") || genInfo.goldOrPlat.Equals(looking4goldPlation));
 
-            writeDebugFile("return " + allTrue);
+            //writeDebugFile("return " + allTrue);
 
             return allTrue;
         }
