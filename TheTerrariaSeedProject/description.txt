@@ -23,7 +23,8 @@ Currently you can search for:
 -How good the beach looks, no cliff no gabs, no near evil
 -If you spawn on top of a cloud, in Snow or Jungle biome
 -How far you need to walk to Dungeon, Temple your first Boots
--If it has an active Enchanted Sword Shrine                
+-If it has an active Enchanted Sword Shrine
+-Is there an exposed Shadow Orb/Crimson Heart
 -other rare stuff like a Dungeon in Snow Biome
           
 ...And many many more (look linked page for full list)
@@ -39,4 +40,5 @@ If you found some bugs, have some ideas for more features, want to help coding o
 Good luck!
 
 Update: bug fix
+included path finding
 you can store world as minimap picture

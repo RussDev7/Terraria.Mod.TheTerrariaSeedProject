@@ -1,5 +1,5 @@
 author = Unftf
-version = 0.1.1.2
+version = 0.1.2.0
 displayName = The Terraria Seed Project
 homepage = https://forums.terraria.org/index.php?threads/tool-the-terraria-seed-project.69351
 hideCode = true

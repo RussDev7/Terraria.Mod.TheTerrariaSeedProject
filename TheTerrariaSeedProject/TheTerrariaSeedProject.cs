@@ -51,10 +51,17 @@ namespace TheTerrariaSeedProject
         public override void Load()
         {
             
+
         }
         public override void Unload()
-        {            
-           
+        {
+
+            string olddbf = Main.SavePath + OptionsDict.Paths.debugPath + @".\debug.txt";
+            if (System.IO.File.Exists(olddbf))
+            {
+                System.IO.File.Delete(olddbf);
+            }
+
         }
 
 
