@@ -46,6 +46,8 @@ namespace TheTerrariaSeedProject.UI
 
 		internal bool unfocusOnTab = true;
 
+        internal bool unfocusOnClick = true;
+
         //public NewUITextBox(string text, float textScale = 1, bool large = false) : base("", textScale, large)
         //public NewUITextBox(string hintText, string text = "") //###
         public NewUITextBox(string hintText, string text = "")
@@ -269,7 +271,14 @@ namespace TheTerrariaSeedProject.UI
 					//OnTabPressed?.Invoke(); //###
                     if (OnTabPressed != null) OnTabPressed.Invoke();
                 }
-				if (JustPressed(Keys.Enter))
+                if (Main.mouseLeft)
+                {
+                    if (unfocusOnClick) Unfocus();
+                    //OnTabPressed?.Invoke(); //###
+                    if (OnTabPressed != null) OnTabPressed.Invoke();
+                }
+
+                if (JustPressed(Keys.Enter))
 				{
 					Main.drawingPlayerChat = false;
 					if (unfocusOnEnter) Unfocus();

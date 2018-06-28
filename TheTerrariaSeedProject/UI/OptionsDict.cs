@@ -23,6 +23,7 @@ namespace TheTerrariaSeedProject.UI
             public const string configName = "Config file name";
             public const string startingSeed = "Starting seed search at";
             public const string searchSeedNum = "Search until starting seed +";
+            public const string storeMMPic = "Store mini map as picture";
         }
 
         public static class Phase1
@@ -32,7 +33,7 @@ namespace TheTerrariaSeedProject.UI
             public const string copperTin = "Copper or Tin";
             public const string ironLead = "Iron or Lead";
             public const string silverTungsten = "Silver or Tungsten";
-            public const string goldPlatin = "Gold or Platin";
+            public const string goldPlatin = "Gold or Platinum";
             public const string moonType = "Moon type";
         }
 
@@ -173,7 +174,8 @@ namespace TheTerrariaSeedProject.UI
         public static readonly List<string> vSpikyTrap = getPatern(0, 31, 5);
         public static readonly List<string> vSpearTrap = getPatern(0, 21, 5);
         public static readonly List<string> vGeyDetoTrap = getPatern(0, 50).Concat(getPatern(50, 11, 10)).ToList();
-        
+        public static readonly List<string> vPathLength = getPatern(100, 9, 100).Concat(getPatern(1000, 7, 500)).Concat(getPatern(5000, 6, 1000)).ToList();
+
 
         public static readonly List<string> vForUnknown = getPatern(0, 10).Concat(getPatern(10, 9, 10)).Concat(getPatern(100, 9, 100)).Concat(getPatern(1000, 9, 1000)).Concat(getPatern(10000, 10, 10000)).ToList();
 
@@ -242,6 +244,7 @@ namespace TheTerrariaSeedProject.UI
             //config
             Add(Configuration.searchSeedNum, vNumSearch);
 
+            Add(Configuration.storeMMPic, new List<string>() { "Off", "For each in phase 3", "For each in phase 3 + item info", "only for stored worlds", "only for stored worlds + item info" });
 
 
             //phase 1
@@ -324,6 +327,7 @@ namespace TheTerrariaSeedProject.UI
                 "Omit Dungeon in Snow Biome",
                 "Omit Dungeon far above surface",
                 "Omit Dungeon below ground",
+                "Omit Floating island cabin in Dungeon",
                 "Omit Pre Skeletron Dungeon Chest Risky",
                 "Omit Pre Skeletron Dungeon Chest Grab",
                 "Omit Biome Item in normal Chest",
@@ -478,6 +482,7 @@ namespace TheTerrariaSeedProject.UI
                 "Near Enchanted Sword",                
                 "Enchanted Sword near Pyramid or Tree",
                 "Very Near Enchanted Sword",
+                "Near Sunflower",
                 "Near Altar",
                 "Near Spider Web count",
                 "Near Mushroom Biome count",
@@ -533,6 +538,8 @@ namespace TheTerrariaSeedProject.UI
                 "Number functional noncraf. Statues",
                 "Different noncraf. Statues",
                 "Number noncraf. Statues",
+                "Nearest Teleportation Potion count",
+                "Free ShadowOrb/Heart",
                 "Floating Island without chest",
                 "Score"
                 });
@@ -542,6 +549,13 @@ namespace TheTerrariaSeedProject.UI
                 "Dungeon Distance",
                 "Ground Distance",
                 "Rock Distance",
+                "Pathlength to Boots",
+                "Pathlength to Iron/Lead Bar",
+                "Pathlength to Teleport Potion",                
+                "Pathlength to Enchanted Sword",
+                "Pathlength to Bee Hive",
+                "Pathlength to Temple Door",
+                "Pathlength to free ShadowOrb/Heart",
                 "Floating Island without chest",
                 "Score"
             });
@@ -607,8 +621,18 @@ namespace TheTerrariaSeedProject.UI
             Add("Different noncraf. Statues", getPatern(0, 30+26+1));
             Add("Number noncraf. Statues", vStatuesTotal);
             Add("Floating Island without chest", v0to1);
+            Add("Near Sunflower", v0to20);
+            Add("Nearest Teleportation Potion count", v0to5);
+            Add("Free ShadowOrb/Heart", v0to5);
 
             Add("Hermes Flurry Boots Distance", vDistanceShort);
+            Add("Pathlength to Boots", vPathLength);
+            Add("Pathlength to Iron/Lead Bar", vPathLength);
+            Add("Pathlength to Teleport Potion", vPathLength);
+            Add("Pathlength to Enchanted Sword", vPathLength);
+            Add("Pathlength to Bee Hive", vPathLength);
+            Add("Pathlength to Temple Door", vPathLength);
+            Add("Pathlength to free ShadowOrb/Heart", vPathLength);
             Add("Temple Distance", vDistanceLong);
             Add("Score", vScore);
 

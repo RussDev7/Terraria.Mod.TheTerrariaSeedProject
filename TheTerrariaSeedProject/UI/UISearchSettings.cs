@@ -294,7 +294,7 @@ namespace TheTerrariaSeedProject.UI
             int mapSizeMain = Main.maxTilesY / 600 - 1;
             string mapSize = mapSizeMain == 1 ? "Small" : mapSizeMain == 2 ? "Medium" : mapSizeMain == 3 ? "Large" : "Unknown";
             string diff = Main.expertMode ? "Expert" : "Normal";
-            string evilType = WorldGen.WorldGenParam_Evil == 1 ? "Crimnson" : WorldGen.WorldGenParam_Evil == 0 ? "Corruption" : "Random";
+            string evilType = WorldGen.WorldGenParam_Evil == 1 ? "Crimson" : WorldGen.WorldGenParam_Evil == 0 ? "Corruption" : "Random";
 
             addDictToInfo(OptionsDict.title).setCustomColor(Color.DarkOrange);
 
@@ -306,6 +306,7 @@ namespace TheTerrariaSeedProject.UI
             infopanel.AddTextInput(OptionsDict.WorldInformation.worldName).SetValue(Main.worldName);
             infopanel.AddTextInput(OptionsDict.Configuration.startingSeed).SetValue(Main.ActiveWorldFileData.Seed.ToString());
             addDictToInfo(OptionsDict.Configuration.searchSeedNum).SetValue("10000");
+            addDictToInfo(OptionsDict.Configuration.storeMMPic).SetValue("Off");
             //addDictToInfo(OptionsDict.GeneralOptions.searchRare).SetValue(opdict[OptionsDict.GeneralOptions.searchRare][opdict[OptionsDict.GeneralOptions.searchRare].Count - 1]);
             addSelectListToInfo(OptionsDict.GeneralOptions.omitRare, InfoPanel.listKindOmitRare);
             addSelectListToInfo(OptionsDict.GeneralOptions.naming, InfoPanel.listKindNaming);
@@ -644,6 +645,10 @@ namespace TheTerrariaSeedProject.UI
             if (!wgss.searchForSeed)
             {
                 currentConfig = Configuration.GenerateConfiguration(infopanel.selectables);
+                //infopanel.selectables.Clear();
+                infopanel.uidesc.ClearCurrent();
+
+
                 InitCountText();                
                 wgss.searchForSeed = true;
                 wgss.stage = 0;
