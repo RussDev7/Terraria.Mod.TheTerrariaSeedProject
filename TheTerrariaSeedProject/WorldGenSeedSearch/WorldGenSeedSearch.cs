@@ -1375,132 +1375,139 @@ namespace TheTerrariaSeedProject
             //writeDebugFile(" analyze time before pathfinding " + elapsedTime);
 
             int maxsize = (Main.maxTilesX * 5 + Main.maxTilesY * 3); // values can be creater!
-            List<Tuple<int, int>>[] waypoints = new List<Tuple<int, int>>[maxsize];
-            int[,] pathLength = new int[Main.maxTilesX, Main.maxTilesY];
-            int[,] travelCost = new int[Main.maxTilesX, Main.maxTilesY];
+            List<Tuple<int, int>>[] waypoints = null;
+            int[,] pathLength = null;
+            int[,] travelCost = null;
 
-            for (int x = 0; x < Main.maxTilesX; x++)
-                for (int y = 0; y < Main.maxTilesY; y++)
-                    pathLength[x, y] = Int32.MaxValue;
-            for (int x = 0; x < Main.maxTilesX; x++)
-                for (int y = 0; y < Main.maxTilesY; y++)
-                    travelCost[x, y] = TravelCost(x, y);
-
-
-            pathLength[Main.spawnTileX, Main.spawnTileY - 1] = 0;
-            waypoints[0] = new List<Tuple<int, int>> { new Tuple<int, int>(Main.spawnTileX, Main.spawnTileY - 1) };
-
-            for (int l = 0; l < maxsize; l++)
+            if (doFull)
             {
-                if (waypoints[l] != null)
-                    foreach (Tuple<int, int> p in waypoints[l])
-                        AddWayPoints(ref pathLength, ref waypoints, ref travelCost, p.Item1, p.Item2, l);
-            }
+                waypoints = new List<Tuple<int, int>>[maxsize];
+                pathLength = new int[Main.maxTilesX, Main.maxTilesY];
+                travelCost = new int[Main.maxTilesX, Main.maxTilesY];
 
-            //norm to ~tiles num
-            for (int x = 0; x < Main.maxTilesX; x++)
-                for (int y = 0; y < Main.maxTilesY; y++)
-                    if (pathLength[x, y] != Int32.MaxValue)
-                        pathLength[x, y] = (int)(0.2 * pathLength[x, y]);
 
-            travelCost = null;
-            waypoints = null;
+                for (int x = 0; x < Main.maxTilesX; x++)
+                    for (int y = 0; y < Main.maxTilesY; y++)
+                        pathLength[x, y] = Int32.MaxValue;
+                for (int x = 0; x < Main.maxTilesX; x++)
+                    for (int y = 0; y < Main.maxTilesY; y++)
+                        travelCost[x, y] = TravelCost(x, y);
 
-            ts = stopWatch.Elapsed;
-            elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-            ts.Hours, ts.Minutes, ts.Seconds,
-            ts.Milliseconds / 10);
-            //writeDebugFile(" analyze time after pathfinding " + elapsedTime);
 
-            //only for debug
-            if (1==42)
-            {
-                int dimX = Main.maxTilesX;
-                int dimY = Main.maxTilesY;
-                int scale = 1;
-                /*while (dimX > 6200)
+                pathLength[Main.spawnTileX, Main.spawnTileY - 1] = 0;
+                waypoints[0] = new List<Tuple<int, int>> { new Tuple<int, int>(Main.spawnTileX, Main.spawnTileY - 1) };
+
+                for (int l = 0; l < maxsize; l++)
                 {
-                    dimX /= 2;
-                    dimY /= 2;
-                    scale *= 2;
-                }*/
-
-                //https://msdn.microsoft.com/en-us/library/system.drawing.imaging.bitmapdata(v=vs.110).aspx
-                System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(dimX, dimY, PixelFormat.Format32bppArgb);
-
-
-                System.Drawing.Rectangle rect = new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height);
-                System.Drawing.Imaging.BitmapData bmpData =
-                    bmp.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadWrite,
-                    bmp.PixelFormat);
-
-
-                // Get the address of the first line.
-                IntPtr ptr = bmpData.Scan0;
-
-                // Declare an array to hold the bytes of the bitmap.
-                int bytes = Math.Abs(bmpData.Stride) * bmp.Height;
-                byte[] rgbValues = new byte[bytes];
-
-                // Copy the RGB values into the array.
-                System.Runtime.InteropServices.Marshal.Copy(ptr, rgbValues, 0, bytes);
-
-                int indx = 0;
-                for (int y = 0; y < Main.maxTilesY; y += scale)
-                    for (int x = 0; x < Main.maxTilesX; x += scale)
-                    {
-                        //MapTile cur = MapHelper.CreateMapTile(x, y, 255);
-                        //Color cc = MapHelper.GetMapTileXnaColor(ref cur);
-                        //int cv = (int)(((float)pathLength[x, y]) / Main.maxTilesX/7 * 255.0);                            
-                        int cv = (int)(((float)pathLength[x, y]) / (0.2*maxsize) * 255.0);
-                        cv = cv > 255 ? 255 : cv;
-                        rgbValues[indx++] = (byte)(255 - cv);
-                        rgbValues[indx++] = (byte)(255 - cv);
-                        rgbValues[indx++] = (byte)(255 - cv);
-                        rgbValues[indx++] = 255;
-
-                    }
-
-                //draw Spawm
-                int aw = 0;
-
-                for (int y = Main.spawnTileY - 1; y > Main.spawnTileY - 36; y--)
-                {
-                    int x = Main.spawnTileX;
-                    int off = y * 4 * Main.maxTilesX + x * 4;
-
-                    rgbValues[off + 0] = 0;
-                    rgbValues[off + 1] = 80;
-                    rgbValues[off + 2] = 50;
-                    rgbValues[off + 3] = 255;
-
-                    for (int awi = 0; awi < (aw < 18 ? aw : 4); awi++)
-                    {
-                        rgbValues[off + 0 + 4 * (awi / 3)] = 0;
-                        rgbValues[off + 1 + 4 * (awi / 3)] = 80;
-                        rgbValues[off + 2 + 4 * (awi / 3)] = 50;
-                        rgbValues[off + 3 + 4 * (awi / 3)] = 255;
-
-                        rgbValues[off + 0 - 4 * (awi / 3)] = 0;
-                        rgbValues[off + 1 - 4 * (awi / 3)] = 80;
-                        rgbValues[off + 2 - 4 * (awi / 3)] = 50;
-                        rgbValues[off + 3 - 4 * (awi / 3)] = 255;
-                    }
-                    aw++;
+                    if (waypoints[l] != null)
+                        foreach (Tuple<int, int> p in waypoints[l])
+                            AddWayPoints(ref pathLength, ref waypoints, ref travelCost, p.Item1, p.Item2, l);
                 }
 
+                //norm to ~tiles num
+                for (int x = 0; x < Main.maxTilesX; x++)
+                    for (int y = 0; y < Main.maxTilesY; y++)
+                        if (pathLength[x, y] != Int32.MaxValue)
+                            pathLength[x, y] = (int)(0.2 * pathLength[x, y]);
 
-                // Copy the RGB values back to the bitmap
-                System.Runtime.InteropServices.Marshal.Copy(rgbValues, 0, ptr, bytes);
+                travelCost = null;
+                waypoints = null;
 
-                // Unlock the bits.
-                bmp.UnlockBits(bmpData);
-                bmp.Save(Main.WorldPath + @"\" + seed + "_paths.png");
+                ts = stopWatch.Elapsed;
+                elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                ts.Hours, ts.Minutes, ts.Seconds,
+                ts.Milliseconds / 10);
+                //writeDebugFile(" analyze time after pathfinding " + elapsedTime);
 
+                //only for debug
+                if (1 == 42)
+                {
+                    int dimX = Main.maxTilesX;
+                    int dimY = Main.maxTilesY;
+                    int scale = 1;
+                    /*while (dimX > 6200)
+                    {
+                        dimX /= 2;
+                        dimY /= 2;
+                        scale *= 2;
+                    }*/
+
+                    //https://msdn.microsoft.com/en-us/library/system.drawing.imaging.bitmapdata(v=vs.110).aspx
+                    System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(dimX, dimY, PixelFormat.Format32bppArgb);
+
+
+                    System.Drawing.Rectangle rect = new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height);
+                    System.Drawing.Imaging.BitmapData bmpData =
+                        bmp.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadWrite,
+                        bmp.PixelFormat);
+
+
+                    // Get the address of the first line.
+                    IntPtr ptr = bmpData.Scan0;
+
+                    // Declare an array to hold the bytes of the bitmap.
+                    int bytes = Math.Abs(bmpData.Stride) * bmp.Height;
+                    byte[] rgbValues = new byte[bytes];
+
+                    // Copy the RGB values into the array.
+                    System.Runtime.InteropServices.Marshal.Copy(ptr, rgbValues, 0, bytes);
+
+                    int indx = 0;
+                    for (int y = 0; y < Main.maxTilesY; y += scale)
+                        for (int x = 0; x < Main.maxTilesX; x += scale)
+                        {
+                            //MapTile cur = MapHelper.CreateMapTile(x, y, 255);
+                            //Color cc = MapHelper.GetMapTileXnaColor(ref cur);
+                            //int cv = (int)(((float)pathLength[x, y]) / Main.maxTilesX/7 * 255.0);                            
+                            int cv = (int)(((float)pathLength[x, y]) / (0.2 * maxsize) * 255.0);
+                            cv = cv > 255 ? 255 : cv;
+                            rgbValues[indx++] = (byte)(255 - cv);
+                            rgbValues[indx++] = (byte)(255 - cv);
+                            rgbValues[indx++] = (byte)(255 - cv);
+                            rgbValues[indx++] = 255;
+
+                        }
+
+                    //draw Spawm
+                    int aw = 0;
+
+                    for (int y = Main.spawnTileY - 1; y > Main.spawnTileY - 36; y--)
+                    {
+                        int x = Main.spawnTileX;
+                        int off = y * 4 * Main.maxTilesX + x * 4;
+
+                        rgbValues[off + 0] = 0;
+                        rgbValues[off + 1] = 80;
+                        rgbValues[off + 2] = 50;
+                        rgbValues[off + 3] = 255;
+
+                        for (int awi = 0; awi < (aw < 18 ? aw : 4); awi++)
+                        {
+                            rgbValues[off + 0 + 4 * (awi / 3)] = 0;
+                            rgbValues[off + 1 + 4 * (awi / 3)] = 80;
+                            rgbValues[off + 2 + 4 * (awi / 3)] = 50;
+                            rgbValues[off + 3 + 4 * (awi / 3)] = 255;
+
+                            rgbValues[off + 0 - 4 * (awi / 3)] = 0;
+                            rgbValues[off + 1 - 4 * (awi / 3)] = 80;
+                            rgbValues[off + 2 - 4 * (awi / 3)] = 50;
+                            rgbValues[off + 3 - 4 * (awi / 3)] = 255;
+                        }
+                        aw++;
+                    }
+
+
+                    // Copy the RGB values back to the bitmap
+                    System.Runtime.InteropServices.Marshal.Copy(rgbValues, 0, ptr, bytes);
+
+                    // Unlock the bits.
+                    bmp.UnlockBits(bmpData);
+                    bmp.Save(Main.WorldPath + @"\" + seed + "_paths.png");
+
+
+                }
 
             }
-
-            
 
             
 
@@ -1606,7 +1613,7 @@ namespace TheTerrariaSeedProject
 
                     }
 
-                    int pathl = FindShortestPathInRange(ref pathLength, cx, cy);
+                    int pathl = doFull? FindShortestPathInRange(ref pathLength, cx, cy): 1000000;
 
 
                     for (int l = 0; l < 40; l++)
@@ -4840,22 +4847,24 @@ namespace TheTerrariaSeedProject
                 dimY /= 2;
                 scale *= 2;
             }*/
-            
+                                 
             //https://msdn.microsoft.com/en-us/library/system.drawing.imaging.bitmapdata(v=vs.110).aspx
+            //only works on windows
             System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(dimX, dimY, PixelFormat.Format32bppArgb);
-                
-
+            
             System.Drawing.Rectangle rect = new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height);
+            
             System.Drawing.Imaging.BitmapData bmpData =
                 bmp.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadWrite,
                 bmp.PixelFormat);
+            
 
-    
             // Get the address of the first line.
             IntPtr ptr = bmpData.Scan0;
-
+            
             // Declare an array to hold the bytes of the bitmap.
             int bytes = Math.Abs(bmpData.Stride) * bmp.Height;
+            
             byte[] rgbValues = new byte[bytes];
             
             // Copy the RGB values into the array.
@@ -4873,6 +4882,7 @@ namespace TheTerrariaSeedProject
                     rgbValues[indx++] = cc.A;
                 }
 
+            
             //draw Spawm
             int aw = 0;
 
@@ -4899,8 +4909,9 @@ namespace TheTerrariaSeedProject
                 }
                 aw++;
             }
+            
 
-            if(includeInfo)
+            if (includeInfo)
             foreach(var itemloclist in score.itemLocation)
             {
                 foreach (var itemloc in itemloclist.Value)
@@ -4908,18 +4919,19 @@ namespace TheTerrariaSeedProject
                     DrawItemImage(ref rgbValues, itemloclist.Key , itemloc , scale);
                 }
             }
-
             
+
 
 
             // Copy the RGB values back to the bitmap
             System.Runtime.InteropServices.Marshal.Copy(rgbValues, 0, ptr, bytes);
-
+            
             // Unlock the bits.
             bmp.UnlockBits(bmpData);
+            
             bmp.Save(Main.worldPathName.Substring(0, Main.worldPathName.Length - 4) + ".png");
             
-                        
+
 
         }
 
