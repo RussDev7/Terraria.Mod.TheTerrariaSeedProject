@@ -23,7 +23,9 @@ namespace TheTerrariaSeedProject.UI
             public const string configName = "Config file name";
             public const string startingSeed = "Starting seed search at";
             public const string searchSeedNum = "Search until starting seed +";
+            public const string stopSearchNum = "Stop search if found";
             public const string storeMMPic = "Store mini map as picture";
+            public const string storeStats = "Store stats for each seed";
         }
 
         public static class Phase1
@@ -35,10 +37,11 @@ namespace TheTerrariaSeedProject.UI
             public const string silverTungsten = "Silver or Tungsten";
             public const string goldPlatin = "Gold or Platinum";
             public const string moonType = "Moon type";
+            public const string hallowSide = "Hallow biome side";
         }
 
         public static class Phase2
-        {            
+        {
             public const string title = "### Phase 2 ###";
             public const string positive = "Phase 2+";
             public const string negative = "Phase 2-";
@@ -62,18 +65,25 @@ namespace TheTerrariaSeedProject.UI
             public const string omitRareAll = "Omit All";
         }
 
+        public static class Tools
+        {
+            public const string dummyPlus = "-Tool- if all true, increase phase points by";
+            public const string dummyNeg = "-Tool- decrease phase points by";
+        }
+
+
         public static class Paths
         {
-            public const string statsPath = @"/TheTerrariaSeedProject/stats/";
+            public const string statsPath = @"/TheTerrariaSeedProject/stats/"; // System.IO.Path.DirectorySeparatorChar
             public const string configPath = @"/TheTerrariaSeedProject/config/";
             public const string debugPath = @"/TheTerrariaSeedProject/";
         }
+
 
         public static class Bug
         {
             public const string worldSizeBugMinMed = "World size min Med";
             public const string worldSizeBugMinLarge = "World size min Larg";
-
         }
 
 
@@ -113,6 +123,7 @@ namespace TheTerrariaSeedProject.UI
             public const string nameDescription = "If a seed passes all Phases it gets saved in your world folder.Here you can select how it should be named.Those tags are concatenated. \n" +
                     ">> World name: the name you entered above or in at world creation. \n" +
                     ">> Seed: seed used to generate the map \n" +
+                    ">> Size, evil type, difficulty: (S)mall, (M)edium, (L)arge; crimson (r or R (for red)), corruption (b or B (for blue)), random evil biome is always the same for one seed, if the evil biome letter is written small (r or b) you can use random as well. e(x)pert, (n)ormal  \n" +
                     ">> Content in short: Some short form of the map content.Each digit has some meaning. \n" +
                     "1.) Number of Pyramids \n" +
                     "2.) If it has a Flying Carpet(C), a Sandstorm in a Bottle(B), or both(H), also Mask (O), or at least a Blizzard in a Bottle(Z) \n" +
@@ -141,7 +152,7 @@ namespace TheTerrariaSeedProject.UI
                     "\n \n If you don't select anything it does: Seed_Content_Score_Rares";
         }
 
-    
+
 
 
 
@@ -149,9 +160,10 @@ namespace TheTerrariaSeedProject.UI
         public static readonly List<string> v0to15 = getPatern(0, 16);
         public static readonly List<string> v0to20 = getPatern(0, 21);
         public static readonly List<string> v0to50 = getPatern(0, 51);
-        
+
+        public static readonly List<string> v0to100 = getPatern(0, 101);
         public static readonly List<string> v0to120 = getPatern(0, 121);
-        public static readonly List<string> v0to5 = getPatern(0, 6);        
+        public static readonly List<string> v0to5 = getPatern(0, 6);
         public static readonly List<string> v0to1 = getPatern(0, 2);
         public static readonly List<string> v0to2 = getPatern(0, 3);
         public static readonly List<string> vDungeonWalls = getPatern(10000, 19, 5000);
@@ -163,7 +175,7 @@ namespace TheTerrariaSeedProject.UI
         public static readonly List<string> vDistanceShort = getPatern(25, 9, 25).Concat(getPatern(250, 4, 50)).Concat(getPatern(500, 11, 100)).ToList();
         public static readonly List<string> vDistanceLong = getPatern(200, 8, 100).Concat(getPatern(1000, 17, 200)).ToList();
         public static readonly List<string> vNumTiles = getPatern(0, 10, 10).Concat(getPatern(100, 9, 100)).Concat(getPatern(1000, 10, 1000)).ToList();
-        public static readonly List<string> vNumSearch = getPatern(1, 3).Concat(getPatern(5, 15,0,2,5)).ToList();
+        public static readonly List<string> vNumSearch = getPatern(1, 3).Concat(getPatern(5, 4, 5)).Concat(getPatern(50, 12, 0, 2, 5)).ToList();
         public static readonly List<string> vScore = getPatern(-1000, 61, 100);
         public static readonly List<string> vEmpty = new List<string>();
         public static readonly List<string> vPaintingsDiff = getPatern(0, 52);
@@ -175,7 +187,8 @@ namespace TheTerrariaSeedProject.UI
         public static readonly List<string> vSpearTrap = getPatern(0, 21, 5);
         public static readonly List<string> vGeyDetoTrap = getPatern(0, 50).Concat(getPatern(50, 11, 10)).ToList();
         public static readonly List<string> vPathLength = getPatern(100, 9, 100).Concat(getPatern(1000, 7, 500)).Concat(getPatern(5000, 6, 1000)).ToList();
-
+        public static readonly List<string> vTilesToMine = getPatern(0, 50).Concat(getPatern(50, 11, 10)).ToList();
+        public static readonly List<string> vdummy = getPatern(0, 21).Concat(new string[] { "50","100","200","500","1000"}).ToList();
 
         public static readonly List<string> vForUnknown = getPatern(0, 10).Concat(getPatern(10, 9, 10)).Concat(getPatern(100, 9, 100)).Concat(getPatern(1000, 9, 1000)).Concat(getPatern(10000, 10, 10000)).ToList();
 
@@ -243,8 +256,10 @@ namespace TheTerrariaSeedProject.UI
 
             //config
             Add(Configuration.searchSeedNum, vNumSearch);
+            Add(Configuration.stopSearchNum, vNumSearch);
 
             Add(Configuration.storeMMPic, new List<string>() { "Off", "For each in phase 3", "For each in phase 3 + item info", "only for stored worlds", "only for stored worlds + item info" });
+            Add(Configuration.storeStats, new List<string>() { "Off", "For each in phase 3", "only for stored worlds"});
 
 
             //phase 1
@@ -281,7 +296,9 @@ namespace TheTerrariaSeedProject.UI
                 "it got for free in that phase). \n  \n All options should be self explained(at least to some degree).Only “Beach penalty” need some further notes. This scores both beaches if they contain gaps in sand or high "+
                 "cliffs. The penalty is low if the beach is flat or slowly increases ground level(in ocean to world mid direction). \n A high beach penalty means that the beach don’t look very well, has gaps without sand or the "+
                 "ocean is far above the bordering areas.Such a high cliff will result in a Beach penalty of over 9000 in most cases. It only considers the world structure, so e.g.evil biome tiles are not part of that penalty but "+
-                "the deep holes of the corruption biome have a high negative impact. Near Dungeon also has negative impact, near living tree does not. Try around a find a value you like. "});
+                "the deep holes of the corruption biome have a high negative impact. Near Dungeon also has negative impact, near living tree does not. Try around a find a value you like. \n \n"+ 
+                "Update: -Tool- dummies, they change the current phase points by selected value. You can use those e.g. if you selected 5 objects in the negative list (and nothing in positive) but you are fine if only 4 of them are true (<). For this "+
+                "add this tool to positive list and select 2 as value. This will give always 2 points. Or if you search for more than one at the same time and value each different (e.g. 3<5, 3+4>5, 6>5, 6+3+4>5)."});
 
 
 
@@ -303,7 +320,8 @@ namespace TheTerrariaSeedProject.UI
                 "is trying to generate it again with vanilla version. First, start up vanilla Terraria again and generate that seed and check if equal, if not, create it again (without restarting Terraria!or creating another world). "+
                 "Most seeds are equal all the time or interchange in between variation 1 and variation 2 (1, 2, 1, 2, 1..) with some additional tiny changes sometimes. Those tiny changes are mostly Enchanted Swords Shrines, Mahogany " +
                 "Trees with their chests and Minecart Tracks and some more not that important. So the condition of a seed having an active Enchanted Sword Shrine is not that reliable all times. But in that case you can generate " +
-                "the seed again and might have one at another location. \n I hope that gets fixed in next update."});
+                "the seed again and might have one at another location. \n I hope that gets fixed in next update. \n \n"+
+                "Update: Pathlengths to cavern entries: '40% cavern layer' means a cavern which reaches deep to 40% of the cavern layer and therefor the pathlength from spawn to the entrance of that layer. "});
 
             Add(Phase3.continueEvaluation, new List<string> { Phase3.continueEvaluatioTakeOverTag, Phase3.continueEvaluationResetTag });
             Add(Phase3.continueEvaluatioTakeOverTag, vEmpty);
@@ -314,9 +332,10 @@ namespace TheTerrariaSeedProject.UI
                 "some short form of the content the map has and a computed fantasy score (in beta state, high score -> many rare/good stuff). Besides that it also adds, if it found some very rare stuff insdide, E.g. if you spawn in sky"+
                 " or there is a Enchanted Sword very near to spawn. Besides the conditions you added, it always searches for rare stuff. If you don't want that, you can also disable it here."});
 
-            Add(GeneralOptions.naming, new List<string> { "World name", "Seed", "Content in short", "Fantasy score", "Rares" });
+            Add(GeneralOptions.naming, new List<string> { "World name", "Seed", "Size, evil type, difficulty", "Content in short", "Fantasy score", "Rares" });
             Add("World name", vEmpty);
             Add("Seed", vEmpty);
+            Add("Size, evil type, difficulty", vEmpty);
             Add("Content in short", vEmpty);
             Add("Fantasy score", vEmpty);
             Add("Rares", vEmpty);
@@ -343,6 +362,7 @@ namespace TheTerrariaSeedProject.UI
                 "Omit Spawn in Jungle biome",
                 "Omit Spawn in Snow biome",
                 "Omit Floating Island without chest",
+                "Omit Open Temple",
                 "Omit All chest items you can't craft or fish"
             });
                                     
@@ -359,6 +379,7 @@ namespace TheTerrariaSeedProject.UI
             Add(Phase1.silverTungsten, new List<string> { "Random", "Silver", "Tungsten" }); //foreach (var elem in this[Phase1.silverTungsten]) Add(elem, vEmpty);
             Add(Phase1.goldPlatin, new List<string> { "Random", "Gold", "Platin" }); //foreach (var elem in this[Phase1.goldPlatin]) Add(elem, vEmpty);
             Add(Phase1.moonType, new List<string> { "Random", "White", "Orange", "Green" }); //foreach (var elem in this[Phase1.moonType]) Add(elem, vEmpty);
+            Add(Phase1.hallowSide, new List<string> { "Random", "Jungle side", "Snow/Dungeon side"});
 
 
             //phase 2 content
@@ -399,7 +420,8 @@ namespace TheTerrariaSeedProject.UI
                 "Evil Tiles for Ice",
                 "No Ocean",
                 "Snow biome surface overlap mid",
-                "Jungle biome surface overlap mid"                
+                "Jungle biome surface overlap mid",
+                OptionsDict.Tools.dummyPlus
                 });
             
             Add(Phase2.negative, new List<string> {                     
@@ -423,7 +445,8 @@ namespace TheTerrariaSeedProject.UI
                 "Blue Dungeon Walls",
                 "Pink Dungeon Walls",
                 "Snow biome surface overlap mid",
-                "Jungle biome surface overlap mid"
+                "Jungle biome surface overlap mid",
+                OptionsDict.Tools.dummyNeg
             });
 
             Add("Number of Pyramids", v0to10);
@@ -473,6 +496,10 @@ namespace TheTerrariaSeedProject.UI
             Add("Distance Pyramid to mid", vDistance);
             Add("Distance Dungeon to mid", vDistance);
             Add("Has evil Ocean", v0to2);
+
+
+            Add(OptionsDict.Tools.dummyPlus, vdummy);
+            Add(OptionsDict.Tools.dummyNeg, vdummy);
 
 
             //phase 3 content
@@ -540,24 +567,55 @@ namespace TheTerrariaSeedProject.UI
                 "Number noncraf. Statues",
                 "Nearest Teleportation Potion count",
                 "Free ShadowOrb/Heart",
+                "Free cavern to mid Jungle",
+                "Free cavern to deep Jungle",
+                "Jungle cavern not blocked by structure",
+                "Dungeon Distance",
+                "Temple Distance",
+                "Temple horizontal distance",
+                "Temple at player side of jungle (%)",
+                "Temple at ocean side of jungle (%)",
+                "Temple at height (%)",
+                "Temple at depth (%)",
+                "Open Temple",
                 "Floating Island without chest",
-                "Score"
+                "Score",
+                OptionsDict.Tools.dummyPlus
                 });
             Add(Phase3.negative, new List<string> {
-                "Hermes Flurry Boots Distance",             
-                "Temple Distance",
-                "Dungeon Distance",
+                "Hermes Flurry Boots Distance", 
                 "Ground Distance",
                 "Rock Distance",
+                "Dungeon Distance",
+                "Temple Distance",
+                "Temple horizontal distance",
+                "Temple at player side of jungle (%)",
+                "Temple at ocean side of jungle (%)",
+                "Temple at height (%)",
+                "Temple at depth (%)",
+                "Pathlength to Temple Door",
                 "Pathlength to Boots",
                 "Pathlength to Iron/Lead Bar",
+                "Pathlength to Gold/Platinum Bar",
+                "Pathlength to Bomb",
+                "Pathlength to Jester's Arrow",
+                "Pathlength to Suspicious Looking Eye",
+                "Pathlength to Snowball Cannon",
                 "Pathlength to Teleport Potion",                
                 "Pathlength to Enchanted Sword",
                 "Pathlength to Bee Hive",
-                "Pathlength to Temple Door",
+                "Pathlength to Boomstick",                
                 "Pathlength to free ShadowOrb/Heart",
+                "Pathlength into 40% cavern layer",
+                "Pathlength to 40% cavern entrance",
+                "Tiles to mine for 40% cavern",
+                "Pathlength to cavern entrance to mid of Jungle",
+                "Tiles to mine for mid Jungle cavern",
+                "Pathlength to cavern entrance to deep Jungle",
+                "Tiles to mine for deep Jungle cavern",
                 "Floating Island without chest",
-                "Score"
+                "Score",
+                OptionsDict.Tools.dummyNeg
             });
 
             Add("Enchanted Sword Shrine", v0to5);
@@ -624,16 +682,41 @@ namespace TheTerrariaSeedProject.UI
             Add("Near Sunflower", v0to20);
             Add("Nearest Teleportation Potion count", v0to5);
             Add("Free ShadowOrb/Heart", v0to5);
+            Add("Free cavern to mid Jungle", v0to1);
+            Add("Free cavern to deep Jungle", v0to1);
+            Add("Jungle cavern not blocked by structure", v0to1);
+            Add("Open Temple", v0to1);
+
 
             Add("Hermes Flurry Boots Distance", vDistanceShort);
             Add("Pathlength to Boots", vPathLength);
             Add("Pathlength to Iron/Lead Bar", vPathLength);
+            Add("Pathlength to Gold/Platinum Bar", vPathLength);
+            Add("Pathlength to Bomb", vPathLength);
+            Add("Pathlength to Jester's Arrow", vPathLength);
+            Add("Pathlength to Suspicious Looking Eye", vPathLength);
+            Add("Pathlength to Snowball Cannon", vPathLength);
             Add("Pathlength to Teleport Potion", vPathLength);
             Add("Pathlength to Enchanted Sword", vPathLength);
             Add("Pathlength to Bee Hive", vPathLength);
+            Add("Pathlength to Boomstick", vPathLength);
             Add("Pathlength to Temple Door", vPathLength);
-            Add("Pathlength to free ShadowOrb/Heart", vPathLength);
-            Add("Temple Distance", vDistanceLong);
+            Add("Pathlength to free ShadowOrb/Heart", vPathLength);  
+            Add("Pathlength into 40% cavern layer", vPathLength);  
+            Add("Pathlength to 40% cavern entrance", vPathLength);  
+            Add("Tiles to mine for 40% cavern", vTilesToMine);
+            Add("Pathlength to cavern entrance to mid of Jungle", vPathLength);
+            Add("Tiles to mine for mid Jungle cavern", vTilesToMine);
+            Add("Pathlength to cavern entrance to deep Jungle", vPathLength);
+            Add("Tiles to mine for deep Jungle cavern", vTilesToMine);
+
+            Add("Temple Distance", vDistanceLong);            
+            Add("Temple horizontal distance", vDistanceLong);
+            Add("Temple at player side of jungle (%)", v0to100);
+            Add("Temple at ocean side of jungle (%)", v0to100);
+            Add("Temple at height (%)", v0to100);
+            Add("Temple at depth (%)", v0to100);
+
             Add("Score", vScore);
 
 

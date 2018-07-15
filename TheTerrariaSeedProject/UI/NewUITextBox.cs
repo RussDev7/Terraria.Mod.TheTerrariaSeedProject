@@ -41,8 +41,10 @@ namespace TheTerrariaSeedProject.UI
 
 		public event Action OnEnterPressed;
 
-		//public event Action OnUpPressed;
-		internal bool unfocusOnEnter = true;
+        public event Action OnMouseLeftPressed; //###
+
+        //public event Action OnUpPressed;
+        internal bool unfocusOnEnter = true;
 
 		internal bool unfocusOnTab = true;
 
@@ -271,11 +273,10 @@ namespace TheTerrariaSeedProject.UI
 					//OnTabPressed?.Invoke(); //###
                     if (OnTabPressed != null) OnTabPressed.Invoke();
                 }
-                if (Main.mouseLeft)
+                if (Main.mouseLeft) //###
                 {
-                    if (unfocusOnClick) Unfocus();
-                    //OnTabPressed?.Invoke(); //###
-                    if (OnTabPressed != null) OnTabPressed.Invoke();
+                    if (unfocusOnClick) Unfocus();                    
+                    if (OnMouseLeftPressed != null) OnMouseLeftPressed.Invoke();
                 }
 
                 if (JustPressed(Keys.Enter))

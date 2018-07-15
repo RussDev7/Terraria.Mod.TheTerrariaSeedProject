@@ -306,7 +306,11 @@ namespace TheTerrariaSeedProject.UI
             infopanel.AddTextInput(OptionsDict.WorldInformation.worldName).SetValue(Main.worldName);
             infopanel.AddTextInput(OptionsDict.Configuration.startingSeed).SetValue(Main.ActiveWorldFileData.Seed.ToString());
             addDictToInfo(OptionsDict.Configuration.searchSeedNum).SetValue("10000");
+            addDictToInfo(OptionsDict.Configuration.stopSearchNum).SetValue("100");
+
+
             addDictToInfo(OptionsDict.Configuration.storeMMPic).SetValue("Off");
+            addDictToInfo(OptionsDict.Configuration.storeStats).SetValue("Off");
             //addDictToInfo(OptionsDict.GeneralOptions.searchRare).SetValue(opdict[OptionsDict.GeneralOptions.searchRare][opdict[OptionsDict.GeneralOptions.searchRare].Count - 1]);
             addSelectListToInfo(OptionsDict.GeneralOptions.omitRare, InfoPanel.listKindOmitRare);
             addSelectListToInfo(OptionsDict.GeneralOptions.naming, InfoPanel.listKindNaming);
@@ -320,7 +324,8 @@ namespace TheTerrariaSeedProject.UI
             addDictToInfo(OptionsDict.Phase1.silverTungsten).SetValue("Random");
             addDictToInfo(OptionsDict.Phase1.goldPlatin).SetValue("Random");
             addDictToInfo(OptionsDict.Phase1.moonType).SetValue("Random");
-            
+            addDictToInfo(OptionsDict.Phase1.hallowSide).SetValue("Random");
+
 
 
             addFreeLine();
@@ -492,11 +497,14 @@ namespace TheTerrariaSeedProject.UI
             return infopanel.AddSelectableList(new SelectableList(what), kind);
         }
 
-        
+
+
+        float lastProgessMargin = 0;
         public void HideUnhideProgressBar()
         {
+            lastProgessMargin = this.progressBar.MarginBottom;
             this.progressBar.MarginBottom = -this.progressBar.MarginBottom;
-            this.Recalculate();
+            //this.Recalculate();  can crash mod here -_> update
         }
 
 
@@ -537,17 +545,18 @@ namespace TheTerrariaSeedProject.UI
                     writeText = false;
                     rephrasing = false;
                 }
-
-
-                if (infopanel != null && infopanel.uielem.Count != lastOptionSize)
+                
+                if (infopanel != null && infopanel.uielem.Count != lastOptionSize )
                 {
 
-                    SetToConfiguration(Configuration.GenerateConfiguration(infopanel.selectables), false);
+                    SetToConfiguration(Configuration.GenerateConfiguration(infopanel.selectables), true); // was false, test debug true, seems to work so far but should not be needed
 
                     lastOptionSize = infopanel.uielem.Count;
                     //WorldGenSeedSearch.writeDebugFile(" updated size to " + lastOptionSize);
                 }
 
+                if (this.progressBar!=null && lastProgessMargin != this.progressBar.MarginBottom)
+                    this.Recalculate();
 
             }
         }
