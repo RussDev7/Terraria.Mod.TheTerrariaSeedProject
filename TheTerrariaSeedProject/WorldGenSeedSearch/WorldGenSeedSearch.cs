@@ -816,12 +816,12 @@ namespace TheTerrariaSeedProject
                 }
                 else
                 {
-                    writeDebugFile(" could not build seed " + seed + " with size " + Main.maxTilesX + " and evil type " + WorldGen.WorldGenParam_Evil + " expert mode " + Main.expertMode);
+                    writeDebugFile(" could not build seed " + seed + " with size " + Main.maxTilesX + " and evil type " + WorldGen.WorldGenParam_Evil + " expert mode " + Main.expertMode + " in stage " + stage) ;
                     writeDebugFile(ex.Message );                    
                     writeDebugFile(ex.ToString());
-                    
+                                        
                     //todod remove from stats
-                    couldNotGenerateStage[stage]++;
+                    couldNotGenerateStage[stage==42?4:stage]++;
 
                     if (statsUpdated)
                     {
@@ -2827,7 +2827,7 @@ namespace TheTerrariaSeedProject
                 }
                 if (cmp < Int32.MaxValue)
                 {
-                    Tuple<List<Tuple<int, int>>, int> entrpath = FindCaveEntrance(ref pathLength, cmxi, cy);
+                    Tuple<List<Tuple<int, int>>, int, int> entrpath = FindCaveEntrance(ref pathLength, cmxi, cy);
                     Tuple<int, int> entr = entrpath.Item1.Last();
                     int tilesToMine = entrpath.Item2;
 
@@ -2868,7 +2868,7 @@ namespace TheTerrariaSeedProject
                 int jmey = 0;
                 if (jmp < Int32.MaxValue)
                 {
-                    Tuple<List<Tuple<int, int>>, int> entrpathJ = FindCaveEntrance(ref pathLength, jmxi, jy);
+                    Tuple<List<Tuple<int, int>>, int, int> entrpathJ = FindCaveEntrance(ref pathLength, jmxi, jy, true, leftmostCavernJungleTilex + jungleWide/10, rightmostCavernJungleTilex+ jungleWide/10);
                     score.itemLocation.Add(ItemID.JungleShirt, entrpathJ.Item1);
 
                     Tuple<int, int> entrJ = entrpathJ.Item1.Last();
@@ -2878,7 +2878,7 @@ namespace TheTerrariaSeedProject
                     hasOBjectOrParam["Pathlength to cavern entrance to mid of Jungle"] = pathLength[entrJ.Item1, entrJ.Item2] / pathNormFac;                    
                     hasOBjectOrParam["Tiles to mine for mid Jungle cavern"] = entrpathJ.Item2;
 
-                    if(jmex > leftmostSurfaceJungleTilex + jungleWideSurf/10 && jmex < rightmostSurfaceJungleTilex + jungleWideSurf / 10 && entrpathJ.Item2 < Main.maxTilesY/120)
+                    if(jmex > leftmostSurfaceJungleTilex + jungleWideSurf/10 && jmex < rightmostSurfaceJungleTilex + jungleWideSurf / 10 && entrpathJ.Item2 < Main.maxTilesY/120 && entrpathJ.Item3 == 0)
                         hasOBjectOrParam["Free cavern to mid Jungle"] = 1;
                 }
 
@@ -2914,7 +2914,7 @@ namespace TheTerrariaSeedProject
                 int jmeyd = 100;
                 if (jmp < Int32.MaxValue)
                 {
-                    Tuple<List<Tuple<int, int>>, int> entrpathJB = FindCaveEntrance(ref pathLength, jmxi, jmyi);
+                    Tuple<List<Tuple<int, int>>, int, int> entrpathJB = FindCaveEntrance(ref pathLength, jmxi, jmyi, true, leftmostCavernJungleTilex + jungleWide / 10, rightmostCavernJungleTilex + jungleWide / 10);
                     score.itemLocation.Add(ItemID.JunglePants, entrpathJB.Item1);
 
                     Tuple<int, int> entrJB = entrpathJB.Item1.Last();
@@ -2923,7 +2923,7 @@ namespace TheTerrariaSeedProject
                     hasOBjectOrParam["Pathlength to cavern entrance to deep Jungle"] = pathLength[jmexd, jmeyd] / pathNormFac;
                     hasOBjectOrParam["Tiles to mine for deep Jungle cavern"] = entrpathJB.Item2;
                     
-                    if (jmexd > leftmostSurfaceJungleTilex + jungleWideSurf / 10 && jmexd < rightmostSurfaceJungleTilex + jungleWideSurf / 10 && entrpathJB.Item2 < Main.maxTilesY / 60)
+                    if (jmexd > leftmostSurfaceJungleTilex + jungleWideSurf / 10 && jmexd < rightmostSurfaceJungleTilex + jungleWideSurf / 10 && entrpathJB.Item2 < Main.maxTilesY / 60 && entrpathJB.Item3 == 0)
                         hasOBjectOrParam["Free cavern to deep Jungle"] = 1;
                 }
                 if( Math.Abs(jmexd-jmex) < 5 && Math.Abs(jmeyd - jmey) < 5 && hasOBjectOrParam["Free cavern to deep Jungle"] == 1 && hasOBjectOrParam["Free cavern to mid Jungle"]==1)
@@ -3119,7 +3119,7 @@ namespace TheTerrariaSeedProject
         }*/
 
 
-        Tuple<List<Tuple<int, int>>,int> FindCaveEntrance(ref int[,] pathlength, int x, int y, bool excludeLastMiningTiles=true)
+        Tuple<List<Tuple<int, int>>,int, int> FindCaveEntrance(ref int[,] pathlength, int x, int y, bool excludeLastMiningTiles=true, int borderLeftX = -1, int borderRightX = 100000)
         {
             List < Tuple<int, int> > path= new List<Tuple<int, int>>();
             path.Add(new Tuple<int, int>(x, y));
@@ -3130,6 +3130,7 @@ namespace TheTerrariaSeedProject
             int ominv = pathlength[x + 0, y + 0];
             int tilesToMine = 0;
             int ctilesToMine = 0;
+            int tilesOutside = 0;
 
             while ((y > Main.worldSurface && y > Main.spawnTileY + 10) || Main.tile[x, y].wall != WallID.None || Main.tile[x, y].active() == true)
             {
@@ -3141,7 +3142,9 @@ namespace TheTerrariaSeedProject
                 
                 int minv = pathlength[x + 0, y + 0];
 
-           
+                if (x < borderLeftX || x > borderRightX)
+                    tilesOutside++;
+
                 ominv = minv;
 
                 
@@ -3183,7 +3186,7 @@ namespace TheTerrariaSeedProject
             }           
 
             if(!excludeLastMiningTiles) tilesToMine += ctilesToMine;
-            return new Tuple<List<Tuple<int, int>>, int>(path, tilesToMine);
+            return new Tuple<List<Tuple<int, int>>, int, int>(path, tilesToMine, tilesOutside);
         }
 
 
