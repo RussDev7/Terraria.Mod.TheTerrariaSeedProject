@@ -1441,6 +1441,9 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Ice Surface", 0);
             hasOBjectOrParam.Add("Snow biome surface overlap mid", 0);
             hasOBjectOrParam.Add("Jungle biome surface overlap mid", 0);
+            hasOBjectOrParam.Add("Jungle biome distance to mid", 100000);
+            hasOBjectOrParam.Add("Snow biome distance to mid", 100000);
+            hasOBjectOrParam.Add("Evil biome distance to mid", 100000);
 
 
             hasOBjectOrParam.Add("Nearest Evil left Ocean", Main.maxTilesX);
@@ -1954,8 +1957,13 @@ namespace TheTerrariaSeedProject
             if (pyramids > (Main.maxTilesY / 600 + 1) )
                 hasOBjectOrParam["Many Pyramids"] += (pyramids - (Main.maxTilesY / 600 + 1));
 
-            
-           
+
+            if (score.itemLocation.ContainsKey(ItemID.HermesBoots) && score.itemLocation.ContainsKey(ItemID.FlurryBoots) && score.itemLocation[ItemID.HermesBoots][0].Item1 == score.itemLocation[ItemID.FlurryBoots][0].Item1 && score.itemLocation[ItemID.HermesBoots][0].Item2 == score.itemLocation[ItemID.FlurryBoots][0].Item2)
+            {
+                score.itemLocation.Remove(ItemID.FlurryBoots);
+            }
+
+
 
             ts = stopWatch.Elapsed;
             elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
@@ -1987,6 +1995,10 @@ namespace TheTerrariaSeedProject
 
             int activeTiles = 0;
             int evilTiles = 0;
+                
+
+            int leftmostSurfaceSnowTilex = Main.maxTilesX;
+            int rightmostSurfaceSnowTilex = 0;
 
             int leftmostCavernJungleTilex = Main.maxTilesX;
             int rightmostCavernJungleTilex = 0;
@@ -2125,7 +2137,10 @@ namespace TheTerrariaSeedProject
                                 hasOBjectOrParam["Ice Surface"] += 1;
                             }
 
-                            if( y < Main.worldSurface && ((x > Main.maxTilesX / 2 && dungSide==0)|| (x < Main.maxTilesX / 2 && dungSide == 1)))
+                            if (y < Main.rockLayer && x < leftmostSurfaceSnowTilex) leftmostSurfaceSnowTilex = x;
+                            if (y < Main.rockLayer && x > rightmostSurfaceSnowTilex) rightmostSurfaceSnowTilex = x;
+
+                            if ( y < Main.worldSurface && ((x > Main.maxTilesX / 2 && dungSide==0)|| (x < Main.maxTilesX / 2 && dungSide == 1)))
                             {
                                 hasOBjectOrParam["Snow biome surface overlap mid"] += 1;
                             }
@@ -2194,6 +2209,8 @@ namespace TheTerrariaSeedProject
                             || tile.type == TileID.Ebonsand || tile.type == TileID.Crimsand || tile.type == TileID.CorruptIce || tile.type == TileID.FleshIce)
                         {
 
+                            if (y< Main.rockLayer && Math.Abs(x - Main.maxTilesX / 2) < hasOBjectOrParam["Evil biome distance to mid"]) hasOBjectOrParam["Evil biome distance to mid"] = Math.Abs(x - Main.maxTilesX / 2);
+                            
 
                             hasOBjectOrParam["Nearest Evil left Ocean"] = Math.Min(x, hasOBjectOrParam["Nearest Evil left Ocean"]);
                             hasOBjectOrParam["Nearest Evil right Ocean"] = Math.Max(x, hasOBjectOrParam["Nearest Evil right Ocean"]);
@@ -2306,27 +2323,29 @@ namespace TheTerrariaSeedProject
                             }
 
                         }
+                        //check jungle loc
+                        else if (tile.type == TileID.JungleGrass)
+                        {
+                            if (y > Main.rockLayer)
+                            {
+                                if (x < leftmostCavernJungleTilex) leftmostCavernJungleTilex = x;
+                                if (x > rightmostCavernJungleTilex) rightmostCavernJungleTilex = x;
+                            }
+                            if (y < Main.rockLayer)
+                            {
+                                if (x < leftmostSurfaceJungleTilex) leftmostSurfaceJungleTilex = x;
+                                if (x > rightmostSurfaceJungleTilex) rightmostSurfaceJungleTilex = x;
+                            }
+                        }
+
 
 
                         if (doFull)
                         {
 
-                            //check jungle loc
-                            if (tile.type == TileID.JungleGrass )
-                            {
-                                if (y > Main.rockLayer)
-                                {
-                                    if (x < leftmostCavernJungleTilex) leftmostCavernJungleTilex = x;
-                                    if (x > rightmostCavernJungleTilex) rightmostCavernJungleTilex = x;
-                                }
-                                if (y < Main.rockLayer)
-                                {
-                                    if (x < leftmostSurfaceJungleTilex) leftmostSurfaceJungleTilex = x;
-                                    if (x > rightmostSurfaceJungleTilex) rightmostSurfaceJungleTilex = x;
-                                }
-                            }
+                            
                             //ESS                    
-                            else if ((tile.type == (ushort)187) && (tile.frameX == (short)918) && (tile.frameY == (short)0))
+                            if ((tile.type == (ushort)187) && (tile.frameX == (short)918) && (tile.frameY == (short)0))
                             {
                                 
                                 if (score.itemLocation.ContainsKey(ItemID.EnchantedSword))
@@ -2799,6 +2818,10 @@ namespace TheTerrariaSeedProject
 
             hasOBjectOrParam.Add("Distance Dungeon to mid", Math.Abs(Main.dungeonX - Main.maxTilesX/2));
             hasOBjectOrParam.Add("Ice surface more than half evil", hasOBjectOrParam["Ice surface evil"] > (hasOBjectOrParam["Ice Surface"] + 50) ? 1 : 0);
+
+            hasOBjectOrParam["Jungle biome distance to mid"] = localDungeonSide < 0 ? (leftmostSurfaceJungleTilex - Main.maxTilesX / 2) : (Main.maxTilesX / 2 - rightmostSurfaceJungleTilex);
+            hasOBjectOrParam["Snow biome distance to mid"] = localDungeonSide > 0 ? (leftmostSurfaceSnowTilex - Main.maxTilesX / 2) : (Main.maxTilesX / 2 - rightmostSurfaceSnowTilex);
+             
 
 
 
@@ -5555,14 +5578,15 @@ namespace TheTerrariaSeedProject
                     rgbValues[off] = (byte)(((0.25 * (int)rgbValues[off]) + 192));
 
                 }
-
+                                
 
                 foreach (var itemloclist in score.itemLocation)
                 {
                     foreach (var itemloc in itemloclist.Value)
-                    {
+                    {                       
+
                         if(itemloclist.Key != ItemID.StoneBlock && itemloclist.Key != ItemID.JungleShirt && itemloclist.Key != ItemID.JunglePants)
-                            DrawItemImage(ref rgbValues, itemloclist.Key, itemloc, scale);
+                            DrawItemImage(ref rgbValues, itemloclist.Key, itemloc, scale);                        
                     }
                 }
                 foreach (var heart in hearts)
