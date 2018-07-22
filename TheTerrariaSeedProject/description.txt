@@ -37,7 +37,7 @@ If you found some bugs, have some ideas for more features, want to help coding o
 Good luck!
 
 Last Update:
--bug fix, enhancement jungle path
+-bug fix, enhancement jungle path, jubgle, snow, evil biome distance to mid
 -more path finding
 -more map icons
 -dummy tool to simplify search
