@@ -1112,6 +1112,7 @@ namespace TheTerrariaSeedProject
                         {
                             gotoCreation = false;
                             isInCreation = true;
+                            
                             uiss.HideUnhideProgressBar();
                             while (!ended && !searchForSeed) { clearWorld(stage); };
                             uiss.HideUnhideProgressBar(); 
@@ -1207,10 +1208,20 @@ namespace TheTerrariaSeedProject
             }
 
 
-
-
-
-            if (stage == 1)
+            if (!searchForSeed)
+            {
+                int resetIndex = tasks.FindIndex(genpass => genpass.Name.Equals("Reset"));
+                if (resetIndex != -1)
+                {
+                    //other tasks not needed now
+                    tasks.Insert(resetIndex + 1, new PassLegacy("Setup configuration", delegate (GenerationProgress progress)
+                    {
+                        progress.Message = "Setup configuration";
+                    }));                    
+                    tasks.RemoveRange(resetIndex + 2, tasks.Count - resetIndex - 2);
+                }
+            }
+            else if (stage == 1)
             {
                 
                 int genIndex = tasks.FindIndex(genpass => genpass.Name.Equals("Sand"));
@@ -1688,14 +1699,17 @@ namespace TheTerrariaSeedProject
                     //double glitch detector might not work
                     if (chest.item[0] != null &&
                         (Main.tile[cx, cy - 1].active() && Main.tile[cx, cy - 1].type == TileID.ClosedDoor) ||
-                        (Main.tile[cx + 1, cy - 1].active() && Main.tile[cx + 1, cy - 1].type == TileID.ClosedDoor)
-                        ) { hasOBjectOrParam["Chest Doub Glitch"] += 1; writeDebugFile("maybe found doubglitch (buggy) at " + cx + " " + cy + " in seed " + Main.ActiveWorldFileData.Seed + " can get overridden: "+ (!doFull));
-                        if (score.itemLocation.ContainsKey(ItemID.WoodenDoor))
-                            score.itemLocation[ItemID.WoodenDoor].Add(new Tuple<int, int>(cx, cy));
-                        else
-                            score.itemLocation.Add(ItemID.WoodenDoor, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
+                        (Main.tile[cx + 1, cy - 1].active() && Main.tile[cx + 1, cy - 1].type == TileID.ClosedDoor) ||
+                        !Main.tile[cx, cy + 2].active() || !Main.tile[cx + 1, cy + 2].active()                 
+                        ) {
 
-                    }
+                        hasOBjectOrParam["Chest Doub Glitch"] += 1; writeDebugFile("maybe found doubglitch (buggy) at " + cx + " " + cy + " in seed " + Main.ActiveWorldFileData.Seed + " can get overridden: "+ (!doFull));
+                        if (score.itemLocation.ContainsKey(ItemID.DynastyChest))
+                            score.itemLocation[ItemID.DynastyChest].Add(new Tuple<int, int>(cx, cy));
+                        else
+                            score.itemLocation.Add(ItemID.DynastyChest, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
+
+                    }                  
                     
 
                     //TODO Grab distance trough walls not included yet,, edit: still not?
@@ -5699,13 +5713,15 @@ namespace TheTerrariaSeedProject
                     int offt = (y + yoff+ h ) * Main.maxTilesX * 4 / scale + x * 4 + w * 4 - cit.Width / 2 * 4;
                     int imgof = h * cit.Width + w;
 
-                    bool isWhite = (tc[imgof].B == 0); //;&& ( (h- cit.Height/2)* (h - cit.Height / 2) + (w-cit.Width/2)* (w - cit.Width / 2) ) > (cit.Width* cit.Height / 4 );
+                    bool isWhite = (tc[imgof].A == 0); //;&& ( (h- cit.Height/2)* (h - cit.Height / 2) + (w-cit.Width/2)* (w - cit.Width / 2) ) > (cit.Width* cit.Height / 4 );
 
                     rgbValues[offt + 0] = isWhite ? rgbValues[offt + 0] : tc[imgof].B;
                     rgbValues[offt + 1] = isWhite ? rgbValues[offt + 1] : tc[imgof].G;
                     rgbValues[offt + 2] = isWhite ? rgbValues[offt + 2] : tc[imgof].R;
                     rgbValues[offt + 3] = isWhite ? rgbValues[offt + 3] : tc[imgof].A;
-                }            
+                }
+            
+            tc = null;
         }
 
         public void DrawCircle(ref byte[] rgbValues, Tuple<int, int> where, int scale, Color cc)
