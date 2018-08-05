@@ -138,6 +138,7 @@ namespace TheTerrariaSeedProject
                 searchForSeed = false;
                 isInCreation = false;
                 inSearch = false;
+                gotoCreation = false;
 
                 //do_worldGenCallBack 
                 //doing new world`?
@@ -1208,7 +1209,7 @@ namespace TheTerrariaSeedProject
             }
 
 
-            if (!searchForSeed)
+            if (!searchForSeed && (stage > 0 || ended))
             {
                 int resetIndex = tasks.FindIndex(genpass => genpass.Name.Equals("Reset"));
                 if (resetIndex != -1)
@@ -4659,7 +4660,7 @@ namespace TheTerrariaSeedProject
 
             if (hasOBjectOrParam["Chest Doub Glitch"] > 0)
             {
-                score += hasOBjectOrParam["Chest Doub Glitch"] > 0 ? 1337 * hasOBjectOrParam["Chest Doub Glitch"] : 0;
+                score += hasOBjectOrParam["Chest Doub Glitch"] > 0 ? 420 * hasOBjectOrParam["Chest Doub Glitch"] : 0;
                 allScoreText += System.Environment.NewLine + "Score Chest Doub Glitch " + (int)score;
             }
 
