@@ -171,7 +171,7 @@ namespace TheTerrariaSeedProject.UI
         public static readonly List<string> vNearEvilOcean = getPatern(0, 8, 25).Concat(getPatern(400, 5, 100)).Concat(getPatern(1000, 10, 200)).ToList();
         public static readonly List<string> vBeachPenalty = getPatern(100, 9, 100).Concat(getPatern(1000, 4, 250)).Concat(getPatern(2000, 16, 500)).Concat(getPatern(10000, 11, 1000)).ToList();
         public static readonly List<string> vEvilTiles = getPatern(0, 10, 10).Concat(getPatern(100, 9, 100)).Concat(getPatern(1000, 9, 1000)).Concat(getPatern(10000, 9, 5000)).ToList();
-        public static readonly List<string> vDistance = getPatern(100, 9, 100).Concat(getPatern(1000, 4, 250)).Concat(getPatern(2000, 5, 500)).ToList();
+        public static readonly List<string> vDistance = getPatern(100, 9, 100).Concat(getPatern(1000, 5, 200)).Concat(getPatern(2000, 9, 250)).ToList();
         public static readonly List<string> vDistanceShort = getPatern(25, 9, 25).Concat(getPatern(250, 4, 50)).Concat(getPatern(500, 11, 100)).ToList();
         public static readonly List<string> vDistanceLong = getPatern(200, 8, 100).Concat(getPatern(1000, 17, 200)).ToList();
         public static readonly List<string> vNumTiles = getPatern(0, 10, 10).Concat(getPatern(100, 9, 100)).Concat(getPatern(1000, 10, 1000)).ToList();
@@ -188,7 +188,10 @@ namespace TheTerrariaSeedProject.UI
         public static readonly List<string> vGeyDetoTrap = getPatern(0, 50).Concat(getPatern(50, 11, 10)).ToList();
         public static readonly List<string> vPathLength = getPatern(100, 9, 100).Concat(getPatern(1000, 7, 500)).Concat(getPatern(5000, 6, 1000)).ToList();
         public static readonly List<string> vTilesToMine = getPatern(0, 50).Concat(getPatern(50, 11, 10)).ToList();
+        public static readonly List<string> vAltarBeach = (new string[] { "0", "10", "25", "50", "75", "100", "150", "200", "250", "300" } ).Concat(getPatern(400, 12, 100)).ToList();
         public static readonly List<string> vdummy = getPatern(0, 21).Concat(new string[] { "50","100","200","500","1000"}).ToList();
+        public static readonly List<string> vMaxDist = getPatern(0, 20, 10).Concat(getPatern(200, 17, 25)).ToList();
+        public static readonly List<string> vMeanHeight = getPatern(0, 26, 10);
 
         public static readonly List<string> vForUnknown = getPatern(0, 10).Concat(getPatern(10, 9, 10)).Concat(getPatern(100, 9, 100)).Concat(getPatern(1000, 9, 1000)).Concat(getPatern(10000, 10, 10000)).ToList();
 
@@ -274,8 +277,8 @@ namespace TheTerrariaSeedProject.UI
                 "\n\n So far I found small maps with 4 pyramids, medium and large with 5.\n \n"+
                 "Challenge: Will you find more? Good luck!" +
                 "\n \n \n"+
-                "Update: You can now also select which ores and moon style the map should have. This is checked before pyramid chance and so very fast. To enter Phase 2 all conditions (ores, moon, pyramid chance) need to be true."
-                
+                "Update: You can now also select which ores and moon style the map should have. This is checked before pyramid chance and so very fast. To enter Phase 2 all conditions (ores, moon, pyramid chance) need to be true."                
+
                 });
 
 
@@ -298,7 +301,9 @@ namespace TheTerrariaSeedProject.UI
                 "ocean is far above the bordering areas.Such a high cliff will result in a Beach penalty of over 9000 in most cases. It only considers the world structure, so e.g.evil biome tiles are not part of that penalty but "+
                 "the deep holes of the corruption biome have a high negative impact. Near Dungeon also has negative impact, near living tree does not. Try around a find a value you like. \n \n"+ 
                 "Update: -Tool- dummies, they change the current phase points by selected value. You can use those e.g. if you selected 5 objects in the negative list (and nothing in positive) but you are fine if only 4 of them are true (<). For this "+
-                "add this tool to positive list and select 2 as value. This will give always 2 points. Or if you search for more than one at the same time and value each different (e.g. 3<5, 3+4>5, 6>5, 6+3+4>5)."});
+                "add this tool to positive list and select 2 as value. This will give always 2 points. Or if you search for more than one at the same time and value each different (e.g. 3<5, 3+4>5, 6>5, 6+3+4>5). \n "  +
+                "-Dungeon farm spot detection. You can search for the number of spot where all 3 Dungeon Wall intersect each other (cyan at mini map) or a line which contain each dungeon wall kind with at least 16 tiles width (dark cyan at mini map)."
+                });
 
 
 
@@ -398,18 +403,21 @@ namespace TheTerrariaSeedProject.UI
                 "Dungeon tiles above surface",
                 "Pre Skeletron Dungeon Chest Risky",
                 "Pre Skeletron Dungeon Chest Grab",
-                "Water Bolt before Skeletron",
+                "Water Bolt before Skeletron",                
                 "Water Bolt",
                 "Muramasa",
                 "Cobalt Shield",
                 "Valor",
                 "Bone Welder",
-                "Alchemy Table",
+                "Alchemy Table",                
                 "Green Dungeon Walls",
                 "Blue Dungeon Walls",
                 "Pink Dungeon Walls",
                 "All Dungeon Walls",
-                "All Dungeon Items",                                
+                "Dungeon farm spot",
+                "Dungeon farm spot 3Wall inters.",
+                "Dungeon farm spot 3Wall in line",
+                "All Dungeon Items",                
                 "Beach penalty mean",
                 "Beach penalty max",
                 "Nearest Evil left Ocean",
@@ -421,6 +429,10 @@ namespace TheTerrariaSeedProject.UI
                 "No Ocean",
                 "Snow biome surface overlap mid",
                 "Jungle biome surface overlap mid",
+                "Jungle biome distance to mid",
+                "Surface average height (aprox.)",
+                "Surface height (sqrt) variance",
+                "Surface max-min height",
                 OptionsDict.Tools.dummyPlus
                 });
             
@@ -440,12 +452,20 @@ namespace TheTerrariaSeedProject.UI
                 "Beach penalty mean",
                 "Beach penalty max",
                 "Has evil Ocean",
-				"No Ocean",
+                "Has evil Dungeon Ocean",
+                "Has evil Jungle Ocean",
+                "No Ocean",
                 "Green Dungeon Walls",
                 "Blue Dungeon Walls",
                 "Pink Dungeon Walls",
                 "Snow biome surface overlap mid",
                 "Jungle biome surface overlap mid",
+                "Jungle biome distance to mid",
+                "Snow biome distance to mid",
+                "Evil biome distance to mid",
+                "Surface average height (aprox.)",
+                "Surface height (sqrt) variance",
+                "Surface max-min height",
                 OptionsDict.Tools.dummyNeg
             });
 
@@ -463,25 +483,34 @@ namespace TheTerrariaSeedProject.UI
             Add("Dungeon tiles above surface", v0to120);            
             Add("Pre Skeletron Dungeon Chest Risky", v0to10);
             Add("Pre Skeletron Dungeon Chest Grab", v0to10);
-            Add("Water Bolt before Skeletron", v0to5);
+            Add("Water Bolt before Skeletron", v0to5);            
             Add("Water Bolt", v0to10);
             Add("Muramasa", v0to10);
             Add("Cobalt Shield", v0to10);
             Add("Valor", v0to10);
             Add("Bone Welder", v0to10);
-            Add("Alchemy Table", v0to10);
+            Add("Alchemy Table", v0to10);            
             Add("Green Dungeon Walls", vDungeonWalls);
             Add("Blue Dungeon Walls", vDungeonWalls);
             Add("Pink Dungeon Walls", vDungeonWalls);
-            Add("All Dungeon Walls", vDungeonALLWalls);
-            Add("All Dungeon Items", v0to1);
+            Add("All Dungeon Walls", vDungeonALLWalls);            
+            Add("Dungeon farm spot", v0to10);
+            Add("Dungeon farm spot 3Wall inters.", v0to10);
+            Add("Dungeon farm spot 3Wall in line", v0to10);
+            Add("All Dungeon Items", v0to1);            
             Add("Nearest Evil left Ocean", vNearEvilOcean);
             Add("Nearest Evil right Ocean", vNearEvilOcean);
             Add("Evil only one side", v0to1);
             Add("Snow biome surface overlap mid", vNumTiles);
             Add("Jungle biome surface overlap mid", vNumTiles);
-            
-            
+            Add("Jungle biome distance to mid", vDistance);
+            Add("Snow biome distance to mid", vDistance);
+            Add("Evil biome distance to mid", vDistance);
+            Add("Surface average height (aprox.)", vMeanHeight);
+            Add("Surface height (sqrt) variance", v0to120);
+            Add("Surface max-min height", vMaxDist);
+
+
 
             Add("Beach penalty mean", vBeachPenalty);
             Add("Beach penalty max", vBeachPenalty);            
@@ -496,6 +525,8 @@ namespace TheTerrariaSeedProject.UI
             Add("Distance Pyramid to mid", vDistance);
             Add("Distance Dungeon to mid", vDistance);
             Add("Has evil Ocean", v0to2);
+            Add("Has evil Dungeon Ocean", v0to1);
+            Add("Has evil Jungle Ocean", v0to1);
 
 
             Add(OptionsDict.Tools.dummyPlus, vdummy);
@@ -579,6 +610,8 @@ namespace TheTerrariaSeedProject.UI
                 "Temple at depth (%)",
                 "Open Temple",
                 "Floating Island without chest",
+                "Nearest Altar Dungeon beach",
+                "Nearest Altar Jungle beach",
                 "Score",
                 OptionsDict.Tools.dummyPlus
                 });
@@ -614,6 +647,8 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to cavern entrance to deep Jungle",
                 "Tiles to mine for deep Jungle cavern",
                 "Floating Island without chest",
+                "Nearest Altar Dungeon beach",
+                "Nearest Altar Jungle beach",
                 "Score",
                 OptionsDict.Tools.dummyNeg
             });
@@ -686,6 +721,8 @@ namespace TheTerrariaSeedProject.UI
             Add("Free cavern to deep Jungle", v0to1);
             Add("Jungle cavern not blocked by structure", v0to1);
             Add("Open Temple", v0to1);
+            Add("Nearest Altar Dungeon beach", vAltarBeach);
+            Add("Nearest Altar Jungle beach", vAltarBeach);
 
 
             Add("Hermes Flurry Boots Distance", vDistanceShort);
@@ -716,9 +753,9 @@ namespace TheTerrariaSeedProject.UI
             Add("Temple at ocean side of jungle (%)", v0to100);
             Add("Temple at height (%)", v0to100);
             Add("Temple at depth (%)", v0to100);
+                        
 
             Add("Score", vScore);
-
 
         }
 
