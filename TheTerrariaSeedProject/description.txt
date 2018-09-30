@@ -37,6 +37,7 @@ If you found some bugs, have some ideas for more features, want to help coding o
 Good luck!
 
 Last Update:
+-surface height and var., altar-search for beach houses, dungeon farm spot detection, Has evil Dungeon/Jungle Ocean
 -bug fix
 -bug fix, enhancement jungle path, jubgle, snow, evil biome distance to mid
 -more path finding
