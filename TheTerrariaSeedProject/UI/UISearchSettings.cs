@@ -762,6 +762,8 @@ namespace TheTerrariaSeedProject.UI
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Enchanted Sword near Pyramid", "");
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Near Enchanted Sword", "");
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Floating Island without chest", "");
+                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit No Ocean", "");
+                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Chest Doub Glitch", "");
 
                     currentConfig.ChangeValueOfSelectableText(0, Configuration.ConfigItemType.SelectableText, OptionsDict.Configuration.configName, name);
 
@@ -791,6 +793,9 @@ namespace TheTerrariaSeedProject.UI
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Enchanted Sword near Tree", "");
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Enchanted Sword near Pyramid", "");
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Near Enchanted Sword", "");
+                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Floating Island without chest", "");
+                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit No Ocean", "");
+                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Chest Doub Glitch", "");
 
                     currentConfig.ChangeValueOfSelectableText(0, Configuration.ConfigItemType.SelectableText, OptionsDict.Configuration.configName, name);
 
@@ -808,26 +813,159 @@ namespace TheTerrariaSeedProject.UI
                     currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListPositive, "Tree Chest Loom", "1");
                     currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListPositive, "Pyramid Carpet", "1");
                     currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListPositive, "Pyramid Bottle", "1");
+                                       
+
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Has evil Ocean", "0");
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Ice surface more than half evil", "0");
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Distance Tree to mid", "700");
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Distance Cloud to mid", "700");
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Distance Pyramid to mid", "800");                    
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Evil Tiles for Jungle Grass", "0");
+
+
+
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Staff of Regrowth", "1");
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Flower Boots", "1");
+
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Temple Distance", (Main.maxTilesX / 16 * 6).ToString() );                    
+                }
+                else if (currentPositive == 4)
+                {
+                    name = "Perfect";
+                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Spawn in Snow biome", "");
+                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Dungeon far above surface", "");
+                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Pre Skeletron Dungeon Chest Risky", "");
+                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Enchanted Sword near Tree", "");
+                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Enchanted Sword near Pyramid", "");
+                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Near Enchanted Sword", "");
+                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Floating Island without chest", "");
+                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit No Ocean", "");
+                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Chest Doub Glitch", "");
+
+                    currentConfig.ChangeValueOfSelectableText(0, Configuration.ConfigItemType.SelectableText, OptionsDict.Configuration.configName, name);
+
+                    currentConfig.ChangeValueOfSelectableText(0, Configuration.ConfigItemType.InputField, OptionsDict.Configuration.searchSeedNum, "10000000");
+                    currentConfig.ChangeValueOfSelectableText(1, Configuration.ConfigItemType.Header, OptionsDict.Phase1.pyramidsPossible, "4");
+                    
+                    currentConfig.ChangeValueOfSelectableText(3, Configuration.ConfigItemType.Header, OptionsDict.Phase3.continueEvaluation, OptionsDict.Phase3.continueEvaluatioTakeOverTag);
+
+
+                    currentConfig.InsertPositiveList(2);
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListPositive, "Snow biome surface overlap mid", "10");
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListPositive, "Jungle biome surface overlap mid", "10");
+
+                    currentConfig.InsertPositiveList(2);
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListPositive, "Evil only one side", "1");
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListPositive, "Tree Chest Loom", "1");
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListPositive, "Pyramid Carpet", "1");
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListPositive, "Pyramid Bottle", "1");
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListPositive, "All Dungeon Walls", "100");
 
                     currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Has evil Ocean", "0");
                     currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Ice surface more than half evil", "0");
                     currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Distance Tree to mid", "700");
                     currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Distance Cloud to mid", "700");
                     currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Distance Pyramid to mid", "800");
-                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Evil Tiles for Jungle Grass", "0");
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Distance Dungeon to mid", (Main.maxTilesX / 16 * 5).ToString());
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Jungle biome distance to mid", (Main.maxTilesX / 16 * 3).ToString());
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Snow biome distance to mid", (Main.maxTilesX / 16 * 3).ToString());
 
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Evil Tiles for Jungle Grass", "0");
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Evil Tiles for Sand", "20000");
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Surface average height (aprox.)", "100");
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Surface height (sqrt) variance", "75");
+
+
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Lava Charm", "1");
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Water Walking Boots", "1");
                     currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Staff of Regrowth", "1");
                     currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Flower Boots", "1");
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Aglet", "1");
 
-                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Temple Distance", "1500");                    
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Temple horizontal distance", (Main.maxTilesX / 16 * 3).ToString());
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Temple at depth (%)", "30");
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Pathlength to Boots", "1300");
+                    
                 }
+                else if (currentPositive == 5)
+                {
+                    name = "FlatWorld";
+                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit All", "");
+
+                    currentConfig.ChangeValueOfSelectableText(0, Configuration.ConfigItemType.SelectableText, OptionsDict.Configuration.configName, name);
+
+                    currentConfig.ChangeValueOfSelectableText(0, Configuration.ConfigItemType.InputField, OptionsDict.Configuration.searchSeedNum, "10000");
+                                        
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListPositive, OptionsDict.Tools.dummyPlus, "1");
+                    
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Surface average height (aprox.)", "100");
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Surface height (sqrt) variance", "30");
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Surface max-min height", "135");
+                }
+                else if (currentPositive == 6)
+                {
+                    name = "SpeedRun";
+                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit All", "");
+
+                    currentConfig.ChangeValueOfSelectableText(0, Configuration.ConfigItemType.SelectableText, OptionsDict.Configuration.configName, name);
+
+                    currentConfig.ChangeValueOfSelectableText(0, Configuration.ConfigItemType.InputField, OptionsDict.Configuration.searchSeedNum, "1000000");
+
+
+                    currentConfig.InsertPositiveList(3);
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "neg. Pathlength to free ShadowOrb/Heart", "-1000");
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Free ShadowOrb/Heart", "3");
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "neg. Pathlength to Boots", "-1500");
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, OptionsDict.Tools.dummyPlus, "10");
+
+                    currentConfig.InsertPositiveList(3);
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "neg. Pathlength to Bee Hive", "-1000");
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "neg. Pathlength to Enchanted Sword", "-500");
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "neg. Pathlength to Boots", "-1500");
+                    //currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Very Near Enchanted Sword", "1");
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, OptionsDict.Tools.dummyPlus, "10");
+
+                    //currentConfig.InsertPositiveList(3);
+                    //currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Jungle cavern not blocked by structure", "1");
+                    //currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Free cavern to mid Jungle", "1");
+                    //currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, OptionsDict.Tools.dummyPlus, "1");
+                                       
+                    currentConfig.InsertPositiveList(3);
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Near Sunflower", "7");
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, OptionsDict.Tools.dummyPlus, "1");
+
+                    currentConfig.InsertPositiveList(3);
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Near Chest", "8");
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, OptionsDict.Tools.dummyPlus, "1");
+                                        
+                    currentConfig.InsertPositiveList(3);
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Meteorite Bar unlocked", "1");
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "neg. Pathlength to Teleport Potion", "-800");
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Nearest Teleportation Potion count", "2");                    
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, OptionsDict.Tools.dummyPlus, "10");
+
+                    
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Dungeon Distance", (Main.maxTilesX / 16 * 6).ToString());
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Temple Distance", (Main.maxTilesX / 16 * 6).ToString());
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Pathlength to Boots", "1000" );
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Pathlength to Iron/Lead Bar", "1000");
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Pathlength to Gold/Platinum", "1000");
+
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Pathlength to Slime Staute", "1500");
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Pathlength to Shark Staute", "1500");
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Pathlength to Anvil", "1500");
+                    
+
+                }
+
+
 
                 SetToConfiguration(currentConfig);
                 Selectable configNameInput = infopanel.Search4ElementWithHeaderName(OptionsDict.Configuration.configName);
                 configNameInput.SetValue(name);
 
                 currentPositive++;
-                if (currentPositive > 3) currentPositive = 0;
+                if (currentPositive > 6) currentPositive = 0;
                 writeText = true; 
             }            
         }

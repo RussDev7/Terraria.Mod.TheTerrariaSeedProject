@@ -186,12 +186,13 @@ namespace TheTerrariaSeedProject.UI
         public static readonly List<string> vSpikyTrap = getPatern(0, 31, 5);
         public static readonly List<string> vSpearTrap = getPatern(0, 21, 5);
         public static readonly List<string> vGeyDetoTrap = getPatern(0, 50).Concat(getPatern(50, 11, 10)).ToList();
-        public static readonly List<string> vPathLength = getPatern(100, 9, 100).Concat(getPatern(1000, 7, 500)).Concat(getPatern(5000, 6, 1000)).ToList();
+        public static readonly List<string> vPathLength = getPatern(100, 9, 100).Concat(getPatern(1000, 14, 250)).Concat(getPatern(5000, 6, 1000)).ToList();
+        public static readonly List<string> vPathLengthNeg = getPatern(-100, 9, -100).Concat(getPatern(-1000, 14, -250)).Concat(getPatern(-5000, 6, -1000)).ToList();
         public static readonly List<string> vTilesToMine = getPatern(0, 50).Concat(getPatern(50, 11, 10)).ToList();
         public static readonly List<string> vAltarBeach = (new string[] { "0", "10", "25", "50", "75", "100", "150", "200", "250", "300" } ).Concat(getPatern(400, 12, 100)).ToList();
         public static readonly List<string> vdummy = getPatern(0, 21).Concat(new string[] { "50","100","200","500","1000"}).ToList();
         public static readonly List<string> vMaxDist = getPatern(0, 20, 10).Concat(getPatern(200, 17, 25)).ToList();
-        public static readonly List<string> vMeanHeight = getPatern(0, 26, 10);
+        public static readonly List<string> vMeanHeight = getPatern(0, 51, 5);
 
         public static readonly List<string> vForUnknown = getPatern(0, 10).Concat(getPatern(10, 9, 10)).Concat(getPatern(100, 9, 100)).Concat(getPatern(1000, 9, 1000)).Concat(getPatern(10000, 10, 10000)).ToList();
 
@@ -585,8 +586,7 @@ namespace TheTerrariaSeedProject.UI
                 "Spiky Ball Trap",
                 "Spear Trap",
                 "Geyser",
-                "Detonator",
-                "Dungeon Distance",
+                "Detonator",                
                 "Ground Distance",
                 "Rock Distance",
                 "Meteorite Bar unlocked",
@@ -609,6 +609,29 @@ namespace TheTerrariaSeedProject.UI
                 "Temple at height (%)",
                 "Temple at depth (%)",
                 "Open Temple",
+                "neg. Pathlength to Temple Door",
+                "neg. Pathlength to Boots",
+                "neg. Pathlength to Iron/Lead Bar",
+                "neg. Pathlength to Gold/Platinum Bar",
+                "neg. Pathlength to Bomb",
+                "neg. Pathlength to Jester's Arrow",
+                "neg. Pathlength to Suspicious Looking Eye",
+                "neg. Pathlength to Snowball Cannon",
+                "neg. Pathlength to Teleport Potion",
+                "neg. Pathlength to Enchanted Sword",
+                "neg. Pathlength to Bee Hive",
+                "neg. Pathlength to Boomstick",
+                "neg. Pathlength to Slime Staute",
+                "neg. Pathlength to Shark Staute",
+                "neg. Pathlength to Anvil",
+                "neg. Pathlength to free ShadowOrb/Heart",
+                "neg. Pathlength into 40% cavern layer",
+                "neg. Pathlength to 40% cavern entrance",
+                "neg. Tiles to mine for 40% cavern",
+                "neg. Pathlength to cavern entrance to mid of Jungle",
+                "neg. Tiles to mine for mid Jungle cavern",
+                "neg. Pathlength to cavern entrance to deep Jungle",
+                "neg. Tiles to mine for deep Jungle cavern",
                 "Floating Island without chest",
                 "Nearest Altar Dungeon beach",
                 "Nearest Altar Jungle beach",
@@ -637,7 +660,10 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to Teleport Potion",                
                 "Pathlength to Enchanted Sword",
                 "Pathlength to Bee Hive",
-                "Pathlength to Boomstick",                
+                "Pathlength to Boomstick",
+                "Pathlength to Slime Staute",
+                "Pathlength to Shark Staute",
+                "Pathlength to Anvil",
                 "Pathlength to free ShadowOrb/Heart",
                 "Pathlength into 40% cavern layer",
                 "Pathlength to 40% cavern entrance",
@@ -721,6 +747,34 @@ namespace TheTerrariaSeedProject.UI
             Add("Free cavern to deep Jungle", v0to1);
             Add("Jungle cavern not blocked by structure", v0to1);
             Add("Open Temple", v0to1);
+
+            Add("neg. Pathlength to Temple Door", vPathLengthNeg);
+            Add("neg. Pathlength to Boots", vPathLengthNeg);
+            Add("neg. Pathlength to Iron/Lead Bar", vPathLengthNeg);
+            Add("neg. Pathlength to Gold/Platinum Bar", vPathLengthNeg);
+            Add("neg. Pathlength to Bomb", vPathLengthNeg);
+            Add("neg. Pathlength to Jester's Arrow", vPathLengthNeg);
+            Add("neg. Pathlength to Suspicious Looking Eye", vPathLengthNeg);
+            Add("neg. Pathlength to Snowball Cannon", vPathLengthNeg);
+            Add("neg. Pathlength to Teleport Potion", vPathLengthNeg);
+            Add("neg. Pathlength to Enchanted Sword", vPathLengthNeg);
+            Add("neg. Pathlength to Bee Hive", vPathLengthNeg);
+            Add("neg. Pathlength to Boomstick", vPathLengthNeg);
+
+            Add("neg. Pathlength to Slime Staute", vPathLengthNeg);
+            Add("neg. Pathlength to Shark Staute", vPathLengthNeg);
+            Add("neg. Pathlength to Anvil", vPathLengthNeg);
+
+
+            Add("neg. Pathlength to free ShadowOrb/Heart", vPathLengthNeg);
+            Add("neg. Pathlength into 40% cavern layer", vPathLengthNeg);
+            Add("neg. Pathlength to 40% cavern entrance", vPathLengthNeg);
+            Add("neg. Tiles to mine for 40% cavern", vPathLengthNeg);
+            Add("neg. Pathlength to cavern entrance to mid of Jungle", vPathLengthNeg);
+            Add("neg. Tiles to mine for mid Jungle cavern", vPathLengthNeg);
+            Add("neg. Pathlength to cavern entrance to deep Jungle", vPathLengthNeg);
+            Add("neg. Tiles to mine for deep Jungle cavern", vPathLengthNeg);
+
             Add("Nearest Altar Dungeon beach", vAltarBeach);
             Add("Nearest Altar Jungle beach", vAltarBeach);
 
@@ -737,6 +791,9 @@ namespace TheTerrariaSeedProject.UI
             Add("Pathlength to Enchanted Sword", vPathLength);
             Add("Pathlength to Bee Hive", vPathLength);
             Add("Pathlength to Boomstick", vPathLength);
+            Add("Pathlength to Slime Staute", vPathLength);
+            Add("Pathlength to Shark Staute", vPathLength);
+            Add("Pathlength to Anvil", vPathLength);
             Add("Pathlength to Temple Door", vPathLength);
             Add("Pathlength to free ShadowOrb/Heart", vPathLength);  
             Add("Pathlength into 40% cavern layer", vPathLength);  
