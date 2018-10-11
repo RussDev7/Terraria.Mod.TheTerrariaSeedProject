@@ -1348,6 +1348,156 @@ namespace TheTerrariaSeedProject
         }
 
 
+        private void ComputePathlength(ref int[,] pathLength)
+        {
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
+            TimeSpan ts = stopWatch.Elapsed;
+            string elapsedTime;
+
+            int maxsize = (Main.maxTilesX * 6 + Main.maxTilesY * 4); // values can be creater!
+            List<Tuple<int, int>>[] waypoints = new List<Tuple<int, int>>[maxsize];
+            short[,] travelCost = new short[Main.maxTilesX, Main.maxTilesY];
+
+            pathLength = new int[Main.maxTilesX, Main.maxTilesY];
+
+
+
+            for (int x = 0; x < Main.maxTilesX; x++)
+                for (int y = 0; y < Main.maxTilesY; y++)
+                    pathLength[x, y] = Int32.MaxValue;
+            for (int x = 0; x < Main.maxTilesX; x++)
+                for (int y = 0; y < Main.maxTilesY; y++)
+                    travelCost[x, y] = (short)TravelCost(x, y);
+
+
+            pathLength[Main.spawnTileX, Main.spawnTileY - 1] = 0;
+            waypoints[0] = new List<Tuple<int, int>> { new Tuple<int, int>(Main.spawnTileX, Main.spawnTileY - 1) };
+
+            ts = stopWatch.Elapsed;
+            elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+            ts.Hours, ts.Minutes, ts.Seconds,
+            ts.Milliseconds / 10);
+            //writeDebugFile(" analyze time after init pathfinding " + elapsedTime);
+
+
+            for (int l = 0; l < maxsize; l++)
+            {
+                if (waypoints[l] != null)
+                {
+                    foreach (Tuple<int, int> p in waypoints[l])
+                        AddWayPoints(ref pathLength, ref waypoints, ref travelCost, p.Item1, p.Item2, l);
+                    waypoints[l].Clear();
+                }
+            }
+
+
+            //norm to ~tiles num --> pathlengthNormFac
+            //for (int x = 0; x < Main.maxTilesX; x++)
+            //    for (int y = 0; y < Main.maxTilesY; y++)
+            //        if (pathLength[x, y] != Int32.MaxValue)
+            //            pathLength[x, y] = (int)(0.2 * pathLength[x, y]);
+
+            travelCost = null;
+            waypoints = null;
+
+            ts = stopWatch.Elapsed;
+            elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+            ts.Hours, ts.Minutes, ts.Seconds,
+            ts.Milliseconds / 10);
+            //writeDebugFile(" analyze time after pathfinding " + elapsedTime);
+
+            //only for debug
+            if (1 == 42)
+            {
+                int dimX = Main.maxTilesX;
+                int dimY = Main.maxTilesY;
+                int scale = 1;
+                /*while (dimX > 6200)
+                {
+                    dimX /= 2;
+                    dimY /= 2;
+                    scale *= 2;
+                }*/
+
+                //https://msdn.microsoft.com/en-us/library/system.drawing.imaging.bitmapdata(v=vs.110).aspx
+                System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(dimX, dimY, PixelFormat.Format32bppArgb);
+
+
+                System.Drawing.Rectangle rect = new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height);
+                System.Drawing.Imaging.BitmapData bmpData =
+                    bmp.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadWrite,
+                    bmp.PixelFormat);
+
+
+                // Get the address of the first line.
+                IntPtr ptr = bmpData.Scan0;
+
+                // Declare an array to hold the bytes of the bitmap.
+                int bytes = Math.Abs(bmpData.Stride) * bmp.Height;
+                byte[] rgbValues = new byte[bytes];
+
+                // Copy the RGB values into the array.
+                System.Runtime.InteropServices.Marshal.Copy(ptr, rgbValues, 0, bytes);
+
+                int indx = 0;
+                for (int y = 0; y < Main.maxTilesY; y += scale)
+                    for (int x = 0; x < Main.maxTilesX; x += scale)
+                    {
+                        //MapTile cur = MapHelper.CreateMapTile(x, y, 255);
+                        //Color cc = MapHelper.GetMapTileXnaColor(ref cur);
+                        //int cv = (int)(((float)pathLength[x, y]) / Main.maxTilesX/7 * 255.0);                            
+                        //int cv = (int)(((float)pathLength[x, y]) / (0.2 * maxsize) * 255.0);
+                        int cv = (int)(((float)pathLength[x, y]) / (maxsize) * 255.0);
+                        cv = cv > 255 ? 255 : cv;
+                        rgbValues[indx++] = (byte)(255 - cv);
+                        rgbValues[indx++] = (byte)(255 - cv);
+                        rgbValues[indx++] = (byte)(255 - cv);
+                        rgbValues[indx++] = 255;
+
+                    }
+
+                //draw Spawm
+                int aw = 0;
+
+                for (int y = Main.spawnTileY - 1; y > Main.spawnTileY - 36; y--)
+                {
+                    int x = Main.spawnTileX;
+                    int off = y * 4 * Main.maxTilesX + x * 4;
+
+                    rgbValues[off + 0] = 0;
+                    rgbValues[off + 1] = 80;
+                    rgbValues[off + 2] = 50;
+                    rgbValues[off + 3] = 255;
+
+                    for (int awi = 0; awi < (aw < 18 ? aw : 4); awi++)
+                    {
+                        rgbValues[off + 0 + 4 * (awi / 3)] = 0;
+                        rgbValues[off + 1 + 4 * (awi / 3)] = 80;
+                        rgbValues[off + 2 + 4 * (awi / 3)] = 50;
+                        rgbValues[off + 3 + 4 * (awi / 3)] = 255;
+
+                        rgbValues[off + 0 - 4 * (awi / 3)] = 0;
+                        rgbValues[off + 1 - 4 * (awi / 3)] = 80;
+                        rgbValues[off + 2 - 4 * (awi / 3)] = 50;
+                        rgbValues[off + 3 - 4 * (awi / 3)] = 255;
+                    }
+                    aw++;
+                }
+
+
+                // Copy the RGB values back to the bitmap
+                System.Runtime.InteropServices.Marshal.Copy(rgbValues, 0, ptr, bytes);
+
+                // Unlock the bits.
+                bmp.UnlockBits(bmpData);
+                bmp.Save(Main.WorldPath + @"\" + seed + "_paths.png");
+
+
+            }
+
+
+        }
 
 
 
@@ -1411,6 +1561,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Near Cloud", 0);
 
             hasOBjectOrParam.Add("Nearest Teleportation Potion count", 0);
+            
             hasOBjectOrParam.Add("Pathlength to Teleport Potion", 1000000);
             hasOBjectOrParam.Add("Pathlength to Iron/Lead Bar", 1000000);
             hasOBjectOrParam.Add("Pathlength to Gold/Platinum Bar", 1000000);
@@ -1427,6 +1578,10 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Pathlength to Suspicious Looking Eye", 1000000);
             hasOBjectOrParam.Add("Pathlength to Snowball Cannon", 1000000);
 
+            hasOBjectOrParam.Add("Pathlength to Slime Staute", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Shark Staute", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Anvil", 1000000);
+
             hasOBjectOrParam.Add("Pathlength into 40% cavern layer", 1000000);
             hasOBjectOrParam.Add("Pathlength to 40% cavern entrance", 1000000);
             hasOBjectOrParam.Add("Tiles to mine for 40% cavern", 1000000);
@@ -1435,6 +1590,42 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Tiles to mine for mid Jungle cavern", 1000000);
             hasOBjectOrParam.Add("Pathlength to cavern entrance to deep Jungle", 1000000);
             hasOBjectOrParam.Add("Tiles to mine for deep Jungle cavern", 1000000);
+
+
+
+
+            
+            hasOBjectOrParam.Add("neg. Pathlength to Teleport Potion", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Iron/Lead Bar", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Gold/Platinum Bar", -1000000);
+
+            hasOBjectOrParam.Add("neg. Pathlength to Bomb", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Jester's Arrow", -1000000);
+
+            hasOBjectOrParam.Add("neg. Pathlength to Boots", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Enchanted Sword", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Bee Hive", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Temple Door", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to free ShadowOrb/Heart", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Boomstick", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Suspicious Looking Eye", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Snowball Cannon", -1000000);
+
+            hasOBjectOrParam.Add("neg. Pathlength to Slime Staute", 1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Shark Staute", 1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Anvil", 1000000);
+
+            hasOBjectOrParam.Add("neg. Pathlength into 40% cavern layer", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to 40% cavern entrance", -1000000);
+            hasOBjectOrParam.Add("neg. Tiles to mine for 40% cavern", -1000000);
+
+            hasOBjectOrParam.Add("neg. Pathlength to cavern entrance to mid of Jungle", -1000000);
+            hasOBjectOrParam.Add("neg. Tiles to mine for mid Jungle cavern", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to cavern entrance to deep Jungle", -1000000);
+            hasOBjectOrParam.Add("neg. Tiles to mine for deep Jungle cavern", -1000000);
+
+
+
 
             hasOBjectOrParam.Add("Free cavern to mid Jungle", 0);
             hasOBjectOrParam.Add("Free cavern to deep Jungle", 0);
@@ -1697,153 +1888,13 @@ namespace TheTerrariaSeedProject
             ts.Milliseconds / 10);
             //writeDebugFile(" analyze time before pathfinding " + elapsedTime);
 
-            int maxsize = (Main.maxTilesX * 6 + Main.maxTilesY * 4); // values can be creater!
-            List<Tuple<int, int>>[] waypoints = null;
+            
             int[,] pathLength = null;
-            int[,] travelCost = null;
-
-
+            
 
             if (doFull)
             {
-
-
-                waypoints = new List<Tuple<int, int>>[maxsize];
-                pathLength = new int[Main.maxTilesX, Main.maxTilesY];
-                travelCost = new int[Main.maxTilesX, Main.maxTilesY];
-
-
-
-                for (int x = 0; x < Main.maxTilesX; x++)
-                    for (int y = 0; y < Main.maxTilesY; y++)
-                        pathLength[x, y] = Int32.MaxValue;
-                for (int x = 0; x < Main.maxTilesX; x++)
-                    for (int y = 0; y < Main.maxTilesY; y++)
-                        travelCost[x, y] = TravelCost(x, y);
-
-
-                pathLength[Main.spawnTileX, Main.spawnTileY - 1] = 0;
-                waypoints[0] = new List<Tuple<int, int>> { new Tuple<int, int>(Main.spawnTileX, Main.spawnTileY - 1) };
-
-                ts = stopWatch.Elapsed;
-                elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-                ts.Hours, ts.Minutes, ts.Seconds,
-                ts.Milliseconds / 10);
-                //writeDebugFile(" analyze time after init pathfinding " + elapsedTime);
-
-
-                for (int l = 0; l < maxsize; l++)
-                {
-                    if (waypoints[l] != null)
-                        foreach (Tuple<int, int> p in waypoints[l])
-                            AddWayPoints(ref pathLength, ref waypoints, ref travelCost, p.Item1, p.Item2, l);
-                }
-
-
-                //norm to ~tiles num --> pathlengthNormFac
-                //for (int x = 0; x < Main.maxTilesX; x++)
-                //    for (int y = 0; y < Main.maxTilesY; y++)
-                //        if (pathLength[x, y] != Int32.MaxValue)
-                //            pathLength[x, y] = (int)(0.2 * pathLength[x, y]);
-
-                travelCost = null;
-                waypoints = null;
-
-                ts = stopWatch.Elapsed;
-                elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-                ts.Hours, ts.Minutes, ts.Seconds,
-                ts.Milliseconds / 10);
-                //writeDebugFile(" analyze time after pathfinding " + elapsedTime);
-
-                //only for debug
-                if (1 == 42)
-                {
-                    int dimX = Main.maxTilesX;
-                    int dimY = Main.maxTilesY;
-                    int scale = 1;
-                    /*while (dimX > 6200)
-                    {
-                        dimX /= 2;
-                        dimY /= 2;
-                        scale *= 2;
-                    }*/
-
-                    //https://msdn.microsoft.com/en-us/library/system.drawing.imaging.bitmapdata(v=vs.110).aspx
-                    System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(dimX, dimY, PixelFormat.Format32bppArgb);
-
-
-                    System.Drawing.Rectangle rect = new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height);
-                    System.Drawing.Imaging.BitmapData bmpData =
-                        bmp.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadWrite,
-                        bmp.PixelFormat);
-
-
-                    // Get the address of the first line.
-                    IntPtr ptr = bmpData.Scan0;
-
-                    // Declare an array to hold the bytes of the bitmap.
-                    int bytes = Math.Abs(bmpData.Stride) * bmp.Height;
-                    byte[] rgbValues = new byte[bytes];
-
-                    // Copy the RGB values into the array.
-                    System.Runtime.InteropServices.Marshal.Copy(ptr, rgbValues, 0, bytes);
-
-                    int indx = 0;
-                    for (int y = 0; y < Main.maxTilesY; y += scale)
-                        for (int x = 0; x < Main.maxTilesX; x += scale)
-                        {
-                            //MapTile cur = MapHelper.CreateMapTile(x, y, 255);
-                            //Color cc = MapHelper.GetMapTileXnaColor(ref cur);
-                            //int cv = (int)(((float)pathLength[x, y]) / Main.maxTilesX/7 * 255.0);                            
-                            //int cv = (int)(((float)pathLength[x, y]) / (0.2 * maxsize) * 255.0);
-                            int cv = (int)(((float)pathLength[x, y]) / (maxsize) * 255.0);
-                            cv = cv > 255 ? 255 : cv;
-                            rgbValues[indx++] = (byte)(255 - cv);
-                            rgbValues[indx++] = (byte)(255 - cv);
-                            rgbValues[indx++] = (byte)(255 - cv);
-                            rgbValues[indx++] = 255;
-
-                        }
-
-                    //draw Spawm
-                    int aw = 0;
-
-                    for (int y = Main.spawnTileY - 1; y > Main.spawnTileY - 36; y--)
-                    {
-                        int x = Main.spawnTileX;
-                        int off = y * 4 * Main.maxTilesX + x * 4;
-
-                        rgbValues[off + 0] = 0;
-                        rgbValues[off + 1] = 80;
-                        rgbValues[off + 2] = 50;
-                        rgbValues[off + 3] = 255;
-
-                        for (int awi = 0; awi < (aw < 18 ? aw : 4); awi++)
-                        {
-                            rgbValues[off + 0 + 4 * (awi / 3)] = 0;
-                            rgbValues[off + 1 + 4 * (awi / 3)] = 80;
-                            rgbValues[off + 2 + 4 * (awi / 3)] = 50;
-                            rgbValues[off + 3 + 4 * (awi / 3)] = 255;
-
-                            rgbValues[off + 0 - 4 * (awi / 3)] = 0;
-                            rgbValues[off + 1 - 4 * (awi / 3)] = 80;
-                            rgbValues[off + 2 - 4 * (awi / 3)] = 50;
-                            rgbValues[off + 3 - 4 * (awi / 3)] = 255;
-                        }
-                        aw++;
-                    }
-
-
-                    // Copy the RGB values back to the bitmap
-                    System.Runtime.InteropServices.Marshal.Copy(rgbValues, 0, ptr, bytes);
-
-                    // Unlock the bits.
-                    bmp.UnlockBits(bmpData);
-                    bmp.Save(Main.WorldPath + @"\" + seed + "_paths.png");
-
-
-                }
-
+                ComputePathlength(ref pathLength);                
 
             }
 
@@ -2848,7 +2899,7 @@ namespace TheTerrariaSeedProject
                                 }
                             }
                             //Sunflower
-                            else if (tile.type == TileID.Sunflower && tile.frameX == (short)0 && tile.frameY == (short)0)
+                            else if (tile.type == TileID.Sunflower && tile.frameY == (short)0 && (tile.frameX == (short)0 || tile.frameX == (short)36 || tile.frameX == (short)72))
                             {
                                 if (checkIfNearSpawn(x, y, 200, 100))
                                 {
@@ -2877,6 +2928,24 @@ namespace TheTerrariaSeedProject
                                 //mushroom is 349 | 0 0
                                 //writeDebugFile("pos:" + x + " " + y + " is statue " + statIdent);
 
+                                //extra check bc good for speed run
+                                if (fx == 144 && fy == 0 && pathLength[sx, sy] < hasOBjectOrParam["Pathlength to Slime Staute"])
+                                {
+                                    hasOBjectOrParam["Pathlength to Slime Staute"] = pathLength[sx, sy];
+                                    if (score.itemLocation.ContainsKey(ItemID.SlimeCrown))
+                                        score.itemLocation[ItemID.SlimeCrown] = new List<Tuple<int, int>> { new Tuple<int, int>(x, y) };
+                                    else
+                                        score.itemLocation.Add(ItemID.SlimeCrown, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
+                                }
+                                else if (fx == 1800 && fy == 0 && pathLength[sx, sy] < hasOBjectOrParam["Pathlength to Shark Staute"])
+                                {
+                                    hasOBjectOrParam["Pathlength to Shark Staute"] = pathLength[sx, sy];
+                                    if (score.itemLocation.ContainsKey(ItemID.Minishark))
+                                        score.itemLocation[ItemID.Minishark] = new List<Tuple<int, int>> { new Tuple<int, int>(x, y) };
+                                    else
+                                        score.itemLocation.Add(ItemID.Minishark, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
+                                }
+                                
 
 
                                 //it counts each tile of each statue, divide by 6 to get the real number == 26 max
@@ -3016,11 +3085,20 @@ namespace TheTerrariaSeedProject
                                 if (y < topmostTempleTiley) topmostTempleTiley = y;
                                 if (y > botmostTempleTiley) botmostTempleTiley = y;
 
+                            } else if(tile.type == TileID.Anvils && tile.frameY == 0 && (tile.frameX == 0 || tile.frameX == 36))
+                            {
+                                if (hasOBjectOrParam["Pathlength to Anvil"] > pathLength[x, y])
+                                {
+                                    hasOBjectOrParam["Pathlength to Anvil"] = pathLength[x, y];
+
+                                    if (score.itemLocation.ContainsKey(ItemID.IronAnvil))
+                                        score.itemLocation[ItemID.IronAnvil] = new List<Tuple<int, int>> { new Tuple<int, int>(x, y) };
+                                    else
+                                        score.itemLocation.Add(ItemID.IronAnvil, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
+                                }
                             }
 
-
-
-
+                            
 
                             //Web
                             if (tile.wall == 62)
@@ -3586,6 +3664,34 @@ namespace TheTerrariaSeedProject
 
 
 
+                //negative value of pathlength for postive list
+                hasOBjectOrParam["neg. Pathlength to Temple Door"] = -hasOBjectOrParam["Pathlength to Temple Door"];
+                hasOBjectOrParam["neg. Pathlength to Boots"] = -hasOBjectOrParam["Pathlength to Boots"];
+                hasOBjectOrParam["neg. Pathlength to Iron/Lead Bar"] = -hasOBjectOrParam["Pathlength to Iron/Lead Bar"];
+                hasOBjectOrParam["neg. Pathlength to Gold/Platinum Bar"] = -hasOBjectOrParam["Pathlength to Gold/Platinum Bar"];
+                hasOBjectOrParam["neg. Pathlength to Bomb"] = -hasOBjectOrParam["Pathlength to Bomb"];
+                hasOBjectOrParam["neg. Pathlength to Jester's Arrow"] = -hasOBjectOrParam["Pathlength to Jester's Arrow"];
+                hasOBjectOrParam["neg. Pathlength to Suspicious Looking Eye"] = -hasOBjectOrParam["Pathlength to Suspicious Looking Eye"];
+                hasOBjectOrParam["neg. Pathlength to Snowball Cannon"] = -hasOBjectOrParam["Pathlength to Snowball Cannon"];
+                hasOBjectOrParam["neg. Pathlength to Teleport Potion"] = -hasOBjectOrParam["Pathlength to Teleport Potion"];
+                hasOBjectOrParam["neg. Pathlength to Enchanted Sword"] = -hasOBjectOrParam["Pathlength to Enchanted Sword"];
+                hasOBjectOrParam["neg. Pathlength to Bee Hive"] = -hasOBjectOrParam["Pathlength to Bee Hive"];
+                hasOBjectOrParam["neg. Pathlength to Boomstick"] = -hasOBjectOrParam["Pathlength to Boomstick"];
+
+                hasOBjectOrParam["neg. Pathlength to Slime Staute"] = -hasOBjectOrParam["Pathlength to Slime Staute"];
+                hasOBjectOrParam["neg. Pathlength to Shark Staute"] = -hasOBjectOrParam["Pathlength to Shark Staute"];
+                                
+
+                hasOBjectOrParam["neg. Pathlength to free ShadowOrb/Heart"] = -hasOBjectOrParam["Pathlength to free ShadowOrb/Heart"];
+                hasOBjectOrParam["neg. Pathlength into 40% cavern layer"] = -hasOBjectOrParam["Pathlength into 40% cavern layer"];
+                hasOBjectOrParam["neg. Pathlength to 40% cavern entrance"] = -hasOBjectOrParam["Pathlength to 40% cavern entrance"];
+                hasOBjectOrParam["neg. Tiles to mine for 40% cavern"] = -hasOBjectOrParam["Tiles to mine for 40% cavern"];
+                hasOBjectOrParam["neg. Pathlength to cavern entrance to mid of Jungle"] = -hasOBjectOrParam["Pathlength to cavern entrance to mid of Jungle"];
+                hasOBjectOrParam["neg. Tiles to mine for mid Jungle cavern"] = -hasOBjectOrParam["Tiles to mine for mid Jungle cavern"];
+                hasOBjectOrParam["neg. Pathlength to cavern entrance to deep Jungle"] = -hasOBjectOrParam["Pathlength to cavern entrance to deep Jungle"];
+                hasOBjectOrParam["neg. Tiles to mine for deep Jungle cavern"] = -hasOBjectOrParam["Tiles to mine for deep Jungle cavern"];
+
+
             }
 
 
@@ -3597,8 +3703,6 @@ namespace TheTerrariaSeedProject
             //writeDebugFile(" analyze all took " + elapsedTime);
 
             pathLength = null; //someone got oom, test if that helps
-            travelCost = null;
-            pathLength = null;
             treesPos = null;
             cloudPos = null;
             tileCounts = null;
@@ -3720,7 +3824,7 @@ namespace TheTerrariaSeedProject
 
 
         const int pathNormFac = 5;
-        private void AddWayPoints(ref int[,] pathLength, ref List<Tuple<int, int>>[] waypoints, ref int[,] travelCost, int x, int y, int l)
+        private void AddWayPoints(ref int[,] pathLength, ref List<Tuple<int, int>>[] waypoints, ref short[,] travelCost, int x, int y, int l)
         {
             if (pathLength[x, y] < l || x< 42 || y<10 || x>Main.maxTilesX-43 || y>Main.maxTilesY-11) return;
             
@@ -3730,28 +3834,29 @@ namespace TheTerrariaSeedProject
             const int costD = 3;
             const int costDLR = 6;
             const int costULR = 7;
-                        
+                     
+            //careful: tracelCost in short with value max 10,000, 3 times close to max short value
             int tcl = travelCost[x - 1, y] + travelCost[x - 1, y + 1] + travelCost[x - 1, y - 1];
             int tcr = travelCost[x + 1, y] + travelCost[x + 1, y + 1] + travelCost[x + 1, y - 1];
             int tcu = travelCost[x , y - 1] + travelCost[x + 1, y - 1];
             int tcd = travelCost[x, y + 1] + travelCost[x + 1, y + 1];
-            
 
-            if (pathLength[x - 1,y] > l )
+            int mpl = l + MIN_PATH_LENGTH;
+            if (pathLength[x - 1,y]  > mpl )
                 AddPoint(ref pathLength, ref waypoints, ref travelCost, x-1, y, l, costLR , tcl);
-            if (pathLength[x + 1, y] > l)
+            if (pathLength[x + 1, y] > mpl)
                 AddPoint(ref pathLength, ref waypoints, ref travelCost, x + 1, y, l, costLR , tcr);
-            if (pathLength[x, y + 1] > l)
+            if (pathLength[x, y + 1] > mpl)
                 AddPoint(ref pathLength, ref waypoints, ref travelCost, x , y+1 , l, costD , tcd);
-            if (pathLength[x, y -1] > l)
+            if (pathLength[x, y -1] > mpl)
                 AddPoint(ref pathLength, ref waypoints, ref travelCost, x, y - 1, l, costU , tcu, true);
-            if (pathLength[x - 1, y - 1] > l)
+            if (pathLength[x - 1, y - 1] > mpl)
                 AddPoint(ref pathLength, ref waypoints, ref travelCost, x - 1, y - 1, l, costULR , tcu + tcl, true);
-            if (pathLength[x + 1, y - 1] > l)
+            if (pathLength[x + 1, y - 1] > mpl)
                 AddPoint(ref pathLength, ref waypoints, ref travelCost, x +1 , y - 1, l, costULR , tcu + tcr, true);
-            if (pathLength[x - 1, y + 1] > l)
+            if (pathLength[x - 1, y + 1] > mpl)
                 AddPoint(ref pathLength, ref waypoints, ref travelCost, x - 1, y + 1, l, costDLR , tcd + tcl);
-            if (pathLength[x + 1, y + 1] > l)
+            if (pathLength[x + 1, y + 1] > mpl)
                 AddPoint(ref pathLength, ref waypoints, ref travelCost, x + 1, y + 1, l, costDLR , tcd + tcr);
 
         }
@@ -3762,22 +3867,22 @@ namespace TheTerrariaSeedProject
         {
             //ignores stuff not generated in vanilla world gen
 
-            const int costWater = 20;
-            const int costHoneyBon = 15;
-            const int costLavaBon = 800;
-            const int costFullLiqBoni = 15;
+            const short costWater = 20;
+            const short costHoneyBon = 15;
+            const short costLavaBon = 800;
+            const short costFullLiqBoni = 15;
 
-            const int costPlatform = 0;
+            const short costPlatform = 0;
 
-            const int costUnderWBoni = 15;
-            const int costCavernLavaBoni = 3;
-            const int costCavernBoni = 2;            
-            const int costUnderGBoni = 1;
+            const short costUnderWBoni = 15;
+            const short costCavernLavaBoni = 3;
+            const short costCavernBoni = 2;            
+            const short costUnderGBoni = 1;
 
-            const int costWebThorn = 25;
-            const int costMineCart = -17;
-            const int costDirt = 60;
-            const int costStone = 120;
+            const short costWebThorn = 25;
+            const short costMineCart = -17;
+            const short costDirt = 60;
+            const short costStone = 120;
 
 
             int bon = 0;
@@ -3874,14 +3979,14 @@ namespace TheTerrariaSeedProject
                 return costDirt + bon;
 
             if (type == TileID.BlueDungeonBrick || type == TileID.GreenDungeonBrick || type == TileID.PinkDungeonBrick || type == TileID.Obsidian || type == TileID.Ebonstone || type == TileID.Crimstone || type == TileID.Hellstone || type == TileID.LihzahrdBrick || type == TileID.Demonite || type == TileID.Crimtane || (type == TileID.ClosedDoor && (Main.tile[x, y].frameY == 594 || Main.tile[x, y].frameY == 612 || Main.tile[x, y].frameY == 620)) )
-                return 100000;
+                return 10000;
 
 
             //stone, ores, mossstone, gemstone
             return costStone + bon;
         }
 
-        private int checkInAir(ref int[,] travelCost, int x, int y)
+        private int checkInAir(ref short[,] travelCost, int x, int y)
         {
             int air = 0;
             const int inAirCost = 25;
@@ -3896,9 +4001,16 @@ namespace TheTerrariaSeedProject
             return air;
         }
 
-        private void AddPoint(ref int[,] pathLength, ref List<Tuple<int, int>>[] waypoints, ref int[,] travelCost, int x, int y, int l, int newLengthAdd, int tileCost, bool countInAir = false)
+
+        const int MIN_PATH_LENGTH = 2;
+        private void AddPoint(ref int[,] pathLength, ref List<Tuple<int, int>>[] waypoints, ref short[,] travelCost, int x, int y, int l, int newLengthAdd, int tileCost, bool countInAir = false)
         {
-            int air = 0;
+            const int CAN_NOT_PASS = 1000;
+
+            //if (tileCost > CAN_NOT_PASS)
+            //   return;
+
+            int air = 0;            
             if (countInAir)
             {
                 air = checkInAir(ref travelCost, x, y);
@@ -3906,7 +4018,7 @@ namespace TheTerrariaSeedProject
                 if (val > 0)
                 {
                     bool inAir = true;
-                    //sloooooow
+                    //sloooooow ==> write without for =>& break
                     int xi = 0;
                     for (xi = -6; xi <= 6 && inAir; xi+=2)
                         for (int yi = -6; yi <= 6 && inAir; yi++)
@@ -3922,10 +4034,10 @@ namespace TheTerrariaSeedProject
 
 
 
-            int add = Math.Max(2, newLengthAdd + tileCost + air);
+            int add = Math.Max(MIN_PATH_LENGTH, newLengthAdd + tileCost + air);
 
 
-            if (add > 1000)
+            if (add > CAN_NOT_PASS)
                 return;
 
             int npl = l + add;
@@ -3936,8 +4048,8 @@ namespace TheTerrariaSeedProject
                 if (npl < waypoints.Length)
                 {
                     if (waypoints[npl] == null)
-                        waypoints[npl] = new List<Tuple<int, int>>();
-                    waypoints[npl].Add(new Tuple<int, int>(x, y)); //can be in more than on list, remove from old?
+                        waypoints[npl] = new List<Tuple<int, int>>();                    
+                    waypoints[npl].Add(new Tuple<int, int>(x, y)); //can be in more than on list, remove from old?                    
                 }
             }
 
@@ -6015,8 +6127,10 @@ namespace TheTerrariaSeedProject
             byte[] rgbValues = new byte[bytes];
 
 
+            //todo in main loop ? (not needed there)
             List<Tuple<int,int>> hearts = new List<Tuple<int, int>>();
             List<Tuple<int, int>> demonAltars = new List<Tuple<int, int>>();
+            List<Tuple<int, int>> rubies = new List<Tuple<int, int>>();
 
 
             int indx = 0;
@@ -6026,14 +6140,18 @@ namespace TheTerrariaSeedProject
                     MapTile cur = MapHelper.CreateMapTile(x, y, 255);
                     Color cc = MapHelper.GetMapTileXnaColor(ref cur);
 
-                    if(x > Main.offLimitBorderTiles && x < Main.maxTilesX - Main.offLimitBorderTiles)
+                    if (x > Main.offLimitBorderTiles && x < Main.maxTilesX - Main.offLimitBorderTiles && y > Main.offLimitBorderTiles && y < Main.maxTilesY - Main.offLimitBorderTiles)
+                    {
                         if (Main.tile[x, y].type == TileID.Heart && Main.tile[x, y].frameX == 0 && Main.tile[x, y].frameY == 0)
                             hearts.Add(new Tuple<int, int>(x, y));
                         else if (Main.tile[x, y].type == TileID.DemonAltar && Main.tile[x, y].frameY == 0 && (
-                            (Main.tile[x, y].frameX == 18 && Main.tile[x, y].wall != WallID.EbonstoneUnsafe && Main.tile[x, y].wall != WallID.CorruptGrassUnsafe && Main.tile[x, y + 2].type != TileID.Ebonstone && Main.tile[x-1, y + 2].type != TileID.Ebonstone && Main.tile[x +1, y + 2].type != TileID.Ebonstone) ||
-                            (Main.tile[x, y].frameX == 72 && Main.tile[x, y].wall != WallID.CrimstoneUnsafe && Main.tile[x, y].wall != WallID.CrimsonGrassUnsafe && Main.tile[x, y+2].type != TileID.Crimstone && Main.tile[x-1, y + 2].type != TileID.Crimstone && Main.tile[x +1 , y + 2].type != TileID.Crimstone)
+                            (Main.tile[x, y].frameX == 18 && Main.tile[x, y].wall != WallID.EbonstoneUnsafe && Main.tile[x, y].wall != WallID.CorruptGrassUnsafe && Main.tile[x, y + 2].type != TileID.Ebonstone && Main.tile[x - 1, y + 2].type != TileID.Ebonstone && Main.tile[x + 1, y + 2].type != TileID.Ebonstone) ||
+                            (Main.tile[x, y].frameX == 72 && Main.tile[x, y].wall != WallID.CrimstoneUnsafe && Main.tile[x, y].wall != WallID.CrimsonGrassUnsafe && Main.tile[x, y + 2].type != TileID.Crimstone && Main.tile[x - 1, y + 2].type != TileID.Crimstone && Main.tile[x + 1, y + 2].type != TileID.Crimstone)
                             ))
                             demonAltars.Add(new Tuple<int, int>(x, y));
+                        else if (Main.tile[x, y].type == TileID.Ruby || (Main.tile[x, y].type == TileID.ExposedGems && Main.tile[x, y].frameX == 72))
+                            rubies.Add(new Tuple<int, int>(x, y));
+                    }
 
                     rgbValues[indx++] = cc.B;
                     rgbValues[indx++] = cc.G; 
@@ -6133,6 +6251,14 @@ namespace TheTerrariaSeedProject
                     if(Main.chest[ci] != null && Main.chest[ci].x > Main.offLimitBorderTiles && Main.chest[ci].y > Main.offLimitBorderTiles && Main.chest[ci].x < Main.maxTilesX-Main.offLimitBorderTiles)
                         DrawCircle(ref rgbValues, new Tuple<int,int>(Main.chest[ci].x, Main.chest[ci].y), scale, new Color(245, 228, 24));
                 }
+                foreach (var ruby in rubies)
+                {
+                    DrawCircle(ref rgbValues, ruby, scale, new Color(255, 0, 180), 5);                    
+                }
+                foreach (var ruby in rubies)
+                {                    
+                    DrawCircle(ref rgbValues, ruby, scale, new Color(255, 0, 0), 3);
+                }
             }
 
 
@@ -6181,6 +6307,11 @@ namespace TheTerrariaSeedProject
                 
             }
 
+            rgbValues = null;
+            hearts.Clear();
+            hearts = null;
+            demonAltars.Clear();
+            demonAltars = null;
         }
               
 
@@ -6245,15 +6376,16 @@ namespace TheTerrariaSeedProject
             tc = null;
         }
 
-        public void DrawCircle(ref byte[] rgbValues, Tuple<int, int> where, int scale, Color cc)
+        public void DrawCircle(ref byte[] rgbValues, Tuple<int, int> where, int scale, Color cc, int iconbgs = 17)
         {
+            //const int iconbgs = 17;
 
 
             int x = where.Item1 / scale ;
-            int y = where.Item2 / scale - 8;
+            int y = where.Item2 / scale - iconbgs/2+1;
 
 
-            const int iconbgs = 17;
+            
 
 
             for (int h = 0; h < iconbgs; h++)
