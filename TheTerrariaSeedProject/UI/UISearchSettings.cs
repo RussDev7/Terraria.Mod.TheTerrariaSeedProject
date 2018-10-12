@@ -280,7 +280,7 @@ namespace TheTerrariaSeedProject.UI
 
             Init();
             currentConfig = Configuration.GenerateConfiguration(infopanel.selectables);
-
+            
         }
 
         
@@ -343,7 +343,7 @@ namespace TheTerrariaSeedProject.UI
 
 
             InitCountText();
-            writtenText = "";
+            writtenText = "";                       
 
         }
 
@@ -720,6 +720,8 @@ namespace TheTerrariaSeedProject.UI
                 if (currentPositive == 0)
                 {
                     name = "Basics";
+                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, OptionsDict.GeneralOptions.omitRareAll, "");
+
                     currentConfig.ChangeValueOfSelectableText(0, Configuration.ConfigItemType.SelectableText, OptionsDict.Configuration.configName, name);
 
                     currentConfig.ChangeValueOfSelectableText(1, Configuration.ConfigItemType.Header, OptionsDict.Phase1.pyramidsPossible, "3");
@@ -737,6 +739,7 @@ namespace TheTerrariaSeedProject.UI
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Spawn in Snow biome", "");
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Dungeon far above surface", "");
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Pre Skeletron Dungeon Chest Risky", "");
+                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, OptionsDict.GeneralOptions.omitRareAll, "");
 
                     currentConfig.ChangeValueOfSelectableText(0, Configuration.ConfigItemType.SelectableText, OptionsDict.Configuration.configName, name);
 
@@ -764,6 +767,7 @@ namespace TheTerrariaSeedProject.UI
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Floating Island without chest", "");
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit No Ocean", "");
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Chest Doub Glitch", "");
+                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, OptionsDict.GeneralOptions.omitRareAll, "");
 
                     currentConfig.ChangeValueOfSelectableText(0, Configuration.ConfigItemType.SelectableText, OptionsDict.Configuration.configName, name);
 
@@ -796,6 +800,7 @@ namespace TheTerrariaSeedProject.UI
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Floating Island without chest", "");
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit No Ocean", "");
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Chest Doub Glitch", "");
+                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, OptionsDict.GeneralOptions.omitRareAll, "");
 
                     currentConfig.ChangeValueOfSelectableText(0, Configuration.ConfigItemType.SelectableText, OptionsDict.Configuration.configName, name);
 
@@ -831,7 +836,7 @@ namespace TheTerrariaSeedProject.UI
                 }
                 else if (currentPositive == 4)
                 {
-                    name = "Perfect";
+                    name = "ExtremelyRare";
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Spawn in Snow biome", "");
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Dungeon far above surface", "");
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Pre Skeletron Dungeon Chest Risky", "");
@@ -841,6 +846,7 @@ namespace TheTerrariaSeedProject.UI
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Floating Island without chest", "");
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit No Ocean", "");
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Chest Doub Glitch", "");
+                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, OptionsDict.GeneralOptions.omitRareAll, "");
 
                     currentConfig.ChangeValueOfSelectableText(0, Configuration.ConfigItemType.SelectableText, OptionsDict.Configuration.configName, name);
 
@@ -873,7 +879,7 @@ namespace TheTerrariaSeedProject.UI
                     currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Evil Tiles for Jungle Grass", "0");
                     currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Evil Tiles for Sand", "20000");
                     currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Surface average height (aprox.)", "100");
-                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Surface height (sqrt) variance", "75");
+                    
 
 
                     currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Lava Charm", "1");
@@ -890,7 +896,7 @@ namespace TheTerrariaSeedProject.UI
                 else if (currentPositive == 5)
                 {
                     name = "FlatWorld";
-                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit All", "");
+                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, OptionsDict.GeneralOptions.omitRareAll, "");
 
                     currentConfig.ChangeValueOfSelectableText(0, Configuration.ConfigItemType.SelectableText, OptionsDict.Configuration.configName, name);
 
@@ -905,23 +911,34 @@ namespace TheTerrariaSeedProject.UI
                 else if (currentPositive == 6)
                 {
                     name = "SpeedRun";
-                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit All", "");
+                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, OptionsDict.GeneralOptions.omitRareAll, "");
 
                     currentConfig.ChangeValueOfSelectableText(0, Configuration.ConfigItemType.SelectableText, OptionsDict.Configuration.configName, name);
 
                     currentConfig.ChangeValueOfSelectableText(0, Configuration.ConfigItemType.InputField, OptionsDict.Configuration.searchSeedNum, "1000000");
 
+                    currentConfig.InsertPositiveList(3);
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Pre Skeletron Muramasa Chest reachable", "1");
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Pre Skeletron Golden Key Grab", "1");
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Pre Skeletron Dungeon Chest Risky", "1");                    
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, OptionsDict.Tools.dummyPlus, "8");
+
+                    currentConfig.InsertPositiveList(3);
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Pre Skeletron Muramasa Chest reachable", "1");
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Pre Skeletron Golden Key Grab", "1");
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Pre Skeletron Dungeon Chest Grab", "1");                    
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, OptionsDict.Tools.dummyPlus, "9");
 
                     currentConfig.InsertPositiveList(3);
                     currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "neg. Pathlength to free ShadowOrb/Heart", "-1000");
                     currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Free ShadowOrb/Heart", "3");
-                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "neg. Pathlength to Boots", "-1500");
+                    //currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "neg. Pathlength to Boots", "-1500");
                     currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, OptionsDict.Tools.dummyPlus, "10");
 
                     currentConfig.InsertPositiveList(3);
                     currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "neg. Pathlength to Bee Hive", "-1000");
                     currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "neg. Pathlength to Enchanted Sword", "-500");
-                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "neg. Pathlength to Boots", "-1500");
+                    //currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "neg. Pathlength to Boots", "-1500");
                     //currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Very Near Enchanted Sword", "1");
                     currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, OptionsDict.Tools.dummyPlus, "10");
 

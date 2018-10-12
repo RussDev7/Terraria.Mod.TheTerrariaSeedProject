@@ -404,6 +404,11 @@ namespace TheTerrariaSeedProject.UI
                 "Dungeon tiles above surface",
                 "Pre Skeletron Dungeon Chest Risky",
                 "Pre Skeletron Dungeon Chest Grab",
+                "Pre Skeletron Muramasa Chest reachable",
+                "Pre Skeletron Cobalt Shield Chest reachable",
+                "Pre Skeletron Shadow Key Chest reachable",
+                "Pre Skeletron Golden Key Grab",
+                "Pre Skeletron Golden Key Risky",
                 "Water Bolt before Skeletron",                
                 "Water Bolt",
                 "Muramasa",
@@ -484,6 +489,11 @@ namespace TheTerrariaSeedProject.UI
             Add("Dungeon tiles above surface", v0to120);            
             Add("Pre Skeletron Dungeon Chest Risky", v0to10);
             Add("Pre Skeletron Dungeon Chest Grab", v0to10);
+            Add("Pre Skeletron Muramasa Chest reachable", v0to1);
+            Add("Pre Skeletron Cobalt Shield Chest reachable", v0to1);
+            Add("Pre Skeletron Shadow Key Chest reachable", v0to1);
+            Add("Pre Skeletron Golden Key Grab", v0to5);
+            Add("Pre Skeletron Golden Key Risky", v0to5);
             Add("Water Bolt before Skeletron", v0to5);            
             Add("Water Bolt", v0to10);
             Add("Muramasa", v0to10);
