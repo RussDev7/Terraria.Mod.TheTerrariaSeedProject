@@ -826,7 +826,8 @@ namespace TheTerrariaSeedProject
                     writeDebugFile(" could not build seed " + seed + " with size " + Main.maxTilesX + " and evil type " + WorldGen.WorldGenParam_Evil + " expert mode " + Main.expertMode + " in stage " + stage) ;
                     writeDebugFile(ex.Message );                    
                     writeDebugFile(ex.ToString());
-                                        
+                    writeDebugFile("stage " + stage);
+
                     //todod remove from stats
                     couldNotGenerateStage[stage==42?4:stage]++;
 
@@ -1579,7 +1580,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Pathlength to Snowball Cannon", 1000000);
 
             hasOBjectOrParam.Add("Pathlength to Slime Staute", 1000000);
-            hasOBjectOrParam.Add("Pathlength to Shark Staute", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Shark Staute", 1000000);            
             hasOBjectOrParam.Add("Pathlength to Anvil", 1000000);
 
             hasOBjectOrParam.Add("Pathlength into 40% cavern layer", 1000000);
@@ -1611,9 +1612,9 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("neg. Pathlength to Suspicious Looking Eye", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Snowball Cannon", -1000000);
 
-            hasOBjectOrParam.Add("neg. Pathlength to Slime Staute", 1000000);
-            hasOBjectOrParam.Add("neg. Pathlength to Shark Staute", 1000000);
-            hasOBjectOrParam.Add("neg. Pathlength to Anvil", 1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Slime Staute", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Shark Staute", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Anvil", -1000000);
 
             hasOBjectOrParam.Add("neg. Pathlength into 40% cavern layer", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to 40% cavern entrance", -1000000);
@@ -2947,7 +2948,6 @@ namespace TheTerrariaSeedProject
                                 }
                                 
 
-
                                 //it counts each tile of each statue, divide by 6 to get the real number == 26 max
                                 if ((fy == 0 && (fx == 72 || fx == 144 || fx == 252 || fx == 360 || fx == 612 || fx == 648 || fx == 828 || fx == 972 || fx == 1332 ||
                                     fx == 1440 || fx == 1476 || fx == 1512 || fx == 1800))
@@ -2972,6 +2972,7 @@ namespace TheTerrariaSeedProject
                                     )
                                 {
                                     //omit 4 vases, and statues you can build like critters and armor statue
+                                    
                                 }
                                 else if (fx % 36 == 0 && fy % 54 == 0)
                                 {
@@ -3679,8 +3680,8 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["neg. Pathlength to Boomstick"] = -hasOBjectOrParam["Pathlength to Boomstick"];
 
                 hasOBjectOrParam["neg. Pathlength to Slime Staute"] = -hasOBjectOrParam["Pathlength to Slime Staute"];
-                hasOBjectOrParam["neg. Pathlength to Shark Staute"] = -hasOBjectOrParam["Pathlength to Shark Staute"];
-                                
+                hasOBjectOrParam["neg. Pathlength to Shark Staute"] = -hasOBjectOrParam["Pathlength to Shark Staute"];                
+                hasOBjectOrParam["neg. Pathlength to Anvil"] = -hasOBjectOrParam["Pathlength to Anvil"];
 
                 hasOBjectOrParam["neg. Pathlength to free ShadowOrb/Heart"] = -hasOBjectOrParam["Pathlength to free ShadowOrb/Heart"];
                 hasOBjectOrParam["neg. Pathlength into 40% cavern layer"] = -hasOBjectOrParam["Pathlength into 40% cavern layer"];
