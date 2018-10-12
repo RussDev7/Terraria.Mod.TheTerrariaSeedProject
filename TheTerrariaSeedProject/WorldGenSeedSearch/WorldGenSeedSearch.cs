@@ -1703,6 +1703,12 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Pre Skeletron Dungeon Chest Grab", 0);
             hasOBjectOrParam.Add("Pre Skeletron Golden Key Risky", 0);
             hasOBjectOrParam.Add("Pre Skeletron Golden Key Grab", 0);
+
+            hasOBjectOrParam.Add("Pre Skeletron Muramasa Chest reachable", 0);
+            hasOBjectOrParam.Add("Pre Skeletron Cobalt Shield Chest reachable", 0);
+            hasOBjectOrParam.Add("Pre Skeletron Shadow Key Chest reachable", 0);
+
+
             hasOBjectOrParam.Add("Alchemy Table", 0);
             hasOBjectOrParam.Add("Sharpening Station", 0);
             hasOBjectOrParam.Add("Dungeon farm spot", 0);
@@ -1947,7 +1953,7 @@ namespace TheTerrariaSeedProject
 
                     //TODO Grab distance trough walls not included yet,, edit: still not?
                     ushort chestWall = Main.tile[cx, cy].wall;
-                    if (chest.y > Main.worldSurface + 2 && (Main.tile[cx, cy].frameX == 72 || (chest.item[0].type == ItemID.GoldenKey && Main.tile[cx, cy].frameX == 0)) && Main.tile[cx, cy].frameY == 0 && Main.tile[cx, cy].type == 21)
+                    if ( (Main.tile[cx, cy].frameX == 72 || (chest.item[0].type == ItemID.GoldenKey && Main.tile[cx, cy].frameX == 0)) && Main.tile[cx, cy].frameY == 0 && Main.tile[cx, cy].type == 21)
                     {
                         //&& (chestWall == 7 || chestWall == 8 || chestWall == 9)
                         //  ||
@@ -1958,27 +1964,34 @@ namespace TheTerrariaSeedProject
                         //Todo update with chest ids
                         //if (!(item.Name.Equals("Piranha Gun") || item.Name.Equals("Rainbow Gun") || item.Name.Equals("Scourge of the Corruptor") || item.Name.Equals("Vampire Knives") || item.Name.Equals("Staff of the Frost Hydra")))
 
+                        bool canget = false;
 
-                        //chest in dungeon                     
-                        if (canGrabDungeonItem(cx, cy))
+                        //TODO rearange code key/item surface, golden key counted at other location in case it is not item[0]
+                        
+                        //chest in dungeon   
+                        if (chest.y <= Main.worldSurface + 2 || canGrabDungeonItem(cx, cy))
                         {
-                            if (score.itemLocation.ContainsKey(chest.item[0].type))
-                                score.itemLocation[chest.item[0].type].Add(new Tuple<int, int>(cx, cy));
-                            else
-                                score.itemLocation.Add(chest.item[0].type, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
-
-
+                            if (chest.y > Main.worldSurface + 2 || chest.item[0].type != ItemID.GoldenKey)
+                            {
+                                //dont show common golden keys above surface
+                                if (score.itemLocation.ContainsKey(chest.item[0].type))
+                                    score.itemLocation[chest.item[0].type].Add(new Tuple<int, int>(cx, cy));
+                                else
+                                    score.itemLocation.Add(chest.item[0].type, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });                                                                
+                            }
+                            
                             if (Main.tile[cx, cy].frameX == 72)
                             {
                                 hasOBjectOrParam["Pre Skeletron Dungeon Chest Grab"] += 1;
                                 //writeDebugFile("########### can grab dungeon item at " + cx + " " + cy + " " + seed);
                             }
-                            else if (Main.tile[cx, cy].frameX == 0 && chest.item[0].type == ItemID.GoldenKey)
+                            else if (Main.tile[cx, cy].frameX == 0 && chest.item[0].type == ItemID.GoldenKey && chest.y > Main.worldSurface + 2)
                             {
+                                //excluding golden keys above surface, they are counted at other place
                                 hasOBjectOrParam["Pre Skeletron Golden Key Grab"] += 1;
                                 //writeDebugFile("########### can grab golden key at " + cx + " " + cy + " " + seed);
                             }
-
+                            canget = true;
                         }
                         else
                         if (canGetDungeonItem(cx, cy - 1, 15, 15))
@@ -1998,9 +2011,16 @@ namespace TheTerrariaSeedProject
                                 hasOBjectOrParam["Pre Skeletron Golden Key Risky"] += 1;
                                 //writeDebugFile("########### can get golden key at " + cx + " " + cy + " " + seed);
                             }
-
-
-
+                            canget = true;
+                        }
+                        if (canget)
+                        {
+                            if(chest.item[0].type == ItemID.Muramasa)
+                                hasOBjectOrParam["Pre Skeletron Muramasa Chest reachable"] = 1;
+                            else if (chest.item[0].type == ItemID.CobaltShield)
+                                hasOBjectOrParam["Pre Skeletron Cobalt Shield Chest reachable"] = 1;
+                            else if (chest.item[0].type == ItemID.ShadowKey)
+                                hasOBjectOrParam["Pre Skeletron Shadow Key Chest reachable"] = 1;
                         }
 
 
@@ -2199,6 +2219,7 @@ namespace TheTerrariaSeedProject
             else
                 hasOBjectOrParam["Pre Skeletron Dungeon Chest Risky"] = Math.Min(hasOBjectOrParam["Pre Skeletron Dungeon Chest Risky"], goldenKeys);
 
+            
 
 
             int pyramids = has(ref hasOBjectOrParam, ItemID.SandstorminaBottle) + has(ref hasOBjectOrParam, ItemID.PharaohsMask) + has(ref hasOBjectOrParam, ItemID.FlyingCarpet);
