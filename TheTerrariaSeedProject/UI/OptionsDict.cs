@@ -622,7 +622,7 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Pathlength to Bee Hive",
                 "neg. Pathlength to Boomstick",
                 "neg. Pathlength to Slime Staute",
-                "neg. Pathlength to Shark Staute",
+                "neg. Pathlength to Shark Staute",                
                 "neg. Pathlength to Anvil",
                 "neg. Pathlength to free ShadowOrb/Heart",
                 "neg. Pathlength into 40% cavern layer",
