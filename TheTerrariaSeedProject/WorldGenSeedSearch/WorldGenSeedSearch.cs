@@ -123,6 +123,7 @@ namespace TheTerrariaSeedProject
         int localDungeonSide = 0;
         int storeMMImg = -1;
         int storeStats = -1;
+        int stepsize = 1;
 
         public override void Initialize()
         {
@@ -188,6 +189,7 @@ namespace TheTerrariaSeedProject
                 statsUpdated = false;
                 int numSeedSearch = 1000 * 1000;
                 int numStopSearch = numSeedSearch;
+                stepsize = 1;
 
                 while (stage > 0 && !ended && !gotToMain)
                 {
@@ -196,8 +198,9 @@ namespace TheTerrariaSeedProject
                         checkButtons();
                         if (gotToMain) { Exit(); break; };
 
-                        if (numSeedSearch-- == 0) goToOptions();
-                        if (numStopSearch == 0) goToOptions();
+                        if (numSeedSearch-- <= 0) {  goToOptions(); }
+                        else if (numStopSearch <= 0) {  goToOptions(); }
+                    
                         if (gotoCreation) stage = 1;
                         if (gotoCreation) StoreLastStats();
 
@@ -223,8 +226,22 @@ namespace TheTerrariaSeedProject
                             worldName = currentConfiguration.FindConfigItemValue(OptionsDict.WorldInformation.worldName, 0);
                             Main.worldName = worldName;
                             mapSize = currentConfiguration.FindConfigItemValue(OptionsDict.WorldInformation.worldSize, 0); //todo custom sizes
-                            Main.maxTilesX = mapSize.Equals("Small") ? 4200 : mapSize.Equals("Medium") ? 6400 : mapSize.Equals("Large") ? 8400 : Main.maxTilesX;
-                            Main.maxTilesY = mapSize.Equals("Small") ? 1200 : mapSize.Equals("Medium") ? 1800 : mapSize.Equals("Large") ? 2400 : Main.maxTilesY;
+
+                            if (mapSize.Contains("x"))
+                            {
+                                int xsi, ysi;
+                                Int32.TryParse(mapSize.Substring(0, mapSize.IndexOf('x')), out xsi);
+                                Int32.TryParse(mapSize.Substring(mapSize.IndexOf('x')+1, mapSize.Length- mapSize.IndexOf('x')-1), out ysi);
+
+                                Main.maxTilesX = xsi < 600 ? Main.maxTilesX : xsi;
+                                Main.maxTilesY = ysi < 600 ? Main.maxTilesY : ysi;
+                                writeDebugFile(" custom world size " + Main.maxTilesX + "x" + Main.maxTilesY);
+                            }
+                            else
+                            {
+                                Main.maxTilesX = mapSize.Equals("Small") ? 4200 : mapSize.Equals("Medium") ? 6400 : mapSize.Equals("Large") ? 8400 : Main.maxTilesX;
+                                Main.maxTilesY = mapSize.Equals("Small") ? 1200 : mapSize.Equals("Medium") ? 1800 : mapSize.Equals("Large") ? 2400 : Main.maxTilesY;
+                            }
 
                             string storeMM = currentConfiguration.FindConfigItemValue(OptionsDict.Configuration.storeMMPic, 0);
                             if (!storeMM.Equals("Off"))
@@ -269,6 +286,7 @@ namespace TheTerrariaSeedProject
 
                             numSeedSearch = currentConfiguration.numSeedSearch;
                             numStopSearch = Int32.Parse(currentConfiguration.FindConfigItemValue(OptionsDict.Configuration.stopSearchNum, 0));
+                            stepsize = Int32.Parse(currentConfiguration.FindConfigItemValue(OptionsDict.Configuration.stepSize, 0));
 
                             InitSearch();
                             Main.ActiveWorldFileData.SetSeed(seed.ToString());
@@ -290,7 +308,7 @@ namespace TheTerrariaSeedProject
 
                             double ratio = numPyramidChanceTrue == 0 ? 0 : ((float)numSearched) / ((float)numPyramidChanceTrue);
 
-
+                            
                             //check if there is the chance the maps has n pyramids
 
                             Main.ActiveWorldFileData.SetSeed(seed.ToString());
@@ -428,9 +446,9 @@ namespace TheTerrariaSeedProject
 
                             // writeDebugFile(" seed " + seed + " chance " + numPyrChance + "("+ genInfo.numPyrChance+") has pyramid " + score.pyramids + "("+genInfo.numPyramids+") cond true " + condsTrue + " with point " + score.points );
 
-                            if (!continueEval) condsTrue = Math.Min(condsTrue, stage);
+                            if (!continueEval && !score.phase3Empty) condsTrue = Math.Min(condsTrue, stage);
 
-
+                            //writeDebugFile("2run " + seed + " cond " + condsTrue +  " rare " + score.rare + "(" + rareMax + ")");
 
                             //has it pyramids, trees, near to mid? 
                             if (condsTrue > 1 || score.rare > 0)
@@ -473,7 +491,7 @@ namespace TheTerrariaSeedProject
 
                             rareMax = Math.Max(score.rare, rareMax);
 
-
+                                                        
 
                             //if world gen messed around again
                             tryAgain = false;
@@ -489,6 +507,9 @@ namespace TheTerrariaSeedProject
                                 rareMax = Math.Max(score.rare, rareMax);
                                 paterCondsTrue = Math.Max(acond.checkConditions(score, currentConfiguration, stage), paterCondsTrue); // to check if score > value
                                 paterScore = Math.Max(computeScore(score), paterScore);
+
+                                
+                                //writeDebugFile("3run " +  seed + " " + trials + " cond " + paterCondsTrue + "(" + condsTrue + ")" + " rare " + score.rare + "(" + rareMax + ")");
                             }
 
 
@@ -530,124 +551,154 @@ namespace TheTerrariaSeedProject
 
                         if (stage == 42 && !ended && !gotoCreation)
                         {
-                            //generate and write map file
-                            writeToDescList(GenerateSeedStateText(), 1);
-
-                            //due to vanilla world generation is buged and sometimes generates various maps with same seed, generate more than one until good
-
-                            paterCondsTrue = condsTrue;
-                            //###check if good map, else redo generation again   
-                            int scoreVal;
-                            //create again if score less     
-                            int MAX_Runs = 2;
-                            int runs = 0;
-                            bool somethingwentwrong = false;
-
-
-
-
-
-                            if (tryAgain || skipStage3)
-                                do
-                                {
-                                    if (runs >= MAX_Runs) paterScore = (int)(0.97f * ((float)paterScore) - 50.0f);
-
-
-                                    if (!TryToGenerate()) { somethingwentwrong = true; break; ; } //--> genInfo
-
-
-                                    analyzeWorld(score, genInfo);
-                                    scoreVal = computeScore(score);
-                                    condsTrue = acond.checkConditions(score, currentConfiguration, 3);
-                                    //writeDebugFile(" run " + runs + " constru " + condsTrue + " pater true" + paterCondsTrue);
-
-
-
-                                    if (runs >= 2 * MAX_Runs) paterCondsTrue -= 1000;
-                                    if (runs++ >= 3 * MAX_Runs) rareMax--;
-
-
-                                } while ((((scoreVal < paterScore) || (condsTrue < paterCondsTrue)) || (score.rare < rareMax)) && !ended); //add break for rare bool "wasrare?"
-                                                                                                                                           //&& !acond.takeAll
-
-                            if (!somethingwentwrong && !statsUpdated)
+                            int repeat = 1;
+                            bool repeating = false;
+                            while (repeat-- > 0 )
                             {
-                                numPyramidChanceTrue++;
-                                hasCount[numPyrChance, score.pyramids] += 1;
-                                chanceCount[numPyrChance] -= 1;
-                                uiss.ChangeCountText(hasCount, chanceCount, numPyrChance, score.pyramids);
-                                statsUpdated = true;
-                            }
-                            lastSeed = seed; lastStage = 42;
-                            if (!somethingwentwrong && (score.rare > 0 || condsTrue > 2))
-                            {
-                                createMapName(score, !tryAgain && runs < 2, currentConfiguration, worldName);
 
-                                WorldFile.saveWorld(false, true);//Main.ActiveWorldFileData.IsCloudSave = false
+                                //generate and write map file
+                                writeToDescList(GenerateSeedStateText(), 1);
 
-                                bool generated = true;
+                                //due to vanilla world generation is buged and sometimes generates various maps with same seed, generate more than one until good
 
-                                if (score.hasOBjectOrParam["Chest Doub Glitch"] > 0)
-                                {
-                                    //sometimes a chest does not get saved
-
-                                    WorldFile.loadWorld(false);
-                                    PostWorldGen();
-
-
-                                    analyzeWorld(score, genInfo);
-                                    computeScore(score);
-                                    condsTrue = acond.checkConditions(score, currentConfiguration, 3);
+                                paterCondsTrue = condsTrue;
+                                //###check if good map, else redo generation again   
+                                int scoreVal;
+                                //create again if score less     
+                                int MAX_Runs = 2;
+                                int runs = 0;
+                                bool somethingwentwrong = false;
 
 
 
-                                    if ((score.rare > 0 || condsTrue > 2))
+                                if (tryAgain || skipStage3 || repeating)
+                                    do
                                     {
-                                        //delete old write new,
-                                        FileUtilities.Delete(Main.worldPathName, false);
-                                        string name = Main.worldPathName.Substring(0, Main.worldPathName.Length - 3) + "twld";
-                                        FileUtilities.Delete(name, false);
-                                        createMapName(score, !tryAgain && runs < 2, currentConfiguration, worldName);
-                                        WorldFile.saveWorld(false, true);
-                                    }
-                                    //else
-                                    //delete wrong map sed?
-                                }
+                                        if (runs > 10 * MAX_Runs) { break; }
+                                        if (((runs) / MAX_Runs) % 4 > 1 && runs % 4 == 1)
+                                        {
+                                            //try other start conditions                                        
+                                            writeDebugFile("mix up WG: " + seed + " trials " + runs + " score " + "(" + paterScore + ")" + " cond " + "(" + paterCondsTrue + ")" + " rare " + "(" + rareMax + ")");
+                                            stage = 2;
+                                            Main.ActiveWorldFileData.SetSeed((seed - 1).ToString());
+                                            if (!TryToGenerate()) { somethingwentwrong = true; break; ; } //--> genInfo
+                                            Main.ActiveWorldFileData.SetSeed((seed).ToString());
+                                            stage = stage == 2 ? 42 : stage;
+                                        }
 
-                                if (generated)
+
+                                        if (!TryToGenerate()) { somethingwentwrong = true; break; ; } //--> genInfo
+
+                                        analyzeWorld(score, genInfo);
+                                        scoreVal = computeScore(score);
+                                        condsTrue = acond.checkConditions(score, currentConfiguration, 3);
+                                        //writeDebugFile(" run " + runs + " constru " + condsTrue + " pater true" + paterCondsTrue);
+
+                                        if (!repeating)
+                                        {
+                                            if (runs >= MAX_Runs && condsTrue >= paterCondsTrue && score.rare >= rareMax) paterScore = (int)((paterScore > 0 ? 0.97f : 1.031f) * ((float)paterScore) - 50.0f);
+                                            if (runs >= 4 * MAX_Runs)
+                                            {
+                                                if (!(score.rare < rareMax))
+                                                    paterCondsTrue--;
+                                                else if (!(condsTrue < paterCondsTrue))
+                                                    rareMax--;
+                                            }
+                                        }
+
+                                        //rare condition if phase 2 did pass and had rare, nothing in phase 3. And here for some reason does not get condition true again.
+
+                                        //writeDebugFile("B:run " + seed + " " + runs + " score " + scoreVal + "(" + paterScore + ")" + " cond " + condsTrue + "(" + paterCondsTrue + ")" + " rare " + score.rare + "(" + rareMax + ")");
+
+                                        runs++;
+                                    } while ((((scoreVal < paterScore) || (condsTrue < paterCondsTrue)) || (score.rare < rareMax)) && !ended && !repeating); //add break for rare bool "wasrare?"
+                                                                                                                                               //&& !acond.takeAll
+
+                                if (!somethingwentwrong && !statsUpdated && !repeating )
                                 {
-                                    Main.PlaySound(41, -1, -1, 1, 0.7f, 0f);
+                                    numPyramidChanceTrue++;
+                                    hasCount[numPyrChance, score.pyramids] += 1;
+                                    chanceCount[numPyrChance] -= 1;
+                                    uiss.ChangeCountText(hasCount, chanceCount, numPyrChance, score.pyramids);
+                                    statsUpdated = true;
+                                }
+                                lastSeed = seed; lastStage = 42;
+                                if (!somethingwentwrong && (score.rare > 0 || condsTrue > 2 || repeating))
+                                {
+                                    createMapName(score, !tryAgain && runs < 2, currentConfiguration, worldName);
 
-                                    passedStage[4]++;
+                                    WorldFile.saveWorld(false, true);//Main.ActiveWorldFileData.IsCloudSave = false
 
-                                    if (condsTrue > 2)
-                                        numStopSearch--;
+                                    bool generated = true;
 
-                                    if (score.rare > 0) rareGen++;
-                                    if (score.rare > 0 && condsTrue < 3) rareGenOnly++;
+                                    if (score.hasOBjectOrParam["Chest Doub Glitch"] > 0)
+                                    {
+                                        //sometimes a chest does not get saved
+
+                                        WorldFile.loadWorld(false);
+                                        PostWorldGen();
+
+
+                                        analyzeWorld(score, genInfo);
+                                        computeScore(score);
+                                        condsTrue = acond.checkConditions(score, currentConfiguration, 3);
 
 
 
-                                    //foreach (var elem in score.hasOBjectOrParam)
-                                    //    wrtei += elem.Key + ": " + elem.Value + Environment.NewLine;
-                                    if (storeMMImg >= 0) StoreMapAsPNG(storeMMImg % 2 > 0);
+                                        if ((score.rare > 0 || (condsTrue > 2 || repeating)))
+                                        {
+                                            //delete old write new,
+                                            FileUtilities.Delete(Main.worldPathName, false);
+                                            string name = Main.worldPathName.Substring(0, Main.worldPathName.Length - 3) + "twld";
+                                            FileUtilities.Delete(name, false);
+                                            createMapName(score, !tryAgain && runs < 2, currentConfiguration, worldName);
+                                            WorldFile.saveWorld(false, true);
+                                        }
+                                        //else
+                                        //delete wrong map sed?
+                                    }
 
-                                    if (storeStats >= 0) StoreLastStats(true);
+                                    if (generated)
+                                    {
+                                        if (!repeating)
+                                        {
+                                            Main.PlaySound(41, -1, -1, 1, 0.7f, 0f);
 
-                                    writeToDescList(GenerateStatsText(), -2);
+                                            passedStage[4]++;
+
+                                            if (condsTrue > 2)
+                                                numStopSearch--;
+
+                                            if (score.rare > 0) rareGen++;
+                                            if (score.rare > 0 && condsTrue < 3) rareGenOnly++;
+                                        }
+
+
+                                        //foreach (var elem in score.hasOBjectOrParam)
+                                        //    wrtei += elem.Key + ": " + elem.Value + Environment.NewLine;
+                                        if (storeMMImg >= 0) StoreMapAsPNG(storeMMImg % 2 > 0);
+
+                                        if (storeStats >= 0) StoreLastStats(true);
+
+                                        writeToDescList(GenerateStatsText(), -2);
+
+                                        repeating = true;
+
+                                    }
+                                    
+
 
                                 }
 
 
-                            }
+                                //start again with next seed
+                                clearWorld(stage);
+                                
 
-
-                            //start again with next seed
-                            clearWorld(stage);
+                            }//end while repeat
                             startNextSeed();
-
                         }
-
+                        
 
 
                     }//without this linux needs more memory
@@ -797,9 +848,112 @@ namespace TheTerrariaSeedProject
             }
         }
         
+        //trial to avoid freezing worlds, do not work
+        private void StartWGT()
+        {
+
+            try
+            {
+
+                WorldGen.generateWorld(Main.ActiveWorldFileData.Seed, null); //--> genInfo   
+            }
+            catch (ThreadAbortException abortException)
+            {
+                writeDebugFile(" freezing seed thread aborted");
+            }
+
+        }
 
         private bool TryToGenerate()
         {
+            
+            /*
+            //trial to avoid freezing worlds, do not work
+            //stopWatchWorldGen = new Stopwatch();
+            //stopWatchWorldGen.Start();
+            clearWorld(stage);
+
+            while (uiss.writeTextUpdating == true || uiss.rephrasing || uiss.detailsList.isUpdating || uiss.writeStats || uiss.writeText) { Thread.Sleep(10); };
+            inSearch = true;
+
+            Thread newThread = null;
+            try
+            {
+
+                newThread = new Thread(new ThreadStart(StartWGT));
+                newThread.Start();
+                int wait = 500;
+                while ((newThread.IsAlive && wait-->0 )|| isInCreation || gotoCreation)
+                {
+                    Thread.Sleep(100);
+                }
+                if (newThread.IsAlive)
+                {
+                    writeDebugFile(" freezing seed detected " + seed + " isInCreation " + isInCreation + " gotoptSeed " + gotoptSeed + " gotoptStage " + gotoptStage + " gotoCreation " + gotoCreation + " searchForSeed " + searchForSeed + " inSearch " + inSearch);
+                    clearWorld(stage);
+                    
+                    newThread.Abort("Information from Main.");
+                    //writeDebugFile("abort send");
+                    throw new Exception();
+                    
+                }
+
+            }
+            catch (Exception ex)
+            {
+                if (gotToMain)
+                {
+                    Exit();
+                    return false;
+                }
+                else
+                {
+                    writeDebugFile(" could not build seed " + seed + " with size " + Main.maxTilesX + " and evil type " + WorldGen.WorldGenParam_Evil + " expert mode " + Main.expertMode + " in stage " + stage + " talive " + (newThread!=null?newThread.IsAlive:false)) ;
+                    writeDebugFile(ex.Message);
+                    writeDebugFile(ex.ToString());
+                    writeDebugFile("stage " + stage);
+
+                    //todod remove from stats
+                    couldNotGenerateStage[stage == 42 ? 4 : stage == 23 ? 1 : stage]++;
+
+                    if((newThread != null ? newThread.IsAlive : false))
+                    {
+                        //after freeze next worlf might be differnt, do dummy world
+                        
+                        int cstage = stage;
+                        int cseed = seed;
+                        stage = 23;
+                        Main.ActiveWorldFileData.SetSeed("0");
+                        //clearWorld(stage);
+                        //StartWGT();
+                        Main.ActiveWorldFileData.SetSeed(cseed.ToString());
+                        stage = stage == 23 ? cstage : stage;
+
+                    }
+
+                    if (statsUpdated)
+                    {
+                        hasCount[numPyrChance, score.pyramids] -= 1;
+
+                    }
+                    else
+                    {
+                        chanceCount[numPyrChance] -= 1;
+                    }
+
+                    uiss.SetCountText(hasCount, chanceCount);
+
+                    startNextSeed();
+                }
+                inSearch = false;
+                return false;
+            }
+
+            inSearch = false;
+            return true;
+            */
+
+            
             //stopWatchWorldGen = new Stopwatch();
             //stopWatchWorldGen.Start();
             clearWorld(stage);
@@ -851,6 +1005,11 @@ namespace TheTerrariaSeedProject
 
             inSearch = false;
             return true;
+            
+
+
+
+
         }
 
 
@@ -894,11 +1053,13 @@ namespace TheTerrariaSeedProject
         //int seedCount = 0;
         private void startNextSeed()
         {
-            
+                        
             stage = 1;
-            seed++;            
-            numSearched++;
-            if (seed == Int32.MinValue) seed++; //else vanilla crashes here
+            seed+=stepsize;            
+            numSearched++;            
+            if (seed == Int32.MinValue) seed = 0; //else vanilla crashes here            
+            if (seed < 0) seed = Int32.MaxValue+seed+1;            
+
             Main.ActiveWorldFileData.SetSeed(seed.ToString());
         }
         private void clearWorld(int cstage)
@@ -1942,7 +2103,7 @@ namespace TheTerrariaSeedProject
                         )
                     {
 
-                        hasOBjectOrParam["Chest Doub Glitch"] += 1; writeDebugFile("maybe found doubglitch (buggy) at " + cx + " " + cy + " in seed " + Main.ActiveWorldFileData.Seed + " can get overridden: " + (!doFull));
+                        //hasOBjectOrParam["Chest Doub Glitch"] += 1; writeDebugFile("maybe found doubglitch (buggy) at " + cx + " " + cy + " in seed " + Main.ActiveWorldFileData.Seed + " can get overridden: " + (!doFull));
                         if (score.itemLocation.ContainsKey(ItemID.DynastyChest))
                             score.itemLocation[ItemID.DynastyChest].Add(new Tuple<int, int>(cx, cy));
                         else
@@ -3826,15 +3987,16 @@ namespace TheTerrariaSeedProject
                     ctilesToMine++;
                 else
                 {
-                    //exclude last tiles
+                    //exclude last tiles 
                     tilesToMine += ctilesToMine;
                     ctilesToMine = 0;
                 }
 
-                if (ox == x && oy == y)
+                if (ox == x && oy == y )
                 {
-                    writeDebugFile("entrance finding failed for seed " + seed);
-                    //should not happen
+                    if(x != Main.spawnTileX && y != Main.spawnTileY)
+                        writeDebugFile("entrance finding failed for seed " + seed);
+                    //should not happen  , only if start is in spawn like in seed 170170245
                     break;
                 }
                 path.Add(new Tuple<int, int>(x, y));
@@ -4120,6 +4282,8 @@ namespace TheTerrariaSeedProject
             public int missingCount = 0;
             public int missingCountNot = 0;
 
+            public bool phase3Empty = false;
+
             /*
             public int sandstromBottle;
             public int pharoMask;
@@ -4149,7 +4313,9 @@ namespace TheTerrariaSeedProject
                 itemLocation = new Dictionary<int, List<Tuple<int, int> >>();
                 missingCount = 0;
                 missingCountNot = 0;
-            }
+                phase3Empty = false;
+
+        }
 
             public void clear()
             {
@@ -6104,14 +6270,17 @@ namespace TheTerrariaSeedProject
                     points++;
                 if (phase3Count == 0 && (step!=1 || phase2Count==0) && points > 1)
                     points++;
-
                 
+
+                //writeDebugFile(" step " + step + " " + phase2Count + " 3:" + phase3Count + " p" + points);
+
 
                 rares = rare;
                 this.points = points;
                 score.rare = rare;
                 score.points = points;
-                                
+
+                score.phase3Empty = phase3Count == 0 ? true : false;
 
                 return points;
             }
@@ -6171,7 +6340,7 @@ namespace TheTerrariaSeedProject
                             (Main.tile[x, y].frameX == 72 && Main.tile[x, y].wall != WallID.CrimstoneUnsafe && Main.tile[x, y].wall != WallID.CrimsonGrassUnsafe && Main.tile[x, y + 2].type != TileID.Crimstone && Main.tile[x - 1, y + 2].type != TileID.Crimstone && Main.tile[x + 1, y + 2].type != TileID.Crimstone)
                             ))
                             demonAltars.Add(new Tuple<int, int>(x, y));
-                        else if (Main.tile[x, y].type == TileID.Ruby || (Main.tile[x, y].type == TileID.ExposedGems && Main.tile[x, y].frameX == 72))
+                        else if (Main.tile[x, y].active() && Main.tile[x, y].type == TileID.Ruby || (Main.tile[x, y].type == TileID.ExposedGems && Main.tile[x, y].frameX == 72))
                             rubies.Add(new Tuple<int, int>(x, y));
                     }
 
