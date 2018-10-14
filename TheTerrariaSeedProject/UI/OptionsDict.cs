@@ -24,6 +24,7 @@ namespace TheTerrariaSeedProject.UI
             public const string startingSeed = "Starting seed search at";
             public const string searchSeedNum = "Search until starting seed +";
             public const string stopSearchNum = "Stop search if found";
+            public const string stepSize = "Seed cycle step size";
             public const string storeMMPic = "Store mini map as picture";
             public const string storeStats = "Store stats for each seed";
         }
@@ -175,7 +176,8 @@ namespace TheTerrariaSeedProject.UI
         public static readonly List<string> vDistanceShort = getPatern(25, 9, 25).Concat(getPatern(250, 4, 50)).Concat(getPatern(500, 11, 100)).ToList();
         public static readonly List<string> vDistanceLong = getPatern(200, 8, 100).Concat(getPatern(1000, 17, 200)).ToList();
         public static readonly List<string> vNumTiles = getPatern(0, 10, 10).Concat(getPatern(100, 9, 100)).Concat(getPatern(1000, 10, 1000)).ToList();
-        public static readonly List<string> vNumSearch = getPatern(1, 3).Concat(getPatern(5, 4, 5)).Concat(getPatern(50, 12, 0, 2, 5)).ToList();
+        public static readonly List<string> vNumSearch = getPatern(1, 7).Concat(getPatern(10, 3, 5)).Concat(getPatern(50, 12, 0, 2, 5)).ToList();
+        public static readonly List<string> vStepSize = (new string[] { "1000000000", "100000000", "10000000", "1000000", "100000", "10000", "1000", "100", "25", "10", "5", "3", "2", "1", "0", "-1", "-2", "-3", "-5", "-10", "-25", "-100", "-1000", "-10000", "-100000", "-1000000", "-10000000","-100000000", "-1000000000" }).ToList();
         public static readonly List<string> vScore = getPatern(-1000, 61, 100);
         public static readonly List<string> vEmpty = new List<string>();
         public static readonly List<string> vPaintingsDiff = getPatern(0, 52);
@@ -261,6 +263,7 @@ namespace TheTerrariaSeedProject.UI
             //config
             Add(Configuration.searchSeedNum, vNumSearch);
             Add(Configuration.stopSearchNum, vNumSearch);
+            Add(Configuration.stepSize, vStepSize);
 
             Add(Configuration.storeMMPic, new List<string>() { "Off", "For each in phase 3", "For each in phase 3 + item info", "only for stored worlds", "only for stored worlds + item info" });
             Add(Configuration.storeStats, new List<string>() { "Off", "For each in phase 3", "only for stored worlds"});
@@ -313,7 +316,7 @@ namespace TheTerrariaSeedProject.UI
                 "location is now defined. As in Phase 2 you have again positive list which contain conditions which need to be true (equal or greater than selected value). For each list the seed can get a point if all containing "+
                 "conditions of that specific list are fulfilled. The negative list reduces again the points by one for any condition listed there. For more details look Phase 2 description."+
                 "The world qualifies to get accepted if it has a total of 3 points or more here. It already got 1 point in Phase 1, and at least one point in Phase 2.If you added more than one positive list in Phase 2 it can start "+
-                "up with more than two points.If the negative options of this phase don’t reduce it again below 3 a seed can get accepted without fulfilling a positive list here. If you want to prohibit that " +
+                "up with more than two points. If the negative options of this phase don’t reduce it again below 3 a seed can get accepted without fulfilling a positive list here. If you want to prohibit that " +
                 "change “Takeover positive” to “Start new”. With this the points the evaluation starts with in Phase 3 can't be higher than 2 and the seed is forced to get at least one additional point here. \n \n"+
                 "As some special kind of condition in this phase you have the option “Score”. That computes a total fantasy score of that seed.It takes e.g. into account how many rare items it has, how many pyramids, clouds, "+
                 "living trees, enchanted swords(near spawn?), the beach structure, the location of evil tiles, were the Dungeon is placed, if it has some rare structures and many many more. It tries to be an objective rating, "+

@@ -307,6 +307,7 @@ namespace TheTerrariaSeedProject.UI
             infopanel.AddTextInput(OptionsDict.Configuration.startingSeed).SetValue(Main.ActiveWorldFileData.Seed.ToString());
             addDictToInfo(OptionsDict.Configuration.searchSeedNum).SetValue("10000");
             addDictToInfo(OptionsDict.Configuration.stopSearchNum).SetValue("100");
+            addDictToInfo(OptionsDict.Configuration.stepSize).SetValue("1");
 
 
             addDictToInfo(OptionsDict.Configuration.storeMMPic).SetValue("Off");
@@ -882,15 +883,15 @@ namespace TheTerrariaSeedProject.UI
                     
 
 
-                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Lava Charm", "1");
-                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Water Walking Boots", "1");
+                    //currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Lava Charm", "1");
+                    //currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Water Walking Boots", "1");
                     currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Staff of Regrowth", "1");
                     currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Flower Boots", "1");
-                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Aglet", "1");
+                    //currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Aglet", "1");
 
                     currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Temple horizontal distance", (Main.maxTilesX / 16 * 3).ToString());
                     currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Temple at depth (%)", "30");
-                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Pathlength to Boots", "1300");
+                    //currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Pathlength to Boots", "1300");
                     
                 }
                 else if (currentPositive == 5)
@@ -957,7 +958,7 @@ namespace TheTerrariaSeedProject.UI
                                         
                     currentConfig.InsertPositiveList(3);
                     currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Meteorite Bar unlocked", "1");
-                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "neg. Pathlength to Teleport Potion", "-800");
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "neg. Pathlength to Teleport Potion", "-650");
                     currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Nearest Teleportation Potion count", "2");                    
                     currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, OptionsDict.Tools.dummyPlus, "10");
 
