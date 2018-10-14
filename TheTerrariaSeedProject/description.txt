@@ -6,6 +6,8 @@ The seeds you found can also be used in the unmodded vanilla version.
 [c/BBDDBB:To enter the seed search mode] start either your world name or seed with "?" (question mark without quotes). 
 E.g. "?my Map name", or "?133742" as seed or just "?" (all without quotes) 
 
+New! https://discord.gg/6HXKa9a
+
 Currently you can search for:
 
 -Number of Pyramids, Clouds, Living Trees and their items
@@ -13,8 +15,7 @@ Currently you can search for:
 -evil biome spawn side after enter Hardmoe (in Jungle or not)
 -If you can get a Water Bolt before Skeletron        
 -or can you grab a Dungeon chest before Skeletron
--The Color of the Dungeon
--If it has all kind of Dungeon Walls
+-The Color of the Dungeon and if all kind of Walls
 -Can you get rare items like Flower Boots, Seaweed or Fish pet
 -How many different paintings and statues
 -How good the beach looks, no cliff no gabs, no near evil
@@ -37,6 +38,7 @@ If you found some bugs, have some ideas for more features, want to help coding o
 Good luck!
 
 Last Update:
+-stepSize, impr. search
 -more +profiles, speedrun options
 -surface height and var., altar-search for beach houses, dungeon farm spot detection, Has evil Dungeon/Jungle Ocean
 -bug fix
