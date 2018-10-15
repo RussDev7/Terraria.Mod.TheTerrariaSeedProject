@@ -285,8 +285,9 @@ namespace TheTerrariaSeedProject
                             continueEval = !currentConfiguration.FindConfigItemValue(OptionsDict.Phase3.continueEvaluation, 3).Equals(OptionsDict.Phase3.continueEvaluationResetTag);
 
                             numSeedSearch = currentConfiguration.numSeedSearch;
-                            numStopSearch = Int32.Parse(currentConfiguration.FindConfigItemValue(OptionsDict.Configuration.stopSearchNum, 0));
-                            stepsize = Int32.Parse(currentConfiguration.FindConfigItemValue(OptionsDict.Configuration.stepSize, 0));
+                            Int32.TryParse(currentConfiguration.FindConfigItemValue(OptionsDict.Configuration.stopSearchNum, 0), out numStopSearch);
+                            bool cp = Int32.TryParse(currentConfiguration.FindConfigItemValue(OptionsDict.Configuration.stepSize, 0), out stepsize);
+                            if (!cp) stepsize = 1;
 
                             InitSearch();
                             Main.ActiveWorldFileData.SetSeed(seed.ToString());
