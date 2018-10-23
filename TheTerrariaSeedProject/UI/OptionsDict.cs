@@ -37,8 +37,10 @@ namespace TheTerrariaSeedProject.UI
             public const string ironLead = "Iron or Lead";
             public const string silverTungsten = "Silver or Tungsten";
             public const string goldPlatin = "Gold or Platinum";
-            public const string moonType = "Moon type";
+            public const string moonType = "Moon type";            
             public const string hallowSide = "Hallow biome side";
+            public const string dungeonWallColor = "Dungeon wall color";
+            public const string dungeonSide = "Dungeon side";
         }
 
         public static class Phase2
@@ -141,7 +143,7 @@ namespace TheTerrariaSeedProject.UI
                     "(v.) a Altar near spawn(A) \n" +
                     "(vi.) the number of chests near spawn \n" +
                     "9.) Fantasy score divided by 333 to scale it from 1 to 9+, if greater than 9 it shows(x), greater 10 (X), if it has less than 0 it shows(-). It can be overwritten if the map has some rare stuff, that could be: \n" +
-                    "(i.) Chest Doub Glitch(D) \n" +
+                    "(i.) Chest duplication Glitch(D) \n" +
                     "(ii.) A Enchanted Sword which is very near to Spawn(#) \n" +
                     "(iii.) Spawn in Sky(Y) \n" +
                     "(iv.) All chest items you can't craft or fish (@) \n" +
@@ -172,11 +174,12 @@ namespace TheTerrariaSeedProject.UI
         public static readonly List<string> vNearEvilOcean = getPatern(0, 8, 25).Concat(getPatern(400, 5, 100)).Concat(getPatern(1000, 10, 200)).ToList();
         public static readonly List<string> vBeachPenalty = getPatern(100, 9, 100).Concat(getPatern(1000, 4, 250)).Concat(getPatern(2000, 16, 500)).Concat(getPatern(10000, 11, 1000)).ToList();
         public static readonly List<string> vEvilTiles = getPatern(0, 10, 10).Concat(getPatern(100, 9, 100)).Concat(getPatern(1000, 9, 1000)).Concat(getPatern(10000, 9, 5000)).ToList();
-        public static readonly List<string> vDistance = getPatern(100, 9, 100).Concat(getPatern(1000, 5, 200)).Concat(getPatern(2000, 9, 250)).ToList();
+        public static readonly List<string> vDistance = getPatern(5, 4, 5).Concat(getPatern(25, 3, 25).Concat(getPatern(100, 9, 100).Concat(getPatern(1000, 5, 200)).Concat(getPatern(2000, 9, 250)))).ToList();
+        public static readonly List<string> vDistanceNeg = getPatern(-1000, 9, 100).Concat(getPatern(-100, 3, 25).Concat(getPatern(-25, 10, 5).Concat(getPatern(25, 3, 25).Concat(getPatern(100, 9, 100).Concat(getPatern(1000, 5, 200)).Concat(getPatern(2000, 9, 250)))))).ToList();
         public static readonly List<string> vDistanceShort = getPatern(25, 9, 25).Concat(getPatern(250, 4, 50)).Concat(getPatern(500, 11, 100)).ToList();
         public static readonly List<string> vDistanceLong = getPatern(200, 8, 100).Concat(getPatern(1000, 17, 200)).ToList();
-        public static readonly List<string> vNumTiles = getPatern(0, 10, 10).Concat(getPatern(100, 9, 100)).Concat(getPatern(1000, 10, 1000)).ToList();
-        public static readonly List<string> vNumSearch = getPatern(1, 7).Concat(getPatern(10, 3, 5)).Concat(getPatern(50, 12, 0, 2, 5)).ToList();
+        public static readonly List<string> vNumTiles = getPatern(0, 10, 10).Concat(getPatern(100, 9, 100)).Concat(getPatern(1000, 9, 1000).Concat(getPatern(10000, 9, 5000))).ToList();
+        public static readonly List<string> vNumSearch = getPatern(1, 7).Concat(getPatern(10, 4, 5)).Concat(getPatern(50, 12, 0, 2, 5)).ToList();
         public static readonly List<string> vStepSize = (new string[] { "1000000000", "100000000", "10000000", "1000000", "100000", "10000", "1000", "100", "25", "10", "5", "3", "2", "1", "0", "-1", "-2", "-3", "-5", "-10", "-25", "-100", "-1000", "-10000", "-100000", "-1000000", "-10000000","-100000000", "-1000000000" }).ToList();
         public static readonly List<string> vScore = getPatern(-1000, 61, 100);
         public static readonly List<string> vEmpty = new List<string>();
@@ -206,12 +209,12 @@ namespace TheTerrariaSeedProject.UI
                 "The Terraria Seed Project(Beta) is a mod which allows you to search for a world with specific properties you are looking for. \n"+
                 "First some quick reference for the buttons: \n \n" +
                 UISearchSettings.IconNames.search +" Start the seed search. \n" +
-                UISearchSettings.IconNames.options +" The search stops after finish generating the current seed. \n"+
+                UISearchSettings.IconNames.options +" The search stops after finishing the current world gen step. \n"+
                 UISearchSettings.IconNames.configLoad +" Loads configuration file. Overrides current settings. \n"+
                 UISearchSettings.IconNames.configSave +" Saves configuration file. Overrides config file with that name if exist. \n"+
                 UISearchSettings.IconNames.positive +" Some configurations examples. Clicking again cycles through them.  \n"+
                 UISearchSettings.IconNames.reset +" Resets all changes you have made since last load or search. Click again and it resets all settings. \n"+
-                UISearchSettings.IconNames.stop +" Stops after finishing the current world gen step and throws you back to main menu. \n \n" +                
+                UISearchSettings.IconNames.stop +" Stops after finishing the current world gen step and exit the mod. \n \n" +                
                 "How it works: \n" +
                 "During world generation this mod checks if the world fulfills the conditions you set. If not it takes the next seed and tries that. \n" +
                 "Some conditions can already be checked before the full world is generated. With this you can save much search time. \n" +
@@ -350,7 +353,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Rares", vEmpty);
             Add(GeneralOptions.omitRare, new List<string> {
                 GeneralOptions.omitRareAll,
-                "Omit Chest Doub Glitch",
+                "Omit Chest duplication Glitch",
                 "Omit Dungeon has strange Pos",
                 "Omit Dungeon in Snow Biome",
                 "Omit Dungeon far above surface",
@@ -389,6 +392,8 @@ namespace TheTerrariaSeedProject.UI
             Add(Phase1.goldPlatin, new List<string> { "Random", "Gold", "Platin" }); //foreach (var elem in this[Phase1.goldPlatin]) Add(elem, vEmpty);
             Add(Phase1.moonType, new List<string> { "Random", "White", "Orange", "Green" }); //foreach (var elem in this[Phase1.moonType]) Add(elem, vEmpty);
             Add(Phase1.hallowSide, new List<string> { "Random", "Jungle side", "Snow/Dungeon side"});
+            Add(Phase1.dungeonWallColor, new List<string> { "Random", "Blue", "Green", "Pink"});
+            Add(Phase1.dungeonSide, new List<string> { "Random", "Left", "Right"});
 
 
             //phase 2 content
@@ -407,21 +412,21 @@ namespace TheTerrariaSeedProject.UI
                 "Dungeon tiles above surface",
                 "Pre Skeletron Dungeon Chest Risky",
                 "Pre Skeletron Dungeon Chest Grab",
+                "Pre Skeletron Dungeon Chest Any",
                 "Pre Skeletron Muramasa Chest reachable",
                 "Pre Skeletron Cobalt Shield Chest reachable",
                 "Pre Skeletron Shadow Key Chest reachable",
                 "Pre Skeletron Golden Key Grab",
                 "Pre Skeletron Golden Key Risky",
+                "Pre Skeletron Golden Key Any",
                 "Water Bolt before Skeletron",                
                 "Water Bolt",
                 "Muramasa",
                 "Cobalt Shield",
                 "Valor",
                 "Bone Welder",
-                "Alchemy Table",                
-                "Green Dungeon Walls",
-                "Blue Dungeon Walls",
-                "Pink Dungeon Walls",
+                "Alchemy Table",
+                "Dungeon Wall count",
                 "All Dungeon Walls",
                 "Dungeon farm spot",
                 "Dungeon farm spot 3Wall inters.",
@@ -439,12 +444,19 @@ namespace TheTerrariaSeedProject.UI
                 "Snow biome surface overlap mid",
                 "Jungle biome surface overlap mid",
                 "Jungle biome distance to mid",
+                "Snow biome distance to mid",
+                "Evil biome distance to mid",
                 "Surface average height (aprox.)",
                 "Surface height (sqrt) variance",
                 "Surface max-min height",
                 OptionsDict.Tools.dummyPlus
                 });
-            
+            //legacy
+            //"Green Dungeon Walls",
+             //   "Blue Dungeon Walls",
+             //   "Pink Dungeon Walls",
+
+
             Add(Phase2.negative, new List<string> {                     
                 "Evil Tiles for Jungle Grass",
                 "Evil Tiles for Sand",
@@ -455,6 +467,7 @@ namespace TheTerrariaSeedProject.UI
                 "Distance Cloud to mid",
                 "Distance Pyramid to mid",
                 "Distance Dungeon to mid",
+                "Distance ShadowOrb/Heart to mid",
                 "Dungeon has strange Pos",
                 "Dungeon tiles above surface",
                 "Dungeon in Snow Biome",
@@ -464,9 +477,7 @@ namespace TheTerrariaSeedProject.UI
                 "Has evil Dungeon Ocean",
                 "Has evil Jungle Ocean",
                 "No Ocean",
-                "Green Dungeon Walls",
-                "Blue Dungeon Walls",
-                "Pink Dungeon Walls",
+                "Dungeon Wall count",
                 "Snow biome surface overlap mid",
                 "Jungle biome surface overlap mid",
                 "Jungle biome distance to mid",
@@ -492,21 +503,24 @@ namespace TheTerrariaSeedProject.UI
             Add("Dungeon tiles above surface", v0to120);            
             Add("Pre Skeletron Dungeon Chest Risky", v0to10);
             Add("Pre Skeletron Dungeon Chest Grab", v0to10);
-            Add("Pre Skeletron Muramasa Chest reachable", v0to1);
-            Add("Pre Skeletron Cobalt Shield Chest reachable", v0to1);
-            Add("Pre Skeletron Shadow Key Chest reachable", v0to1);
+            Add("Pre Skeletron Dungeon Chest Any", v0to10);
+            Add("Pre Skeletron Muramasa Chest reachable", v0to5);
+            Add("Pre Skeletron Cobalt Shield Chest reachable", v0to5);
+            Add("Pre Skeletron Shadow Key Chest reachable", v0to5);
             Add("Pre Skeletron Golden Key Grab", v0to5);
             Add("Pre Skeletron Golden Key Risky", v0to5);
+            Add("Pre Skeletron Golden Key Any", v0to5);
             Add("Water Bolt before Skeletron", v0to5);            
             Add("Water Bolt", v0to10);
             Add("Muramasa", v0to10);
             Add("Cobalt Shield", v0to10);
             Add("Valor", v0to10);
             Add("Bone Welder", v0to10);
-            Add("Alchemy Table", v0to10);            
-            Add("Green Dungeon Walls", vDungeonWalls);
-            Add("Blue Dungeon Walls", vDungeonWalls);
-            Add("Pink Dungeon Walls", vDungeonWalls);
+            Add("Alchemy Table", v0to10);
+            //Add("Green Dungeon Walls", vDungeonWalls);
+            //Add("Blue Dungeon Walls", vDungeonWalls);
+            //Add("Pink Dungeon Walls", vDungeonWalls);
+            Add("Dungeon Wall count", vDungeonWalls);
             Add("All Dungeon Walls", vDungeonALLWalls);            
             Add("Dungeon farm spot", v0to10);
             Add("Dungeon farm spot 3Wall inters.", v0to10);
@@ -517,8 +531,8 @@ namespace TheTerrariaSeedProject.UI
             Add("Evil only one side", v0to1);
             Add("Snow biome surface overlap mid", vNumTiles);
             Add("Jungle biome surface overlap mid", vNumTiles);
-            Add("Jungle biome distance to mid", vDistance);
-            Add("Snow biome distance to mid", vDistance);
+            Add("Jungle biome distance to mid", vDistanceNeg);
+            Add("Snow biome distance to mid", vDistanceNeg);
             Add("Evil biome distance to mid", vDistance);
             Add("Surface average height (aprox.)", vMeanHeight);
             Add("Surface height (sqrt) variance", v0to120);
@@ -538,6 +552,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Distance Cloud to mid", vDistance);
             Add("Distance Pyramid to mid", vDistance);
             Add("Distance Dungeon to mid", vDistance);
+            Add("Distance ShadowOrb/Heart to mid", vDistance);
             Add("Has evil Ocean", v0to2);
             Add("Has evil Dungeon Ocean", v0to1);
             Add("Has evil Jungle Ocean", v0to1);
@@ -631,6 +646,7 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Pathlength to Suspicious Looking Eye",
                 "neg. Pathlength to Snowball Cannon",
                 "neg. Pathlength to Teleport Potion",
+                "neg. Pathlength to Meteorite Bar",
                 "neg. Pathlength to Enchanted Sword",
                 "neg. Pathlength to Bee Hive",
                 "neg. Pathlength to Boomstick",
@@ -648,6 +664,10 @@ namespace TheTerrariaSeedProject.UI
                 "Floating Island without chest",
                 "Nearest Altar Dungeon beach",
                 "Nearest Altar Jungle beach",
+                "Spawn in Snow biome",
+                "Spawn in Jungle biome",
+                "Spawn in Sky",
+                "Spawn in Evil biome",
                 "Score",
                 OptionsDict.Tools.dummyPlus
                 });
@@ -670,7 +690,8 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to Jester's Arrow",
                 "Pathlength to Suspicious Looking Eye",
                 "Pathlength to Snowball Cannon",
-                "Pathlength to Teleport Potion",                
+                "Pathlength to Teleport Potion",
+                "Pathlength to Meteorite Bar",
                 "Pathlength to Enchanted Sword",
                 "Pathlength to Bee Hive",
                 "Pathlength to Boomstick",
@@ -770,6 +791,7 @@ namespace TheTerrariaSeedProject.UI
             Add("neg. Pathlength to Suspicious Looking Eye", vPathLengthNeg);
             Add("neg. Pathlength to Snowball Cannon", vPathLengthNeg);
             Add("neg. Pathlength to Teleport Potion", vPathLengthNeg);
+            Add("neg. Pathlength to Meteorite Bar", vPathLengthNeg);
             Add("neg. Pathlength to Enchanted Sword", vPathLengthNeg);
             Add("neg. Pathlength to Bee Hive", vPathLengthNeg);
             Add("neg. Pathlength to Boomstick", vPathLengthNeg);
@@ -801,6 +823,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Pathlength to Suspicious Looking Eye", vPathLength);
             Add("Pathlength to Snowball Cannon", vPathLength);
             Add("Pathlength to Teleport Potion", vPathLength);
+            Add("Pathlength to Meteorite Bar", vPathLength);
             Add("Pathlength to Enchanted Sword", vPathLength);
             Add("Pathlength to Bee Hive", vPathLength);
             Add("Pathlength to Boomstick", vPathLength);
@@ -823,7 +846,11 @@ namespace TheTerrariaSeedProject.UI
             Add("Temple at ocean side of jungle (%)", v0to100);
             Add("Temple at height (%)", v0to100);
             Add("Temple at depth (%)", v0to100);
-                        
+
+            Add("Spawn in Snow biome", v0to1);
+            Add("Spawn in Jungle biome", v0to1);            
+            Add("Spawn in Sky", v0to1);
+            Add("Spawn in Evil biome", v0to1);
 
             Add("Score", vScore);
 

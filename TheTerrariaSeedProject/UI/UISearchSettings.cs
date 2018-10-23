@@ -28,7 +28,7 @@ namespace TheTerrariaSeedProject.UI
     {
         private UIGenProgressBar progressBar = new UIGenProgressBar();
         private UIHeader progressMessage = new UIHeader();
-        private GenerationProgress progress;
+        public GenerationProgress progress;
 
         public UIPanel buttonPanel;
 
@@ -326,6 +326,8 @@ namespace TheTerrariaSeedProject.UI
             addDictToInfo(OptionsDict.Phase1.goldPlatin).SetValue("Random");
             addDictToInfo(OptionsDict.Phase1.moonType).SetValue("Random");
             addDictToInfo(OptionsDict.Phase1.hallowSide).SetValue("Random");
+            addDictToInfo(OptionsDict.Phase1.dungeonWallColor).SetValue("Random");
+            addDictToInfo(OptionsDict.Phase1.dungeonSide).SetValue("Random");
 
 
 
@@ -520,7 +522,7 @@ namespace TheTerrariaSeedProject.UI
             if (detailsList != null && detailsPanel != null && detailsListScrollbar != null && !writeTextUpdating)
             {
                 if (!writeTextUpdating && !detailsList.isUpdating && !rephrasing && (!wgss.inSearch || wgss.isInCreation) && (this.currentSize != (this.GetDimensions()).Width || writeText || ((detailsList.entryList.Count == 0) && writeStats) || (detailsList.entryList.Count == 0 && wgss.isInCreation && writtenText.Length > 0)))
-                {
+                {                    
                     rephrasing = true;
                     writeText = true;
                     float currentSize = getDescListWith();
@@ -547,7 +549,7 @@ namespace TheTerrariaSeedProject.UI
                     rephrasing = false;
                 }
                 
-                if (infopanel != null && infopanel.uielem.Count != lastOptionSize )
+                if (infopanel != null && infopanel.uielem.Count != lastOptionSize && wgss.isInCreation)
                 {
 
                     SetToConfiguration(Configuration.GenerateConfiguration(infopanel.selectables), true); // was false, test debug true, seems to work so far but should not be needed
@@ -604,20 +606,28 @@ namespace TheTerrariaSeedProject.UI
                 wgss.ended = true;
                 wgss.searchForSeed = false;
                 wgss.stage = -1;
-                
             }
+            else if(wgss.isInCreation)
+            {
+                wgss.ended = true;
+                wgss.searchForSeed = false;
+                wgss.stage = -1;
+            }
+
         }
 
 
         private void SetBackToDefault()
         {
             //if (wgss.isInCreation || !wgss.inSearch)
-            if (!wgss.searchForSeed)
-            {
-                Init();
-                infopanel.selectables.Sort();
-                currentConfig = Configuration.GenerateConfiguration(infopanel.selectables);
-            }
+            if (wgss.isInCreation)
+                if (!wgss.searchForSeed)
+                {
+                    Init();
+                    infopanel.selectables.Sort();
+                    currentConfig = Configuration.GenerateConfiguration(infopanel.selectables);
+                    
+                }
         }
 
 
@@ -652,9 +662,10 @@ namespace TheTerrariaSeedProject.UI
 
         private void searchClick(UIMouseEvent evt, UIElement listeningElement)
         {
-            if (!wgss.searchForSeed)
+            if (!wgss.searchForSeed && wgss.isInCreation)
             {
                 currentConfig = Configuration.GenerateConfiguration(infopanel.selectables);
+                
                 //infopanel.selectables.Clear();
                 infopanel.uidesc.ClearCurrent();
 
@@ -670,7 +681,7 @@ namespace TheTerrariaSeedProject.UI
         private void optionsClick(UIMouseEvent evt, UIElement listeningElement)
         {
             if (wgss.inSearch)
-            {
+            {                
                 wgss.goToOptions(true); 
             }
         }
@@ -767,7 +778,7 @@ namespace TheTerrariaSeedProject.UI
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Near Enchanted Sword", "");
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Floating Island without chest", "");
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit No Ocean", "");
-                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Chest Doub Glitch", "");
+                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Chest duplication Glitch", "");
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, OptionsDict.GeneralOptions.omitRareAll, "");
 
                     currentConfig.ChangeValueOfSelectableText(0, Configuration.ConfigItemType.SelectableText, OptionsDict.Configuration.configName, name);
@@ -800,7 +811,7 @@ namespace TheTerrariaSeedProject.UI
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Near Enchanted Sword", "");
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Floating Island without chest", "");
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit No Ocean", "");
-                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Chest Doub Glitch", "");
+                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Chest duplication Glitch", "");
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, OptionsDict.GeneralOptions.omitRareAll, "");
 
                     currentConfig.ChangeValueOfSelectableText(0, Configuration.ConfigItemType.SelectableText, OptionsDict.Configuration.configName, name);
@@ -846,7 +857,7 @@ namespace TheTerrariaSeedProject.UI
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Near Enchanted Sword", "");
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Floating Island without chest", "");
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit No Ocean", "");
-                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Chest Doub Glitch", "");
+                    currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, "Omit Chest duplication Glitch", "");
                     currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, OptionsDict.GeneralOptions.omitRareAll, "");
 
                     currentConfig.ChangeValueOfSelectableText(0, Configuration.ConfigItemType.SelectableText, OptionsDict.Configuration.configName, name);
@@ -1095,8 +1106,11 @@ namespace TheTerrariaSeedProject.UI
             }
 
             infopanel.selectables.Sort();
-            if(setToCurrent)
+            if (setToCurrent)
+            {
                 currentConfig = Configuration.GenerateConfiguration(infopanel.selectables);
+                
+            }
             //infopanel.uielem.RecalculateChildren();
             //infopanel.uielem.Recalculate();
 
