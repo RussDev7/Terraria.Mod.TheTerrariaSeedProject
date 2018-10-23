@@ -38,6 +38,7 @@ If you found some bugs, have some ideas for more features, want to help coding o
 Good luck!
 
 Last Update:
+-speed up
 -stepSize, impr. search
 -more +profiles, speedrun options
 -surface height and var., altar-search for beach houses, dungeon farm spot detection, Has evil Dungeon/Jungle Ocean
