@@ -38,6 +38,7 @@ If you found some bugs, have some ideas for more features, want to help coding o
 Good luck!
 
 Last Update:
+-pyramid, tree size, dynamite, ruby, gravitation..
 -speed up
 -stepSize, impr. search
 -more +profiles, speedrun options
