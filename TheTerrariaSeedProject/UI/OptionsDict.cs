@@ -89,6 +89,11 @@ namespace TheTerrariaSeedProject.UI
             public const string worldSizeBugMinLarge = "World size min Larg";
         }
 
+        public static class ModConfig
+        {
+            public const string dontShowItemIDs = "#dontShowItemIDs:";            
+        }
+
 
         public static class SelectableList
         {
@@ -166,6 +171,9 @@ namespace TheTerrariaSeedProject.UI
 
         public static readonly List<string> v0to100 = getPatern(0, 101);
         public static readonly List<string> v0to120 = getPatern(0, 121);
+        public static readonly List<string> v0to500_5 = getPatern(0, 101, 5);
+        public static readonly List<string> v0to500_5_700_10 = getPatern(0, 100, 5).Concat(getPatern(500, 21, 10)).ToList();
+        public static readonly List<string> v0to200_2 = getPatern(0, 101, 2);
         public static readonly List<string> v0to5 = getPatern(0, 6);
         public static readonly List<string> v0to1 = getPatern(0, 2);
         public static readonly List<string> v0to2 = getPatern(0, 3);
@@ -191,13 +199,15 @@ namespace TheTerrariaSeedProject.UI
         public static readonly List<string> vSpikyTrap = getPatern(0, 31, 5);
         public static readonly List<string> vSpearTrap = getPatern(0, 21, 5);
         public static readonly List<string> vGeyDetoTrap = getPatern(0, 50).Concat(getPatern(50, 11, 10)).ToList();
-        public static readonly List<string> vPathLength = getPatern(100, 9, 100).Concat(getPatern(1000, 14, 250)).Concat(getPatern(5000, 6, 1000)).ToList();
-        public static readonly List<string> vPathLengthNeg = getPatern(-100, 9, -100).Concat(getPatern(-1000, 14, -250)).Concat(getPatern(-5000, 6, -1000)).ToList();
+        public static readonly List<string> vPathLength = getPatern(10, 9, 10).Concat(getPatern(100, 9, 100).Concat(getPatern(1000, 14, 250)).Concat(getPatern(5000, 6, 1000))).ToList();
+        public static readonly List<string> vPathLengthNeg = getPatern(-10, 9, -10).Concat(getPatern(-100, 9, -100).Concat(getPatern(-1000, 14, -250)).Concat(getPatern(-5000, 6, -1000))).ToList();
         public static readonly List<string> vTilesToMine = getPatern(0, 50).Concat(getPatern(50, 11, 10)).ToList();
         public static readonly List<string> vAltarBeach = (new string[] { "0", "10", "25", "50", "75", "100", "150", "200", "250", "300" } ).Concat(getPatern(400, 12, 100)).ToList();
         public static readonly List<string> vdummy = getPatern(0, 21).Concat(new string[] { "50","100","200","500","1000"}).ToList();
         public static readonly List<string> vMaxDist = getPatern(0, 20, 10).Concat(getPatern(200, 17, 25)).ToList();
         public static readonly List<string> vMeanHeight = getPatern(0, 51, 5);
+        public static readonly List<string> vTreePyrExistCavernDist = getPatern(-300, 61, 10);
+        public static readonly List<string> vUnderground = getPatern(0, 50).Concat(getPatern(50, 10, 5)).Concat(getPatern(100, 10, 20)).Concat(getPatern(300, 29, 25)).ToList();
 
         public static readonly List<string> vForUnknown = getPatern(0, 10).Concat(getPatern(10, 9, 10)).Concat(getPatern(100, 9, 100)).Concat(getPatern(1000, 9, 1000)).Concat(getPatern(10000, 10, 10000)).ToList();
 
@@ -404,12 +414,23 @@ namespace TheTerrariaSeedProject.UI
                 "Pyramid Bottle",
                 "Pyramid Carpet",
                 "Pyramid Mask",
+                "Max open air pyramid surface",
+                "Max pyramid height",
+                "Max pyramid tunnel height",
+                "Max pyramid total height",
+                "Max pyr. exit cav.-entr. distance",
                 "Tree Chest",
                 "Tree Chest Loom",
+                "Max Living Tree Size",
+                "Min Living Tree Size",
+                "Max Living Tree root Size",
+                "Max Living Tree total Size",
+                "Max Tree exit cav.-entr. distance",
                 "Dungeon has good Pos",
                 "Dungeon has strange Pos",
                 "Dungeon in Snow Biome",
                 "Dungeon tiles above surface",
+                "Dungeon below ground tree",
                 "Pre Skeletron Dungeon Chest Risky",
                 "Pre Skeletron Dungeon Chest Grab",
                 "Pre Skeletron Dungeon Chest Any",
@@ -449,6 +470,7 @@ namespace TheTerrariaSeedProject.UI
                 "Surface average height (aprox.)",
                 "Surface height (sqrt) variance",
                 "Surface max-min height",
+                "Underground layer height",
                 OptionsDict.Tools.dummyPlus
                 });
             //legacy
@@ -486,12 +508,27 @@ namespace TheTerrariaSeedProject.UI
                 "Surface average height (aprox.)",
                 "Surface height (sqrt) variance",
                 "Surface max-min height",
+                "Max Living Tree Size",
+                "Min Living Tree Size",
+                "Max Tree exit cav.-entr. distance",                                
+                "Max pyr. exit cav.-entr. distance",
+                "Underground layer height",
                 OptionsDict.Tools.dummyNeg
             });
 
             Add("Number of Pyramids", v0to10);
+            Add("Max open air pyramid surface", v0to200_2);            
+            Add("Max pyramid height", v0to200_2);
+            Add("Max pyramid tunnel height", v0to500_5);
+            Add("Max pyramid total height", v0to500_5);
+            Add("Max pyr. exit cav.-entr. distance", vTreePyrExistCavernDist);
             Add("Number of Clouds", v0to10);
             Add("Number of Living Trees", v0to5);
+            Add("Max Living Tree Size", v0to120);
+            Add("Min Living Tree Size", v0to120);
+            Add("Max Living Tree root Size", v0to500_5);
+            Add("Max Living Tree total Size", v0to500_5_700_10);
+            Add("Max Tree exit cav.-entr. distance", vTreePyrExistCavernDist);
             Add("Pyramid Bottle", v0to5);
             Add("Pyramid Carpet", v0to5);
             Add("Pyramid Mask", v0to5);
@@ -500,7 +537,8 @@ namespace TheTerrariaSeedProject.UI
             Add("Dungeon has good Pos", v0to1);
             Add("Dungeon has strange Pos", v0to1);
             Add("Dungeon in Snow Biome", v0to1);
-            Add("Dungeon tiles above surface", v0to120);            
+            Add("Dungeon tiles above surface", v0to120);    
+            Add("Dungeon below ground tree", v0to1);
             Add("Pre Skeletron Dungeon Chest Risky", v0to10);
             Add("Pre Skeletron Dungeon Chest Grab", v0to10);
             Add("Pre Skeletron Dungeon Chest Any", v0to10);
@@ -556,6 +594,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Has evil Ocean", v0to2);
             Add("Has evil Dungeon Ocean", v0to1);
             Add("Has evil Jungle Ocean", v0to1);
+            Add("Underground layer height", vUnderground);
 
 
             Add(OptionsDict.Tools.dummyPlus, vdummy);
@@ -582,6 +621,7 @@ namespace TheTerrariaSeedProject.UI
                 "Cloud Horseshoe",
                 "Cloud Sky Mill",
                 "All Cloud Items",
+                "Bee Hives",
                 "High Hive",
                 "Sharpening Station",
                 "Flower Boots",
@@ -615,8 +655,8 @@ namespace TheTerrariaSeedProject.UI
                 "Spear Trap",
                 "Geyser",
                 "Detonator",                
-                "Ground Distance",
-                "Rock Distance",
+                "Underground Distance to spawn",
+                "Cavern Distance to spawn",
                 "Meteorite Bar unlocked",
                 "Number different Paintings",
                 "Number Paintings",
@@ -642,17 +682,22 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Pathlength to Iron/Lead Bar",
                 "neg. Pathlength to Gold/Platinum Bar",
                 "neg. Pathlength to Bomb",
+                "neg. Pathlength to Dynamite",
+                "neg. Pathlength to 2nd Dynamite",
+                "neg. Pathlength to Gravitation Potion",
                 "neg. Pathlength to Jester's Arrow",
                 "neg. Pathlength to Suspicious Looking Eye",
                 "neg. Pathlength to Snowball Cannon",
                 "neg. Pathlength to Teleport Potion",
                 "neg. Pathlength to Meteorite Bar",
                 "neg. Pathlength to Enchanted Sword",
+                "neg. Pathlength to Altar",
                 "neg. Pathlength to Bee Hive",
                 "neg. Pathlength to Boomstick",
                 "neg. Pathlength to Slime Staute",
                 "neg. Pathlength to Shark Staute",                
                 "neg. Pathlength to Anvil",
+                "neg. Pathlength to Ruby",
                 "neg. Pathlength to free ShadowOrb/Heart",
                 "neg. Pathlength into 40% cavern layer",
                 "neg. Pathlength to 40% cavern entrance",
@@ -673,8 +718,8 @@ namespace TheTerrariaSeedProject.UI
                 });
             Add(Phase3.negative, new List<string> {
                 "Hermes Flurry Boots Distance", 
-                "Ground Distance",
-                "Rock Distance",
+                "Underground Distance to spawn",
+                "Cavern Distance to spawn",
                 "Dungeon Distance",
                 "Temple Distance",
                 "Temple horizontal distance",
@@ -687,17 +732,22 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to Iron/Lead Bar",
                 "Pathlength to Gold/Platinum Bar",
                 "Pathlength to Bomb",
+                "Pathlength to Dynamite",
+                "Pathlength to 2nd Dynamite",
+                "Pathlength to Gravitation Potion",
                 "Pathlength to Jester's Arrow",
                 "Pathlength to Suspicious Looking Eye",
                 "Pathlength to Snowball Cannon",
                 "Pathlength to Teleport Potion",
                 "Pathlength to Meteorite Bar",
                 "Pathlength to Enchanted Sword",
+                "Pathlength to Altar",
                 "Pathlength to Bee Hive",
                 "Pathlength to Boomstick",
                 "Pathlength to Slime Staute",
                 "Pathlength to Shark Staute",
                 "Pathlength to Anvil",
+                "Pathlength to Ruby",
                 "Pathlength to free ShadowOrb/Heart",
                 "Pathlength into 40% cavern layer",
                 "Pathlength to 40% cavern entrance",
@@ -724,6 +774,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Near Chest", v0to20);
             Add("Near Tree", v0to5);
             Add("Near Cloud", v0to5);
+            Add("Bee Hives", v0to20);
             Add("High Hive", v0to10);
             Add("Cloud Chest", v0to10);
             Add("Cloud Ballon", v0to10);
@@ -765,8 +816,8 @@ namespace TheTerrariaSeedProject.UI
             Add("Detonator", vGeyDetoTrap);
             Add("Meteorite Bar unlocked", v0to10);
             Add("Dungeon Distance", vDistanceLong);
-            Add("Ground Distance", vDistanceShort);
-            Add("Rock Distance", vDistanceShort);
+            Add("Underground Distance to spawn", vDistanceShort);
+            Add("Cavern Distance to spawn", vDistanceShort);
             Add("Number different Paintings", vPaintingsDiff);
             Add("Number Paintings", vPaintingsTotal);
             Add("Different functional noncraf. Statues", getPatern(0,27));
@@ -787,18 +838,23 @@ namespace TheTerrariaSeedProject.UI
             Add("neg. Pathlength to Iron/Lead Bar", vPathLengthNeg);
             Add("neg. Pathlength to Gold/Platinum Bar", vPathLengthNeg);
             Add("neg. Pathlength to Bomb", vPathLengthNeg);
+            Add("neg. Pathlength to Dynamite", vPathLengthNeg);
+            Add("neg. Pathlength to 2nd Dynamite", vPathLengthNeg);
+            Add("neg. Pathlength to Gravitation Potion", vPathLengthNeg);
             Add("neg. Pathlength to Jester's Arrow", vPathLengthNeg);
             Add("neg. Pathlength to Suspicious Looking Eye", vPathLengthNeg);
             Add("neg. Pathlength to Snowball Cannon", vPathLengthNeg);
             Add("neg. Pathlength to Teleport Potion", vPathLengthNeg);
             Add("neg. Pathlength to Meteorite Bar", vPathLengthNeg);
             Add("neg. Pathlength to Enchanted Sword", vPathLengthNeg);
+            Add("neg. Pathlength to Altar", vPathLengthNeg);
             Add("neg. Pathlength to Bee Hive", vPathLengthNeg);
             Add("neg. Pathlength to Boomstick", vPathLengthNeg);
 
             Add("neg. Pathlength to Slime Staute", vPathLengthNeg);
             Add("neg. Pathlength to Shark Staute", vPathLengthNeg);
             Add("neg. Pathlength to Anvil", vPathLengthNeg);
+            Add("neg. Pathlength to Ruby", vPathLengthNeg);
 
 
             Add("neg. Pathlength to free ShadowOrb/Heart", vPathLengthNeg);
@@ -819,17 +875,22 @@ namespace TheTerrariaSeedProject.UI
             Add("Pathlength to Iron/Lead Bar", vPathLength);
             Add("Pathlength to Gold/Platinum Bar", vPathLength);
             Add("Pathlength to Bomb", vPathLength);
+            Add("Pathlength to Dynamite", vPathLength);
+            Add("Pathlength to 2nd Dynamite", vPathLength);
+            Add("Pathlength to Gravitation Potion", vPathLength);
             Add("Pathlength to Jester's Arrow", vPathLength);
             Add("Pathlength to Suspicious Looking Eye", vPathLength);
             Add("Pathlength to Snowball Cannon", vPathLength);
             Add("Pathlength to Teleport Potion", vPathLength);
             Add("Pathlength to Meteorite Bar", vPathLength);
             Add("Pathlength to Enchanted Sword", vPathLength);
+            Add("Pathlength to Altar", vPathLength);
             Add("Pathlength to Bee Hive", vPathLength);
             Add("Pathlength to Boomstick", vPathLength);
             Add("Pathlength to Slime Staute", vPathLength);
             Add("Pathlength to Shark Staute", vPathLength);
             Add("Pathlength to Anvil", vPathLength);
+            Add("Pathlength to Ruby", vPathLength);
             Add("Pathlength to Temple Door", vPathLength);
             Add("Pathlength to free ShadowOrb/Heart", vPathLength);  
             Add("Pathlength into 40% cavern layer", vPathLength);  
