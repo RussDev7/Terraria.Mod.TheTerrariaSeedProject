@@ -139,6 +139,7 @@ namespace TheTerrariaSeedProject
         {
             //TODO all in one, else endless stacks, edit: ????????
 
+
             if (saveLogSet)
                 WorldGen.saveLock = false;
             if (Main.menuMode != 10) { stage = 0; return; }
@@ -163,12 +164,7 @@ namespace TheTerrariaSeedProject
                 if (!System.IO.Directory.Exists(Main.SavePath + OptionsDict.Paths.configPath))
                     System.IO.Directory.CreateDirectory(Main.SavePath + OptionsDict.Paths.configPath);
 
-
-                itemIDdoNotWant = readConfigFile();
-
-
-                //stuff only need to done once
-                acond = new AcceptConditons();
+                               
 
                 worldName = Main.worldName;
                 string seedText = Main.ActiveWorldFileData.SeedText;
@@ -179,6 +175,13 @@ namespace TheTerrariaSeedProject
                 if (worldName.Length > 0 && worldName[0] == '?')
                     worldName = worldName.Substring(1, worldName.Length - 1);
                 Main.worldName = worldName.Length == 0 ? "SeedSearch" : worldName;
+
+
+                itemIDdoNotWant = readConfigFile();
+
+                //stuff only need to done once
+                acond = new AcceptConditons();
+
 
                 gotToMain = false;
 
@@ -1020,6 +1023,20 @@ namespace TheTerrariaSeedProject
             }
         }
 
+        public void setDirectComputeValues()
+        {
+            //check hardmode evil biome side and dungeon wall color
+            //that might not work in later terraria versions!!!! !!!!!!!
+
+            UnifiedRandom dummy = new UnifiedRandom(seed);
+            int a = dummy.Next(200, 300);
+            a += dummy.Next(300, 400);
+
+            double randVar = dummy.NextDouble();
+            evilHMIsLeft = (int)(randVar * (double)2) == 0 && a > 0;
+            dungeonColor = (int)(randVar * (double)3); // 0: blue, 1:green, 2: pink ===> evil hm side and dcolor correlated 
+        }
+
 
 
         private int startIndex = 0;
@@ -1139,16 +1156,7 @@ namespace TheTerrariaSeedProject
                         {
                             bool oreMoon = true;
 
-                            //check hardmode evil biome side and dungeon wall color
-                            //that might not work in later terraria versions!!!! !!!!!!!
-
-                            UnifiedRandom dummy = new UnifiedRandom(seed);
-                            int a = dummy.Next(200, 300);
-                            a += dummy.Next(300, 400);
-
-                            double randVar = dummy.NextDouble();
-                            evilHMIsLeft = (int)(randVar * (double)2) == 0 && a > 0;
-                            dungeonColor = (int)(randVar * (double)3); // 0: blue, 1:green, 2: pink ===> evil hm side and dcolor correlated 
+                            setDirectComputeValues();
 
 
                             if (search4MoonOres)
@@ -1547,6 +1555,10 @@ namespace TheTerrariaSeedProject
 
             score.insertGenInfo(genInfo);
 
+            //TODo better inclusion
+            localDungeonSide = Main.dungeonX < Main.spawnTileX ? -1 : 1;
+            setDirectComputeValues();
+
 
             hasOBjectOrParam.Add("Max open air pyramid surface", 0);
             hasOBjectOrParam.Add("Max pyramid height", 0);
@@ -1612,6 +1624,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Pathlength to Dynamite", 1000000);
             hasOBjectOrParam.Add("Pathlength to 2nd Dynamite", 1000000);
             hasOBjectOrParam.Add("Pathlength to Gravitation Potion", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Crystal Heart", 1000000);
             hasOBjectOrParam.Add("Pathlength to Jester's Arrow", 1000000);
 
             hasOBjectOrParam.Add("Pathlength to Boots", 1000000);
@@ -1649,8 +1662,10 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("neg. Pathlength to Gold/Platinum Bar", -1000000);
 
             hasOBjectOrParam.Add("neg. Pathlength to Bomb", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Dynamite", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to 2nd Dynamite", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Gravitation Potion", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Crystal Heart", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Jester's Arrow", -1000000);
 
             hasOBjectOrParam.Add("neg. Pathlength to Boots", -1000000);
@@ -3179,6 +3194,14 @@ namespace TheTerrariaSeedProject
                                         score.itemLocation.Add(ItemID.IronAnvil, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
                                 }
                             }
+                            else if(Main.tile[x, y].type == TileID.Heart && Main.tile[x, y].frameX == 0 && Main.tile[x, y].frameY == 0)
+                            {
+                                int pathl = FindShortestPathInRange(ref pathLength, x, y, 2, 2, 3, 3);
+
+                                if (pathl < hasOBjectOrParam["Pathlength to Crystal Heart"])
+                                    hasOBjectOrParam["Pathlength to Crystal Heart"] = pathl;
+
+                            }
                             else if (Main.tile[x, y].active() && Main.tile[x, y].type == TileID.Ruby || (Main.tile[x, y].type == TileID.ExposedGems && Main.tile[x, y].frameX == 72))
                             {
                                 int pathl = FindShortestPathInRange(ref pathLength, x, y, 2, 2, 3, 3);
@@ -3803,6 +3826,7 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["neg. Pathlength to Dynamite"] = -hasOBjectOrParam["Pathlength to Dynamite"];
                 hasOBjectOrParam["neg. Pathlength to 2nd Dynamite"] = -hasOBjectOrParam["Pathlength to 2nd Dynamite"];
                 hasOBjectOrParam["neg. Pathlength to Gravitation Potion"] = -hasOBjectOrParam["Pathlength to Gravitation Potion"];
+                hasOBjectOrParam["neg. Pathlength to Crystal Heart"] = -hasOBjectOrParam["Pathlength to Crystal Heart"];
                 hasOBjectOrParam["neg. Pathlength to Jester's Arrow"] = -hasOBjectOrParam["Pathlength to Jester's Arrow"];
 
                 hasOBjectOrParam["neg. Pathlength to Suspicious Looking Eye"] = -hasOBjectOrParam["Pathlength to Suspicious Looking Eye"];
@@ -5632,7 +5656,7 @@ namespace TheTerrariaSeedProject
 
             if (hasOBjectOrParam["Open Temple"] > 0)
             {
-                score += 1337;
+                score += 420;
                 allScoreText += System.Environment.NewLine + "Score Open Temple " + (int)score;
             }
 
