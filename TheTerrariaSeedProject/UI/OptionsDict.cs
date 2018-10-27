@@ -685,6 +685,7 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Pathlength to Dynamite",
                 "neg. Pathlength to 2nd Dynamite",
                 "neg. Pathlength to Gravitation Potion",
+                "neg. Pathlength to Crystal Heart",
                 "neg. Pathlength to Jester's Arrow",
                 "neg. Pathlength to Suspicious Looking Eye",
                 "neg. Pathlength to Snowball Cannon",
@@ -735,6 +736,7 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to Dynamite",
                 "Pathlength to 2nd Dynamite",
                 "Pathlength to Gravitation Potion",
+                "Pathlength to Crystal Heart",
                 "Pathlength to Jester's Arrow",
                 "Pathlength to Suspicious Looking Eye",
                 "Pathlength to Snowball Cannon",
@@ -841,6 +843,7 @@ namespace TheTerrariaSeedProject.UI
             Add("neg. Pathlength to Dynamite", vPathLengthNeg);
             Add("neg. Pathlength to 2nd Dynamite", vPathLengthNeg);
             Add("neg. Pathlength to Gravitation Potion", vPathLengthNeg);
+            Add("neg. Pathlength to Crystal Heart", vPathLengthNeg);
             Add("neg. Pathlength to Jester's Arrow", vPathLengthNeg);
             Add("neg. Pathlength to Suspicious Looking Eye", vPathLengthNeg);
             Add("neg. Pathlength to Snowball Cannon", vPathLengthNeg);
@@ -878,6 +881,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Pathlength to Dynamite", vPathLength);
             Add("Pathlength to 2nd Dynamite", vPathLength);
             Add("Pathlength to Gravitation Potion", vPathLength);
+            Add("Pathlength to Crystal Heart", vPathLength);
             Add("Pathlength to Jester's Arrow", vPathLength);
             Add("Pathlength to Suspicious Looking Eye", vPathLength);
             Add("Pathlength to Snowball Cannon", vPathLength);
