@@ -213,7 +213,7 @@ namespace TheTerrariaSeedProject
 
                 bool loadWorld = false;
                 
-                if (worldName.Substring(worldName.Length - 4).Equals(".wld"))
+                if (worldName.Length > 4 && worldName.Substring(worldName.Length - 4).Equals(".wld"))
                 {
                     //load world instead of search
                     //only works if seed is ?
