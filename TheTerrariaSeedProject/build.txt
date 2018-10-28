@@ -1,10 +1,10 @@
 author = Unftf
-version = 0.3.1.1
+version = 0.3.1.2
 displayName = The Terraria Seed Project
 homepage = https://forums.terraria.org/index.php?threads/tool-the-terraria-seed-project.69351
 hideCode = true
 hideResources = false
 includeSource = false
 buildIgnore = *.csproj, *.user, obj\*, bin\*, .vs\*, *.config, .git\*
-includePDB = false
+includePDB = false;
 languageVersion = 6
