@@ -176,6 +176,7 @@ namespace TheTerrariaSeedProject
                     worldName = worldName.Substring(1, worldName.Length - 1);
                 Main.worldName = worldName.Length == 0 ? "SeedSearch" : worldName;
 
+                
 
                 itemIDdoNotWant = readConfigFile();
 
@@ -188,7 +189,7 @@ namespace TheTerrariaSeedProject
                 nameToID = new Dictionary<string, int>();
 
                 seed = ParseAndSetSeed(Main.ActiveWorldFileData.SeedText);
-
+                
 
                 InitSearch();
 
@@ -209,7 +210,42 @@ namespace TheTerrariaSeedProject
                 stepsize = 1;
                 numSearched = 0;
 
-                while (stage > 0 && !ended && !gotToMain)
+
+                bool loadWorld = false;
+                
+                if (worldName.Substring(worldName.Length - 4).Equals(".wld"))
+                {
+                    //load world instead of search
+                    //only works if seed is ?
+                    
+                    string path = Main.worldPathName.Substring(0, Main.worldPathName.Length - 4);
+                    writeDebugFile(path);
+                    if (System.IO.File.Exists(path))
+                    {
+                        loadWorld = true;
+                        Main.worldName = worldName.Substring(0, worldName.Length - 4);
+                        worldName = Main.worldName;
+                        
+                        Main.ActiveWorldFileData = new WorldFileData(path, false);
+
+                        WorldFile.loadWorld(false);
+                        stage = 42;
+                        ended = false;
+                        gotToMain = false;
+                        numPyrChance = -1;
+                        currentConfiguration = uiss.currentConfig;
+                        PostWorldGen();
+                        analyzeWorld(score, genInfo);
+                        computeScore(score);
+                        StoreMapAsPNG(true);
+                        StoreLastStats(true);
+                        stage = 0;
+                    }
+
+                }
+
+
+                while (stage > 0 && !ended && !gotToMain && !loadWorld)
                 {
                     {   // <-- without this linux\mono need more memory
 
@@ -6129,7 +6165,7 @@ namespace TheTerrariaSeedProject
 
             Main.worldName = worldName + (valid ? "" : "_unsure");
 
-            Main.ActiveWorldFileData = WorldFile.CreateMetadata(Main.worldName, Main.ActiveWorldFileData.IsCloudSave, Main.expertMode);
+            Main.ActiveWorldFileData = WorldFile.CreateMetadata(Main.worldName, false, Main.expertMode);
             Main.ActiveWorldFileData.SetSeed(cseed);
         }
 
