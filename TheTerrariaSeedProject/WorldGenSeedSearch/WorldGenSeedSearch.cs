@@ -1677,6 +1677,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Pathlength to Shark Staute", 1000000);
             hasOBjectOrParam.Add("Pathlength to Anvil", 1000000);
             hasOBjectOrParam.Add("Pathlength to Ruby", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Chest", 1000000);
 
             hasOBjectOrParam.Add("Pathlength into 40% cavern layer", 1000000);
             hasOBjectOrParam.Add("Pathlength to 40% cavern entrance", 1000000);
@@ -1718,6 +1719,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("neg. Pathlength to Shark Staute", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Anvil", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Ruby", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Chest", -1000000);
 
             hasOBjectOrParam.Add("neg. Pathlength into 40% cavern layer", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to 40% cavern entrance", -1000000);
@@ -1970,6 +1972,8 @@ namespace TheTerrariaSeedProject
 
                     }
 
+                    
+
 
                     //TODO Grab distance trough walls not included yet,, edit: still not?
                     ushort chestWall = Main.tile[cx, cy].wall;
@@ -2047,6 +2051,11 @@ namespace TheTerrariaSeedProject
                     }
 
                     int pathl = doFull ? FindShortestPathInRange(ref pathLength, cx, cy) : 1000000;
+
+                    if (chest.item[0] != null && pathl < hasOBjectOrParam["Pathlength to Chest"])
+                    {
+                        hasOBjectOrParam["Pathlength to Chest"] = pathl;
+                    }
 
 
                     for (int l = 0; l < 40; l++)
@@ -3878,6 +3887,7 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["neg. Pathlength to Shark Staute"] = -hasOBjectOrParam["Pathlength to Shark Staute"];
                 hasOBjectOrParam["neg. Pathlength to Anvil"] = -hasOBjectOrParam["Pathlength to Anvil"];
                 hasOBjectOrParam["neg. Pathlength to Ruby"] = -hasOBjectOrParam["Pathlength to Ruby"];
+                hasOBjectOrParam["neg. Pathlength to Chest"] = -hasOBjectOrParam["Pathlength to Chest"];
 
                 hasOBjectOrParam["neg. Pathlength to free ShadowOrb/Heart"] = -hasOBjectOrParam["Pathlength to free ShadowOrb/Heart"];
                 hasOBjectOrParam["neg. Pathlength into 40% cavern layer"] = -hasOBjectOrParam["Pathlength into 40% cavern layer"];
