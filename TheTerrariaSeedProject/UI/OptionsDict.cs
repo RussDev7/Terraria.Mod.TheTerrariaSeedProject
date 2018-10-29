@@ -699,6 +699,7 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Pathlength to Shark Staute",                
                 "neg. Pathlength to Anvil",
                 "neg. Pathlength to Ruby",
+                "neg. Pathlength to Chest",
                 "neg. Pathlength to free ShadowOrb/Heart",
                 "neg. Pathlength into 40% cavern layer",
                 "neg. Pathlength to 40% cavern entrance",
@@ -750,6 +751,7 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to Shark Staute",
                 "Pathlength to Anvil",
                 "Pathlength to Ruby",
+                "Pathlength to Chest",
                 "Pathlength to free ShadowOrb/Heart",
                 "Pathlength into 40% cavern layer",
                 "Pathlength to 40% cavern entrance",
@@ -858,6 +860,7 @@ namespace TheTerrariaSeedProject.UI
             Add("neg. Pathlength to Shark Staute", vPathLengthNeg);
             Add("neg. Pathlength to Anvil", vPathLengthNeg);
             Add("neg. Pathlength to Ruby", vPathLengthNeg);
+            Add("neg. Pathlength to Chest", vPathLengthNeg);
 
 
             Add("neg. Pathlength to free ShadowOrb/Heart", vPathLengthNeg);
@@ -895,6 +898,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Pathlength to Shark Staute", vPathLength);
             Add("Pathlength to Anvil", vPathLength);
             Add("Pathlength to Ruby", vPathLength);
+            Add("Pathlength to Chest", vPathLength);
             Add("Pathlength to Temple Door", vPathLength);
             Add("Pathlength to free ShadowOrb/Heart", vPathLength);  
             Add("Pathlength into 40% cavern layer", vPathLength);  
