@@ -10,11 +10,11 @@ using Microsoft.Xna.Framework.Input;
 using ReLogic.Graphics;
 using System;
 using Terraria;
-using Terraria.Graphics;
+//using Terraria.Graphics;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
 
-using Terraria.ModLoader;
+//using Terraria.ModLoader;
 
 
 //needed?
@@ -317,14 +317,16 @@ namespace TheTerrariaSeedProject.UI
             if (currentString.Length == 0 && !focused)
 			{
 				color *= 0.5f;
-				//Utils.DrawBorderString(spriteBatch, hintText, new Vector2(space.X, space.Y), Color.Gray, 1f);
-				spriteBatch.DrawString(Main.fontMouseText, hintText, drawPos, color);
-			}
+                //Utils.DrawBorderString(spriteBatch, hintText, new Vector2(space.X, space.Y), Color.Gray, 1f);
+                //spriteBatch.DrawString(Main.fontMouseText, hintText, drawPos, color);
+                Utils.DrawBorderString(spriteBatch, hintText, new Vector2(space.X, space.Y), color, 1f);
+            }
 			else
-			{                
-                //Utils.DrawBorderString(spriteBatch, displayString, drawPos, Color.White, 1f);
-                spriteBatch.DrawString(Main.fontMouseText, displayString, drawPos, color);
-			}
+			{
+                //Utils.DrawBorderString(spriteBatch, displayString, drawPos, Color.White, 1f);                
+                //spriteBatch.DrawString(Main.fontMouseText, displayString, drawPos, color);
+                Utils.DrawBorderString(spriteBatch, displayString, drawPos, color, 1f);
+            }
 
 			//			CalculatedStyle innerDimensions2 = base.GetInnerDimensions();
 			//			Vector2 pos2 = innerDimensions2.Position();

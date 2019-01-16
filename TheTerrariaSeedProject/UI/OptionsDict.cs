@@ -148,7 +148,7 @@ namespace TheTerrariaSeedProject.UI
                     "(v.) a Altar near spawn(A) \n" +
                     "(vi.) the number of chests near spawn \n" +
                     "9.) Fantasy score divided by 333 to scale it from 1 to 9+, if greater than 9 it shows(x), greater 10 (X), if it has less than 0 it shows(-). It can be overwritten if the map has some rare stuff, that could be: \n" +
-                    "(i.) Chest duplication Glitch(D) \n" +
+                    "(i.) Chest duplication Glitch(D)\n" +
                     "(ii.) A Enchanted Sword which is very near to Spawn(#) \n" +
                     "(iii.) Spawn in Sky(Y) \n" +
                     "(iv.) All chest items you can't craft or fish (@) \n" +
@@ -710,6 +710,8 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Pathlength to Ruby",
                 "neg. Pathlength to Cloud in a Bottle",
                 "neg. Pathlength to 2 Herb Bag Chest",
+                "neg. Pathlength to Extractinator",
+                "neg. Pathlength to Magic/Ice Mirror",
                 "neg. Pathlength to Chest",
                 "neg. Pathlength to free ShadowOrb/Heart",
                 "neg. Pathlength into 40% cavern layer",
@@ -766,6 +768,8 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to Ruby",
                 "Pathlength to Cloud in a Bottle",
                 "Pathlength to 2 Herb Bag Chest",
+                "Pathlength to Extractinator",
+                "Pathlength to Magic/Ice Mirror",
                 "Pathlength to Chest",                
                 "Pathlength to free ShadowOrb/Heart",
                 "Pathlength into 40% cavern layer",
@@ -879,6 +883,8 @@ namespace TheTerrariaSeedProject.UI
             Add("neg. Pathlength to Ruby", vPathLengthNeg);
             Add("neg. Pathlength to Cloud in a Bottle", vPathLengthNeg);
             Add("neg. Pathlength to 2 Herb Bag Chest", vPathLengthNeg);
+            Add("neg. Pathlength to Extractinator", vPathLengthNeg);
+            Add("neg. Pathlength to Magic/Ice Mirror", vPathLengthNeg);
             Add("neg. Pathlength to Chest", vPathLengthNeg);
 
 
@@ -921,6 +927,8 @@ namespace TheTerrariaSeedProject.UI
             Add("Pathlength to Ruby", vPathLength);
             Add("Pathlength to Cloud in a Bottle", vPathLength);
             Add("Pathlength to 2 Herb Bag Chest", vPathLength);
+            Add("Pathlength to Extractinator", vPathLength);
+            Add("Pathlength to Magic/Ice Mirror", vPathLength);
             Add("Pathlength to Chest", vPathLength);
             Add("Pathlength to Temple Door", vPathLength);
             Add("Pathlength to free ShadowOrb/Heart", vPathLength);  
