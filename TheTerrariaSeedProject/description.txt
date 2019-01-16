@@ -33,7 +33,7 @@ This mod does not change the generated World. It only evaluates what was done.
 
 More details at mod page or at in-game description.
 
-If you found some bugs, have some ideas for more features, want to help coding or found some nice seeds do not hesitate writing me in linked mod page.
+If you found some bugs, have some ideas, want to help coding or found some nice seeds do not hesitate writing me in linked mod page.
 
 Good luck!
 
