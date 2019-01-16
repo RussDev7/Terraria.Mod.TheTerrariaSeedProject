@@ -517,7 +517,7 @@ namespace TheTerrariaSeedProject
 
                                 bool generated = true;
 
-                                if (score.hasOBjectOrParam["Chest duplication Glitch"] > 0)
+                                if (score.hasOBjectOrParam["Chest duplication Glitch"] > 0)  //debug correct term removed, working now without? Not for modded
                                 {
                                     //sometimes a chest does not get saved
 
@@ -791,6 +791,12 @@ namespace TheTerrariaSeedProject
                     writeDebugFile(ex.Message);
                     writeDebugFile(ex.ToString());
                     writeDebugFile("stage " + stage);
+
+                    var st = new StackTrace(ex, true);                    
+                    var frame = st.GetFrame(0);                    
+                    var line = frame.GetFileLineNumber();
+                    writeDebugFile(frame + " line " + line);
+
 
                     //todod remove from stats
                     couldNotGenerateStage[stage == 42 ? 4 : stage]++;
@@ -1426,15 +1432,16 @@ namespace TheTerrariaSeedProject
 
         }
 
-
+        
         private void ComputePathlength(ref int[,] pathLength)
         {
+            
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
             TimeSpan ts = stopWatch.Elapsed;
             string elapsedTime;
 
-            int maxsize = (Main.maxTilesX * 6 + Main.maxTilesY * 4); // values can be creater!
+            int maxsize = (Main.maxTilesX * 6 + Main.maxTilesY * 4); // values can be greater!
             List<Tuple<int, int>>[] waypoints = new List<Tuple<int, int>>[maxsize];
             short[,] travelCost = new short[Main.maxTilesX, Main.maxTilesY];
 
@@ -1449,6 +1456,7 @@ namespace TheTerrariaSeedProject
                 for (int y = 0; y < Main.maxTilesY; y++)
                     travelCost[x, y] = (short)TravelCost(x, y);
 
+            
 
             pathLength[Main.spawnTileX, Main.spawnTileY - 1] = 0;
             waypoints[0] = new List<Tuple<int, int>> { new Tuple<int, int>(Main.spawnTileX, Main.spawnTileY - 1) };
@@ -1458,8 +1466,9 @@ namespace TheTerrariaSeedProject
             ts.Hours, ts.Minutes, ts.Seconds,
             ts.Milliseconds / 10);
             //writeDebugFile(" analyze time after init pathfinding " + elapsedTime);
-
-
+            
+            
+          
             for (int l = 0; l < maxsize; l++)
             {
                 if (waypoints[l] != null)
@@ -1469,7 +1478,7 @@ namespace TheTerrariaSeedProject
                     waypoints[l].Clear();
                 }
             }
-
+                        
 
             //norm to ~tiles num --> pathlengthNormFac
             //for (int x = 0; x < Main.maxTilesX; x++)
@@ -1687,6 +1696,8 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Pathlength to Ruby", 1000000);
             hasOBjectOrParam.Add("Pathlength to Cloud in a Bottle", 1000000);
             hasOBjectOrParam.Add("Pathlength to 2 Herb Bag Chest", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Extractinator", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Magic/Ice Mirror", 1000000);
             hasOBjectOrParam.Add("Pathlength to Chest", 1000000);
 
             hasOBjectOrParam.Add("Pathlength into 40% cavern layer", 1000000);
@@ -1733,6 +1744,8 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("neg. Pathlength to Ruby", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Cloud in a Bottle", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to 2 Herb Bag Chest", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Extractinator", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Magic/Ice Mirror", 1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Chest", -1000000);
 
             hasOBjectOrParam.Add("neg. Pathlength into 40% cavern layer", -1000000);
@@ -1946,18 +1959,25 @@ namespace TheTerrariaSeedProject
 
             }
 
-
+            
             //check chests
             for (int i = 0; i < 1000; i++)
             {
                 Chest chest = Main.chest[i];
-                if (chest != null)
+                if (chest != null )
                 {
+                    
                     //check if doubl chest
                     int cx = chest.x;
                     int cy = chest.y;
 
                     if (chest.x < Main.offLimitBorderTiles || chest.x > Main.maxTilesX - Main.offLimitBorderTiles || chest.y < Main.offLimitBorderTiles || chest.y > Main.maxTilesX - Main.offLimitBorderTiles)
+                        continue;
+
+                    if (!((Main.tile[cx, cy].type == TileID.Containers || Main.tile[cx + 1, cy].type == TileID.Containers || Main.tile[cx, cy + 1].type == TileID.Containers || Main.tile[cx + 1, cy + 1].type == TileID.Containers)
+                         &&
+                         (Main.tile[cx, cy].active() || Main.tile[cx + 1, cy].active() || Main.tile[cx, cy + 1].active() || Main.tile[cx + 1, cy + 1].active()))
+                       )
                         continue;
 
 
@@ -1977,13 +1997,13 @@ namespace TheTerrariaSeedProject
 
                     //double glitch detector might not work
                     if (chest.item[0] != null &&
-                        (Main.tile[cx, cy - 1].active() && Main.tile[cx, cy - 1].type == TileID.ClosedDoor) ||
+                        ((Main.tile[cx, cy - 1].active() && Main.tile[cx, cy - 1].type == TileID.ClosedDoor) ||
                         (Main.tile[cx + 1, cy - 1].active() && Main.tile[cx + 1, cy - 1].type == TileID.ClosedDoor) ||
                         !Main.tile[cx, cy + 2].active() || !Main.tile[cx + 1, cy + 2].active()
-                        )
+                        ))                        
                     {
 
-                        //hasOBjectOrParam["Chest duplication Glitch"] += 1; writeDebugFile("maybe found doubglitch (buggy) at " + cx + " " + cy + " in seed " + Main.ActiveWorldFileData.Seed + " can get overridden: " + (!doFull));
+                        hasOBjectOrParam["Chest duplication Glitch"] += 1; //writeDebugFile("maybe found doubglitch (buggy) at " + cx + " " + cy + " in seed " + Main.ActiveWorldFileData.Seed + " can get overridden: " + (!doFull));
                         if (score.itemLocation.ContainsKey(ItemID.DynastyChest))
                             score.itemLocation[ItemID.DynastyChest].Add(new Tuple<int, int>(cx, cy));
                         else
@@ -2348,6 +2368,31 @@ namespace TheTerrariaSeedProject
                                         score.itemLocation.Add(item.type, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
                                 }
                             }
+                            else if (item.type == ItemID.Extractinator)
+                            {
+                                if (pathl < hasOBjectOrParam["Pathlength to Extractinator"])
+                                {
+                                    hasOBjectOrParam["Pathlength to Extractinator"] = pathl;
+                                    if (score.itemLocation.ContainsKey(item.type))
+                                        score.itemLocation[item.type] = new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) };
+                                    else
+                                        score.itemLocation.Add(item.type, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
+                                }
+                            }
+                            else if (item.type == ItemID.MagicMirror || item.type == ItemID.IceMirror)
+                            {
+                                
+                                if (pathl < hasOBjectOrParam["Pathlength to Magic/Ice Mirror"])
+                                {
+                                    hasOBjectOrParam["Pathlength to Magic/Ice Mirror"] = pathl;
+                                    if (score.itemLocation.ContainsKey(ItemID.MagicMirror))
+                                        score.itemLocation[ItemID.MagicMirror] = new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) };
+                                    else
+                                        score.itemLocation.Add(ItemID.MagicMirror, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
+                                }
+                            }
+
+
 
 
 
@@ -2417,7 +2462,8 @@ namespace TheTerrariaSeedProject
             var statuesCount = new Dictionary<string, int>();
             var statuesFunctionalCount = new Dictionary<string, int>();
 
-            int[] wallCounts = new int[256];
+            const int Max_wall_count = 256;
+            int[] wallCounts = new int[Max_wall_count];
 
             int activeTiles = 0;
             int evilTiles = 0;
@@ -2453,9 +2499,14 @@ namespace TheTerrariaSeedProject
 
                     if (!tile.active())
                     {
-                        wallCounts[tile.wall] += 1;
 
-                        if(tile.wall == WallID.LivingWood && !treeToUGDung && checkIfNearDungeon(x,y,60,40))
+                        // if used with mod or new update there might be more
+                        if (tile.wall < Max_wall_count && tile.wall >= 0)
+                            wallCounts[tile.wall] += 1;
+
+                        
+
+                        if (tile.wall == WallID.LivingWood && !treeToUGDung && checkIfNearDungeon(x,y,60,40))
                         {
                             treeToUGDung = true;
 
@@ -2772,7 +2823,7 @@ namespace TheTerrariaSeedProject
                             for (int xi = x - 1; xi < x + 2; xi++)
                                 for (int yi = y - 1; yi < y + 2; yi++)
                                 {
-                                    if (isInDungeon(xi, yi) && Main.tile[xi, yi].wall != tw1 && Main.tile[xi, yi].wall != tw2)
+                                    if (isInDungeon(xi, yi) && Main.tile[xi, yi].wall != tw1 && Main.tile[xi, yi].wall != tw2  )
                                     {
                                         if (wallCount == 1)
                                             tw2 = Main.tile[xi, yi].wall;
@@ -2834,7 +2885,7 @@ namespace TheTerrariaSeedProject
 
                                 bool doSearch = true;
                                 const int ignoreX = rangeMin;
-                                const int ignoreY = 1;//4  TODO: recode, atm only works for 1, if creater regions cant connect anymore with 100%
+                                const int ignoreY = 1;//4  TODO: recode, atm only works for 1, if greater regions cant connect anymore with 100%
                                 for (int i = dungeonFarmSpotCandidates.Count - 1; i >= 0 && doSearch; i--)
                                 {
                                     if (x - dungeonFarmSpotCandidates[i].Item1 > ignoreX)
@@ -2853,10 +2904,10 @@ namespace TheTerrariaSeedProject
 
                                     bool isGood = true;
                                     for (int i = 2; i < rangeMin; i++)
-                                        if (Main.tile[x - i, y].wall != twl) { isGood = false; break; }
+                                        if (x-i<0 || Main.tile[x - i, y].wall != twl) { isGood = false; break; }
                                     if (isGood)
                                         for (int i = 2; i < rangeMin; i++)
-                                            if (Main.tile[x + i, y].wall != twr) { isGood = false; break; }
+                                            if (x + i >= Main.maxTilesX || Main.tile[x + i, y].wall != twr) { isGood = false; break; }
                                     if (isGood)
                                     {
                                         //search for 3rd wall type in line
@@ -2866,9 +2917,9 @@ namespace TheTerrariaSeedProject
                                         for (int i = rangeMin + 1; i < rangeMax; i++)
                                         {
                                             bool isGood3 = false;
-                                            if (isInDungeon(x + i, +y))
+                                            if (x + i + rangeMin >= Main.maxTilesX || isInDungeon(x + i, +y))
                                             {
-                                                if (Main.tile[x + i, y].wall != twl && Main.tile[x + i, y].wall != twr)
+                                                if ((Main.tile[x + i, y].wall != twl && Main.tile[x + i, y].wall != twr))
                                                 { //check if is 3rd wall type, todo: can be done more efficent
                                                     isGood3 = true;
                                                     ushort twrr = Main.tile[x + i, y].wall;
@@ -2893,7 +2944,9 @@ namespace TheTerrariaSeedProject
                                             //check if place above
                                             bool validSpawn = false;
                                             const int npcSpawnRange = 35;
-                                            if (((isInDungeon(x - rangeMin, y - npcSpawnRange) && isInDungeon(x - rangeMin, y - npcSpawnRange - 1) && isInDungeon(x - rangeMin, y - npcSpawnRange - 2))
+                                            if ( (x- rangeMin > 0 && y > npcSpawnRange+2 && x + start3 + rangeMin < Main.maxTilesX)
+                                                &&
+                                                ((isInDungeon(x - rangeMin, y - npcSpawnRange) && isInDungeon(x - rangeMin, y - npcSpawnRange - 1) && isInDungeon(x - rangeMin, y - npcSpawnRange - 2))
                                                 || (isInDungeon(x + start3 + rangeMin, y - npcSpawnRange) && isInDungeon(x + start3 + rangeMin, y - npcSpawnRange - 1) && isInDungeon(x + start3 + rangeMin, y - npcSpawnRange - 2)))
                                                 && (isInDungeon(x + start3 / 2, y - npcSpawnRange) && isInDungeon(x + start3 / 2, y - npcSpawnRange - 1) && isInDungeon(x + start3 / 2, y - npcSpawnRange - 2))
                                                 )
@@ -3341,7 +3394,23 @@ namespace TheTerrariaSeedProject
                                     hasOBjectOrParam["Pathlength to Ruby"] = pathl;
 
                             }
+                            else if (Main.tile[x, y].type == TileID.Extractinator && Main.tile[x, y].frameX == 0 && Main.tile[x, y].frameY == 0)
+                            {
+                                int pathl = FindShortestPathInRange(ref pathLength, x, y, 2, 2, 3, 3);
 
+                                if (pathl < hasOBjectOrParam["Pathlength to Extractinator"])
+                                {
+                                    hasOBjectOrParam["Pathlength to Extractinator"] = pathl;
+                                    
+                                    if (score.itemLocation.ContainsKey(ItemID.Extractinator))
+                                        score.itemLocation[ItemID.Extractinator] = new List<Tuple<int, int>> { new Tuple<int, int>(x, y) };
+                                    else
+                                        score.itemLocation.Add(ItemID.Extractinator, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
+
+                                }
+                                                                
+
+                            }
 
 
                             //Web
@@ -3371,6 +3440,8 @@ namespace TheTerrariaSeedProject
                 }//end for y
 
             }//end for x
+
+
 
 
 
@@ -3549,11 +3620,11 @@ namespace TheTerrariaSeedProject
 
             //below ground ? tofo refine, might not work sometimes
             int blockCountR = 0, blockCountL = 0;
-            for (int x = Main.dungeonX - 50; x < Main.dungeonX; x++)
-                for (int y = Main.dungeonY - 50; y < Main.dungeonY - 40; y++)
+            for (int x = Main.dungeonX - 50; x < Main.dungeonX && x < Main.maxTilesX; x++)
+                for (int y = Main.dungeonY - 50; y < Main.dungeonY - 40 && y < Main.maxTilesY; y++)
                     blockCountL += (Main.tile[x, y].active() && Main.tile[x, y].type != 189) ? 1 : 0; // dont count clouds
-            for (int x = Main.dungeonX; x < Main.dungeonX + 50; x++)
-                for (int y = Main.dungeonY - 50; y < Main.dungeonY - 40; y++)
+            for (int x = Main.dungeonX; x < Main.dungeonX + 50 && x < Main.maxTilesX; x++)
+                for (int y = Main.dungeonY - 50; y < Main.dungeonY - 40 && y < Main.maxTilesY; y++)
                     blockCountR += (Main.tile[x, y].active() && Main.tile[x, y].type != 189) ? 1 : 0; // dont count clouds
 
 
@@ -3996,6 +4067,8 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["neg. Pathlength to Ruby"] = -hasOBjectOrParam["Pathlength to Ruby"];
                 hasOBjectOrParam["neg. Pathlength to Cloud in a Bottle"] = -hasOBjectOrParam["Pathlength to Cloud in a Bottle"];
                 hasOBjectOrParam["neg. Pathlength to 2 Herb Bag Chest"] = -hasOBjectOrParam["Pathlength to 2 Herb Bag Chest"];
+                hasOBjectOrParam["neg. Pathlength to Extractinator"] = -hasOBjectOrParam["Pathlength to Extractinator"];
+                hasOBjectOrParam["neg. Pathlength to Magic/Ice Mirror"] = -hasOBjectOrParam["Pathlength to Magic/Ice Mirror"];
                 hasOBjectOrParam["neg. Pathlength to Chest"] = -hasOBjectOrParam["Pathlength to Chest"];
 
                 hasOBjectOrParam["neg. Pathlength to free ShadowOrb/Heart"] = -hasOBjectOrParam["Pathlength to free ShadowOrb/Heart"];
@@ -4313,6 +4386,8 @@ namespace TheTerrariaSeedProject
         const int pathNormFac = 5;
         private void AddWayPoints(ref int[,] pathLength, ref List<Tuple<int, int>>[] waypoints, ref short[,] travelCost, int x, int y, int l)
         {
+            
+
             if (pathLength[x, y] < l || x < 42 || y < 10 || x > Main.maxTilesX - 43 || y > Main.maxTilesY - 11) return;
 
 
@@ -5873,7 +5948,7 @@ namespace TheTerrariaSeedProject
 
             if (hasOBjectOrParam["Chest duplication Glitch"] > 0)
             {
-                score += hasOBjectOrParam["Chest duplication Glitch"] > 0 ? 420 * hasOBjectOrParam["Chest duplication Glitch"] : 0;
+                score += hasOBjectOrParam["Chest duplication Glitch"] > 0 ? 120 * hasOBjectOrParam["Chest duplication Glitch"] : 0;
                 allScoreText += System.Environment.NewLine + "Score Chest duplication Glitch " + (int)score;
             }
 
@@ -6855,16 +6930,16 @@ namespace TheTerrariaSeedProject
 
                     for (int xti = xt; xti > xt - 10; xti--)
                     {
-                        if (Main.tile[xti, yt].active() && Main.tile[xti, yt].type != TileID.LivingWood && Main.tile[xti, yt].type != TileID.LeafBlock
+                        if (xti < 0 || (Main.tile[xti, yt].active() && Main.tile[xti, yt].type != TileID.LivingWood && Main.tile[xti, yt].type != TileID.LeafBlock
                         && Main.tile[xti, yt].type != TileID.Vines && Main.tile[xti, yt].wall != WallID.LivingWood && Main.tile[xti, yt].type != TileID.Trees
                         && Main.tile[xti, yt].type != TileID.PalmTree && Main.tile[xti, yt].type != TileID.Sunflower && Main.tile[xti, yt].type != TileID.Pots
                         && Main.tile[xti, yt].type != TileID.Plants && Main.tile[xti, yt].type != TileID.JunglePlants && Main.tile[xti, yt].type != TileID.FleshWeeds
-                        && Main.tile[xti, yt].type != TileID.CorruptPlants && Main.tile[xti, yt].type != TileID.SmallPiles && Main.tile[xti, yt].type != TileID.LargePiles)
+                        && Main.tile[xti, yt].type != TileID.CorruptPlants && Main.tile[xti, yt].type != TileID.SmallPiles && Main.tile[xti, yt].type != TileID.LargePiles))
                         {
                             isTree = false;
                             break;
                         }
-                        if (!Main.tile[xti, yt].active() && Main.tile[xti, yt].wall != WallID.LivingWood)
+                        if (xti > 0 && !Main.tile[xti, yt].active() && Main.tile[xti, yt].wall != WallID.LivingWood)
                         {
                             break;
                         }
@@ -6872,17 +6947,17 @@ namespace TheTerrariaSeedProject
                     if (!isTree) return false;
                     for (int xti = xt; xti < xt + 10; xti++)
                     {
-                        if (Main.tile[xti, yt].active() && Main.tile[xti, yt].type != TileID.LivingWood && Main.tile[xti, yt].type != TileID.LeafBlock
+                        if (xti >= Main.maxTilesX || ( Main.tile[xti, yt].active() && Main.tile[xti, yt].type != TileID.LivingWood && Main.tile[xti, yt].type != TileID.LeafBlock
                         && Main.tile[xti, yt].type != TileID.Vines && Main.tile[xti, yt].wall != WallID.LivingWood && Main.tile[xti, yt].type != TileID.Trees
                         && Main.tile[xti, yt].type != TileID.PalmTree && Main.tile[xti, yt].type != TileID.Sunflower && Main.tile[xti, yt].type != TileID.Pots
                         && Main.tile[xti, yt].type != TileID.Plants && Main.tile[xti, yt].type != TileID.JunglePlants && Main.tile[xti, yt].type != TileID.FleshWeeds
-                        && Main.tile[xti, yt].type != TileID.CorruptPlants && Main.tile[xti, yt].type != TileID.SmallPiles && Main.tile[xti, yt].type != TileID.LargePiles)
+                        && Main.tile[xti, yt].type != TileID.CorruptPlants && Main.tile[xti, yt].type != TileID.SmallPiles && Main.tile[xti, yt].type != TileID.LargePiles))
                         {
 
                             isTree = false;
                             break;
                         }
-                        if (!Main.tile[xti, yt].active() && Main.tile[xti, yt].wall != WallID.LivingWood)
+                        if (xti < Main.maxTilesX && !Main.tile[xti, yt].active() && Main.tile[xti, yt].wall != WallID.LivingWood)
                         {
                             break;
                         }
@@ -6897,8 +6972,8 @@ namespace TheTerrariaSeedProject
                     int xr = xt;
                     const int maxDiff = 5;
                     bool found = Main.tile[xt, yt].wall == WallID.LivingWood || (Main.tile[xl, yt].active() && (Main.tile[xl, yt].type == TileID.LivingWood || Main.tile[xt, yt].type == TileID.LeafBlock));
-                    while ((!Main.tile[xl, yt].active() || (Main.tile[xl, yt].active() && (Main.tile[xl, yt].wall != WallID.LivingWood && Main.tile[xl, yt].type != TileID.LivingWood && Main.tile[xl, yt].type != TileID.LeafBlock))) && xt - xl <= maxDiff) { xl--; if (Main.tile[xl, yt].active() || Main.tile[xl, yt].wall == WallID.LivingWood) found = true; }
-                    while ((!Main.tile[xr, yt].active() || (Main.tile[xr, yt].active() && (Main.tile[xr, yt].wall != WallID.LivingWood && Main.tile[xr, yt].type != TileID.LivingWood && Main.tile[xr, yt].type != TileID.LeafBlock))) && xr - xt <= maxDiff) { xr++; if (Main.tile[xr, yt].active() || Main.tile[xr, yt].wall == WallID.LivingWood) found = true; }
+                    while (xl> 0 && (!Main.tile[xl, yt].active() || (Main.tile[xl, yt].active() && (Main.tile[xl, yt].wall != WallID.LivingWood && Main.tile[xl, yt].type != TileID.LivingWood && Main.tile[xl, yt].type != TileID.LeafBlock))) && xt - xl <= maxDiff) { xl--; if (Main.tile[xl, yt].active() || Main.tile[xl, yt].wall == WallID.LivingWood) found = true; }
+                    while (xr< Main.maxTilesX && (!Main.tile[xr, yt].active() || (Main.tile[xr, yt].active() && (Main.tile[xr, yt].wall != WallID.LivingWood && Main.tile[xr, yt].type != TileID.LivingWood && Main.tile[xr, yt].type != TileID.LeafBlock))) && xr - xt <= maxDiff) { xr++; if (Main.tile[xr, yt].active() || Main.tile[xr, yt].wall == WallID.LivingWood) found = true; }
 
                     int diffL = xt - xl;
                     int diffR = xr - xt;
@@ -6926,8 +7001,8 @@ namespace TheTerrariaSeedProject
                     int xr = xt;
                     const int maxDiff = 5;
                     bool found = Main.tile[xt, yt].wall == WallID.LivingWood || (Main.tile[xl, yt].active() && (Main.tile[xl, yt].type == TileID.LivingWood || (Main.tile[xl, yt].type == TileID.Platforms && Main.tile[xl, yt].frameY == 414)));
-                    while ((!Main.tile[xl, yt].active() || (Main.tile[xl, yt].active() && (Main.tile[xl, yt].wall != WallID.LivingWood && Main.tile[xl, yt].type != TileID.LivingWood && !(Main.tile[xl, yt].type == TileID.Platforms && Main.tile[xl, yt].frameY == 414)))) && xt - xl <= maxDiff) { xl--; if ((Main.tile[xl, yt].active() && (Main.tile[xl, yt].type == TileID.LivingWood || (Main.tile[xl, yt].type == TileID.Platforms && Main.tile[xl, yt].frameY == 414))) || Main.tile[xl, yt].wall == WallID.LivingWood) found = true; }
-                    while ((!Main.tile[xr, yt].active() || (Main.tile[xr, yt].active() && (Main.tile[xr, yt].wall != WallID.LivingWood && Main.tile[xr, yt].type != TileID.LivingWood && !(Main.tile[xr, yt].type == TileID.Platforms && Main.tile[xr, yt].frameY == 414)))) && xr - xt <= maxDiff) { xr++; if ((Main.tile[xr, yt].active() && (Main.tile[xr, yt].type == TileID.LivingWood || (Main.tile[xr, yt].type == TileID.Platforms && Main.tile[xr, yt].frameY == 414))) || Main.tile[xr, yt].wall == WallID.LivingWood) found = true; }
+                    while (xl> 0 && (!Main.tile[xl, yt].active() || (Main.tile[xl, yt].active() && (Main.tile[xl, yt].wall != WallID.LivingWood && Main.tile[xl, yt].type != TileID.LivingWood && !(Main.tile[xl, yt].type == TileID.Platforms && Main.tile[xl, yt].frameY == 414)))) && xt - xl <= maxDiff) { xl--; if ((Main.tile[xl, yt].active() && (Main.tile[xl, yt].type == TileID.LivingWood || (Main.tile[xl, yt].type == TileID.Platforms && Main.tile[xl, yt].frameY == 414))) || Main.tile[xl, yt].wall == WallID.LivingWood) found = true; }
+                    while (xr < Main.maxTilesX && (!Main.tile[xr, yt].active() || (Main.tile[xr, yt].active() && (Main.tile[xr, yt].wall != WallID.LivingWood && Main.tile[xr, yt].type != TileID.LivingWood && !(Main.tile[xr, yt].type == TileID.Platforms && Main.tile[xr, yt].frameY == 414)))) && xr - xt <= maxDiff) { xr++; if ((Main.tile[xr, yt].active() && (Main.tile[xr, yt].type == TileID.LivingWood || (Main.tile[xr, yt].type == TileID.Platforms && Main.tile[xr, yt].frameY == 414))) || Main.tile[xr, yt].wall == WallID.LivingWood) found = true; }
 
                     int diffL = xt - xl;
                     int diffR = xr - xt;
@@ -7311,15 +7386,21 @@ namespace TheTerrariaSeedProject
 
             int x = where.Item1/scale;
             int y = where.Item2/scale+4;
-                        
+            
 
             const int iconbgs = 48;
 
-            
-            while(y < Main.maxTilesY/scale - 4*iconbgs)
+            int maxoff = rgbValues.Length-1;
+
+
+            while (y < Main.maxTilesY/scale - 4*iconbgs)
             {
-                int offt = (y+4) * Main.maxTilesX * 4 / scale + x * 4 ;                
+                int offt = (y+4) * Main.maxTilesX * 4 / scale + x * 4 ;
                 //if (rgbValues[offt + 0] != (byte)255 || rgbValues[offt + 1] != (byte)255 || rgbValues[offt + 2] != (byte)255)
+
+                if (offt + 3 > maxoff)
+                    continue;
+
                 if (rgbValues[offt + 3] != (byte)254)
                     break;
                 else
@@ -7335,7 +7416,8 @@ namespace TheTerrariaSeedProject
 
                     bool isWhite = ( (h- iconbgs / 2)* (h - iconbgs / 2) + (w- iconbgs / 2)* (w - iconbgs / 2) ) > (iconbgs * iconbgs / 4 );
 
-
+                    if (offt + 3 > maxoff)
+                        continue;
 
                     rgbValues[offt + 0] = isWhite ? rgbValues[offt + 0] : (byte)((rgbValues[offt + 0]>>2) + 192);
                     rgbValues[offt + 1] = isWhite ? rgbValues[offt + 1] : (byte)((rgbValues[offt + 1]>>2) + 192);
@@ -7353,6 +7435,9 @@ namespace TheTerrariaSeedProject
                     int imgof = h * cit.Width + w;
 
                     bool isWhite = (tc[imgof].A == 0); //;&& ( (h- cit.Height/2)* (h - cit.Height / 2) + (w-cit.Width/2)* (w - cit.Width / 2) ) > (cit.Width* cit.Height / 4 );
+
+                    if (offt + 3 > maxoff)
+                        continue;
 
                     rgbValues[offt + 0] = isWhite ? rgbValues[offt + 0] : (byte)((rgbValues[offt + 0] >> 2) + ((tc[imgof].B >> 1)+ (tc[imgof].B >> 2)));
                     rgbValues[offt + 1] = isWhite ? rgbValues[offt + 1] : (byte)((rgbValues[offt + 1] >> 2) + ((tc[imgof].G >> 1)+ (tc[imgof].G >> 2))); 
@@ -7372,7 +7457,7 @@ namespace TheTerrariaSeedProject
             int y = where.Item2 / scale - iconbgs/2+1;
 
 
-            
+            int maxoff = rgbValues.Length - 1;
 
 
             for (int h = 0; h < iconbgs; h++)
@@ -7387,6 +7472,9 @@ namespace TheTerrariaSeedProject
                     //rgbValues[offt + 1] = isWhite ? (byte)(((cc.G >> 2) + (cc.G >> 1)) + (rgbValues[offt + 0] >> 2)) : rgbValues[offt + 1];
                     //rgbValues[offt + 2] = isWhite ? (byte)(((cc.R >> 2) + (cc.R >> 1)) + (rgbValues[offt + 0] >> 2)) : rgbValues[offt + 2];
                     //rgbValues[offt + 3] = isWhite ? (byte)(((cc.A >> 2) + (cc.A >> 1)) + (rgbValues[offt + 0] >> 2)) : rgbValues[offt + 3];
+
+                    if (offt + 3 > maxoff)
+                        continue;
 
                     rgbValues[offt + 0] = isWhite ? (byte)cc.B : rgbValues[offt + 0];
                     rgbValues[offt + 1] = isWhite ? (byte)cc.G : rgbValues[offt + 1];
