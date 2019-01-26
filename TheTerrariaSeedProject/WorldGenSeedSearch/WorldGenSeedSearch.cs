@@ -132,6 +132,7 @@ namespace TheTerrariaSeedProject
 
         bool continueEval = false;
         bool saveLogSet = false;
+        int  useOtherStackFrame = 0;
 
         List<int> itemIDdoNotWant = null;
 
@@ -142,6 +143,35 @@ namespace TheTerrariaSeedProject
 
             if (saveLogSet)
                 WorldGen.saveLock = false;
+
+            /// debug lines start
+            //if (!System.IO.Directory.Exists(Main.SavePath + OptionsDict.Paths.debugPath))
+            //    System.IO.Directory.CreateDirectory(Main.SavePath + OptionsDict.Paths.debugPath);            
+            //writeDebugFile("menu mode: " + Main.menuMode );
+
+            //writeDebugFile("calling func name0: " + (new StackFrame(0, true).GetMethod().Name) );
+            //writeDebugFile("calling func name1: " + (new StackFrame(1, true).GetMethod().Name));
+            //writeDebugFile("calling func name2: " + (new StackFrame(2, true).GetMethod().Name));
+            //writeDebugFile("calling func name3: " + (new StackFrame(3, true).GetMethod().Name));
+            //writeDebugFile("calling func name4: " + (new StackFrame(4, true).GetMethod().Name));
+            //writeDebugFile("calling func name5: " + (new StackFrame(5, true).GetMethod().Name));
+            //writeDebugFile("calling func name6: " + (new StackFrame(6, true).GetMethod().Name));
+            //writeDebugFile("calling func name7: " + (new StackFrame(7, true).GetMethod().Name));
+            /// debug lines end
+
+            if (useOtherStackFrame == 0)
+            {
+                Mod overhaul = ModLoader.GetMod("TerrariaOverhaul");
+                if (overhaul != null)
+                {
+                    useOtherStackFrame = 7;
+                }
+                else
+                    useOtherStackFrame = 3;
+            }
+
+
+
             if (Main.menuMode != 10) { stage = 0; return; }
             saveLogSet = false;
 
@@ -157,9 +187,10 @@ namespace TheTerrariaSeedProject
                 //do_worldGenCallBack 
                 //doing new world`?
                 string callingFun = new StackFrame(3, true).GetMethod().Name;
+                string callingFun7 = new StackFrame(useOtherStackFrame, true).GetMethod().Name; //some people have different exe overhaul
 
 
-                if (!callingFun.Equals("do_worldGenCallBack")) return;
+                if (!callingFun.Equals("do_worldGenCallBack") && !callingFun7.Equals("do_worldGenCallBack")) return;
 
                 if (!System.IO.Directory.Exists(Main.SavePath + OptionsDict.Paths.configPath))
                     System.IO.Directory.CreateDirectory(Main.SavePath + OptionsDict.Paths.configPath);
@@ -1633,7 +1664,7 @@ namespace TheTerrariaSeedProject
 
             hasOBjectOrParam.Add("Cloud Chest", 0);
             hasOBjectOrParam.Add("Tree", 0);
-            hasOBjectOrParam.Add("Tree Chest", 0);            
+            hasOBjectOrParam.Add("Tree Chest", 0);        
             hasOBjectOrParam.Add("Max Living Tree Size", 0);            
             hasOBjectOrParam.Add("Min Living Tree Size", 0);
             hasOBjectOrParam.Add("Max Living Tree root Size", 0);
@@ -1641,7 +1672,11 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Max Tree exit cav.-entr. distance", -100000);
 
             hasOBjectOrParam.Add("Trees near mid", 0);
+            hasOBjectOrParam.Add("Tree chests near mid", 0);
             hasOBjectOrParam.Add("Near Tree", 0);
+            hasOBjectOrParam.Add("Near Tree Chest", 0);
+            hasOBjectOrParam.Add("Distance Tree Chest to mid", 0);
+
             hasOBjectOrParam.Add("Lake near mid (guess)", 0);
 
             hasOBjectOrParam.Add("Water Bolt before Skeletron", 0);
@@ -1649,6 +1684,8 @@ namespace TheTerrariaSeedProject
 
             hasOBjectOrParam.Add("Temple Distance", 0);
             hasOBjectOrParam.Add("Temple horizontal distance", 0);
+            hasOBjectOrParam.Add("Temple Tile horizontal distance", 0);
+            hasOBjectOrParam.Add("Temple Tile vertical distance", 0);
             hasOBjectOrParam.Add("Temple at player side of jungle (%)", 0);
             hasOBjectOrParam.Add("Temple at ocean side of jungle (%)", 0);
             hasOBjectOrParam.Add("Temple at height (%)", 0);
@@ -1699,7 +1736,9 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Pathlength to Extractinator", 1000000);
             hasOBjectOrParam.Add("Pathlength to Magic/Ice Mirror", 1000000);
             hasOBjectOrParam.Add("Pathlength to Chest", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Tree Chest", 1000000);
 
+            hasOBjectOrParam.Add("Pathlength into cavern layer", 1000000);
             hasOBjectOrParam.Add("Pathlength into 40% cavern layer", 1000000);
             hasOBjectOrParam.Add("Pathlength to 40% cavern entrance", 1000000);
             hasOBjectOrParam.Add("Tiles to mine for 40% cavern", 1000000);
@@ -1747,7 +1786,9 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("neg. Pathlength to Extractinator", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Magic/Ice Mirror", 1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Chest", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Tree Chest", -1000000);
 
+            hasOBjectOrParam.Add("neg. Pathlength into cavern layer", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength into 40% cavern layer", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to 40% cavern entrance", -1000000);
             hasOBjectOrParam.Add("neg. Tiles to mine for 40% cavern", -1000000);
@@ -2177,6 +2218,24 @@ namespace TheTerrariaSeedProject
                         else if (cy <= Main.worldSurface + 2 && item.type == ItemID.GoldenKey)
                         {
                             hasOBjectOrParam["Pre Skeletron Golden Key Grab"] += 1;
+                        }
+                        else if (item.type == ItemID.LivingWoodWand)
+                        {
+                            hasOBjectOrParam["Distance Tree Chest to mid"] = Math.Abs(Main.maxTilesX / 2 - cx);
+
+                            if(Math.Abs(Main.maxTilesX/2-cx) < 300)
+                                hasOBjectOrParam["Tree chests near mid"]++;
+
+                            if (doFull)
+                            {
+                                if (checkIfNearSpawn(cx, cy, 275, 8000))
+                                    hasOBjectOrParam["Near Tree Chest"]++;
+
+                                if (pathl < hasOBjectOrParam["Pathlength to Tree Chest"])
+                                {
+                                    hasOBjectOrParam["Pathlength to Tree Chest"] = pathl;
+                                }
+                            }
                         }
 
 
@@ -3360,6 +3419,7 @@ namespace TheTerrariaSeedProject
                             //Temple location
                             else if (tile.type == TileID.LihzahrdBrick || tile.wall == WallID.LihzahrdBrickUnsafe)
                             {
+                               
                                 if (x < leftmostTempleTilex) leftmostTempleTilex = x;
                                 if (x > rightmostTempleTilex) rightmostTempleTilex = x;
                                 if (y < topmostTempleTiley) topmostTempleTiley = y;
@@ -3757,7 +3817,9 @@ namespace TheTerrariaSeedProject
                 int startx = 100;
                 int endx = Main.maxTilesX - 100;
                 int cy = (int)(Main.rockLayer + 0.4 * ((Main.maxTilesY - Main.rockLayer) - 200));
+                int cyEnter = (int)(Main.rockLayer + 10);
                 int cmp = Int32.MaxValue;
+                int cmpEnter = Int32.MaxValue;
                 int cmxi = 0;
 
                 for (int cxi = startx; cxi <= endx; cxi++)
@@ -3766,6 +3828,10 @@ namespace TheTerrariaSeedProject
                     {
                         cmp = pathLength[cxi, cy];
                         cmxi = cxi;
+                    }
+                    if (pathLength[cxi, cyEnter] < cmpEnter && !isInDungeon(cxi, cyEnter))
+                    {
+                        cmpEnter = pathLength[cxi, cyEnter];                        
                     }
                 }
                 if (cmp < Int32.MaxValue)
@@ -3780,6 +3846,8 @@ namespace TheTerrariaSeedProject
                     hasOBjectOrParam["Pathlength into 40% cavern layer"] = cmp / pathNormFac;
                     hasOBjectOrParam["Pathlength to 40% cavern entrance"] = pathLength[entr.Item1, entr.Item2] / pathNormFac;
                     hasOBjectOrParam["Tiles to mine for 40% cavern"] = tilesToMine;
+
+                    hasOBjectOrParam["Pathlength into cavern layer"] = cmpEnter / pathNormFac;
                 }
 
                 //into jungle
@@ -3896,6 +3964,18 @@ namespace TheTerrariaSeedProject
                 ratio = (int)(diff / (Main.maxTilesY - Main.rockLayer - 200) * 100.0f);
                 hasOBjectOrParam["Temple at height (%)"] = 100 - ratio;
                 hasOBjectOrParam["Temple at depth (%)"] = ratio;
+    
+                hasOBjectOrParam["Temple Tile horizontal distance"] = (localDungeonSide < 0) ? rightmostCavernJungleTilex - Main.spawnTileX : Main.spawnTileX - leftmostTempleTilex;
+                hasOBjectOrParam["Temple Tile vertical distance"] = Math.Abs(topmostTempleTiley - Main.spawnTileY);
+
+
+                if (hasOBjectOrParam["Temple Distance"] == 0)
+                {
+                    //no temple door
+                    hasOBjectOrParam["Temple Distance"] = getDistanceToSpawn(templeMidx, templeMidy);
+                    hasOBjectOrParam["Temple horizontal distance"] = Math.Abs(templeMidx - Main.spawnTileX);
+                    hasOBjectOrParam["Open Temple"] = 1;
+                }
 
 
                 //################################################## use geninfo?
@@ -4043,7 +4123,7 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["neg. Pathlength to Boots"] = -hasOBjectOrParam["Pathlength to Boots"];
                 hasOBjectOrParam["neg. Pathlength to Iron/Lead Bar"] = -hasOBjectOrParam["Pathlength to Iron/Lead Bar"];
                 hasOBjectOrParam["neg. Pathlength to 10 Iron/Lead Bar Chest"] = -hasOBjectOrParam["Pathlength to 10 Iron/Lead Bar Chest"];
-                hasOBjectOrParam["neg. Pathlength to Gold/Platinum Bar"] = -hasOBjectOrParam["Pathlength to Gold/Platinum Bar"];
+                hasOBjectOrParam["neg. Pathlength to Gold/Platinum Bar"] = -hasOBjectOrParam["Pathlength to Gold/Platinum Bar"];                
                 hasOBjectOrParam["neg. Pathlength to Bomb"] = -hasOBjectOrParam["Pathlength to Bomb"];
                 hasOBjectOrParam["neg. Pathlength to Dynamite"] = -hasOBjectOrParam["Pathlength to Dynamite"];
                 hasOBjectOrParam["neg. Pathlength to 2nd Dynamite"] = -hasOBjectOrParam["Pathlength to 2nd Dynamite"];
@@ -4070,8 +4150,10 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["neg. Pathlength to Extractinator"] = -hasOBjectOrParam["Pathlength to Extractinator"];
                 hasOBjectOrParam["neg. Pathlength to Magic/Ice Mirror"] = -hasOBjectOrParam["Pathlength to Magic/Ice Mirror"];
                 hasOBjectOrParam["neg. Pathlength to Chest"] = -hasOBjectOrParam["Pathlength to Chest"];
+                hasOBjectOrParam["neg. Pathlength to Tree Chest"] = -hasOBjectOrParam["Pathlength to Tree Chest"];
 
                 hasOBjectOrParam["neg. Pathlength to free ShadowOrb/Heart"] = -hasOBjectOrParam["Pathlength to free ShadowOrb/Heart"];
+                hasOBjectOrParam["neg. Pathlength into cavern layer"] = -hasOBjectOrParam["Pathlength into cavern layer"];
                 hasOBjectOrParam["neg. Pathlength into 40% cavern layer"] = -hasOBjectOrParam["Pathlength into 40% cavern layer"];
                 hasOBjectOrParam["neg. Pathlength to 40% cavern entrance"] = -hasOBjectOrParam["Pathlength to 40% cavern entrance"];
                 hasOBjectOrParam["neg. Tiles to mine for 40% cavern"] = -hasOBjectOrParam["Tiles to mine for 40% cavern"];
@@ -5724,7 +5806,8 @@ namespace TheTerrariaSeedProject
 
             allScoreText += System.Environment.NewLine + "Score Near ES " + (int)score;
 
-            score += hasOBjectOrParam["Near Tree"] > 0 ? sumUp(hasOBjectOrParam["Near Tree"], 100, 1.0) : 0;
+            score += hasOBjectOrParam["Near Tree"] > 0 ? sumUp(hasOBjectOrParam["Near Tree"], 90, 1.0) : 0;
+            score += hasOBjectOrParam["Near Tree Chest"] > 0 ? sumUp(hasOBjectOrParam["Near Tree Chest"], 75, 1.25) : 0;
 
             allScoreText += System.Environment.NewLine + "Score Near Tree " + (int)score;
 
