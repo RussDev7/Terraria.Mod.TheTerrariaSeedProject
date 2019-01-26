@@ -38,6 +38,7 @@ If you found some bugs, have some ideas, want to help coding or found some nice 
 Good luck!
 
 Last Update:
+-near tree chest, temple tile distance, cavern layer pathlength
 -pyramid, tree size, dynamite, ruby, gravitation..
 -speed up
 -stepSize, impr. search
