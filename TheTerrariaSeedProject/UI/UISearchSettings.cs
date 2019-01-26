@@ -559,7 +559,7 @@ namespace TheTerrariaSeedProject.UI
                 }
 
                 if (this.progressBar!=null && lastProgessMargin != this.progressBar.MarginBottom)
-                    this.Recalculate();
+                    this.Recalculate(); //something goes wrong herre with overhaul mod
 
             }
         }

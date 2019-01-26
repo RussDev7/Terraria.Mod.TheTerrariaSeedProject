@@ -184,7 +184,7 @@ namespace TheTerrariaSeedProject.UI
         public static readonly List<string> vEvilTiles = getPatern(0, 10, 10).Concat(getPatern(100, 9, 100)).Concat(getPatern(1000, 9, 1000)).Concat(getPatern(10000, 9, 5000)).ToList();
         public static readonly List<string> vDistance = getPatern(5, 4, 5).Concat(getPatern(25, 7, 25).Concat(getPatern(200, 4, 50).Concat(getPatern(400, 6, 100).Concat(getPatern(1000, 5, 200)).Concat(getPatern(2000, 9, 250))))).ToList();
         public static readonly List<string> vDistanceNeg = getPatern(-1000, 9, 100).Concat(getPatern(-100, 3, 25).Concat(getPatern(-25, 10, 5).Concat(getPatern(25, 3, 25).Concat(getPatern(100, 9, 100).Concat(getPatern(1000, 5, 200)).Concat(getPatern(2000, 9, 250)))))).ToList();
-        public static readonly List<string> vDistanceShort = getPatern(25, 9, 25).Concat(getPatern(250, 4, 50)).Concat(getPatern(500, 11, 100)).ToList();
+        public static readonly List<string> vDistanceShort = getPatern(25, 9, 25).Concat(getPatern(250, 4, 50)).Concat(getPatern(500, 16, 100)).ToList();
         public static readonly List<string> vDistanceLong = getPatern(200, 8, 100).Concat(getPatern(1000, 17, 200)).ToList();
         public static readonly List<string> vNumTiles = getPatern(0, 10, 10).Concat(getPatern(100, 9, 100)).Concat(getPatern(1000, 9, 1000).Concat(getPatern(10000, 9, 5000))).ToList();
         public static readonly List<string> vNumSearch = getPatern(1, 7).Concat(getPatern(10, 4, 5)).Concat(getPatern(50, 12, 0, 2, 5)).ToList();
@@ -427,6 +427,7 @@ namespace TheTerrariaSeedProject.UI
                 "Max Living Tree total Size",
                 "Max Tree exit cav.-entr. distance",
                 "Trees near mid",
+                "Tree chests near mid",
                 "Lake near mid (guess)",
                 "Dungeon has good Pos",
                 "Dungeon has strange Pos",
@@ -488,6 +489,7 @@ namespace TheTerrariaSeedProject.UI
                 "Ice surface evil",
                 "Ice surface more than half evil",
                 "Distance Tree to mid",
+                "Distance Tree Chest to mid",
                 "Distance Cloud to mid",
                 "Distance Pyramid to mid",
                 "Distance Dungeon to mid",
@@ -533,6 +535,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Max Living Tree total Size", v0to500_5_700_10);
             Add("Max Tree exit cav.-entr. distance", vTreePyrExistCavernDist);
             Add("Trees near mid", v0to5);
+            Add("Tree chests near mid", v0to5);
             Add("Lake near mid (guess)", v0to1);
             
             Add("Pyramid Bottle", v0to5);
@@ -593,6 +596,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Ice surface evil", vEvilTiles);
             Add("Ice surface more than half evil", v0to1);
             Add("Distance Tree to mid", vDistance);
+            Add("Distance Tree Chest to mid", vDistance);
             Add("Distance Cloud to mid", vDistance);
             Add("Distance Pyramid to mid", vDistance);
             Add("Distance Dungeon to mid", vDistance);
@@ -621,6 +625,7 @@ namespace TheTerrariaSeedProject.UI
                 "Near Mushroom Biome count",
                 "Near Chest",
                 "Near Tree",
+                "Near Tree Chest",
                 "Near Cloud",
                 "Cloud Chest",
                 "Cloud Ballon",
@@ -679,6 +684,8 @@ namespace TheTerrariaSeedProject.UI
                 "Dungeon Distance",
                 "Temple Distance",
                 "Temple horizontal distance",
+                "Temple Tile horizontal distance",
+                "Temple Tile vertical distance",
                 "Temple at player side of jungle (%)",
                 "Temple at ocean side of jungle (%)",
                 "Temple at height (%)",
@@ -713,7 +720,9 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Pathlength to Extractinator",
                 "neg. Pathlength to Magic/Ice Mirror",
                 "neg. Pathlength to Chest",
+                "neg. Pathlength to Tree Chest",
                 "neg. Pathlength to free ShadowOrb/Heart",
+                "neg. Pathlength into cavern layer",
                 "neg. Pathlength into 40% cavern layer",
                 "neg. Pathlength to 40% cavern entrance",
                 "neg. Tiles to mine for 40% cavern",
@@ -738,6 +747,8 @@ namespace TheTerrariaSeedProject.UI
                 "Dungeon Distance",
                 "Temple Distance",
                 "Temple horizontal distance",
+                "Temple Tile horizontal distance",
+                "Temple Tile vertical distance",
                 "Temple at player side of jungle (%)",
                 "Temple at ocean side of jungle (%)",
                 "Temple at height (%)",
@@ -770,8 +781,10 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to 2 Herb Bag Chest",
                 "Pathlength to Extractinator",
                 "Pathlength to Magic/Ice Mirror",
-                "Pathlength to Chest",                
+                "Pathlength to Chest",
+                "Pathlength to Tree Chest",                
                 "Pathlength to free ShadowOrb/Heart",
+                "Pathlength into cavern layer",
                 "Pathlength into 40% cavern layer",
                 "Pathlength to 40% cavern entrance",
                 "Tiles to mine for 40% cavern",
@@ -796,6 +809,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Near Mushroom Biome count", vNumTiles);
             Add("Near Chest", v0to20);
             Add("Near Tree", v0to5);
+            Add("Near Tree Chest", v0to5);
             Add("Near Cloud", v0to5);
             Add("Bee Hives", v0to20);
             Add("High Hive", v0to10);
@@ -886,9 +900,11 @@ namespace TheTerrariaSeedProject.UI
             Add("neg. Pathlength to Extractinator", vPathLengthNeg);
             Add("neg. Pathlength to Magic/Ice Mirror", vPathLengthNeg);
             Add("neg. Pathlength to Chest", vPathLengthNeg);
+            Add("neg. Pathlength to Tree Chest", vPathLengthNeg);
 
 
             Add("neg. Pathlength to free ShadowOrb/Heart", vPathLengthNeg);
+            Add("neg. Pathlength into cavern layer", vPathLengthNeg);
             Add("neg. Pathlength into 40% cavern layer", vPathLengthNeg);
             Add("neg. Pathlength to 40% cavern entrance", vPathLengthNeg);
             Add("neg. Tiles to mine for 40% cavern", vPathLengthNeg);
@@ -930,8 +946,10 @@ namespace TheTerrariaSeedProject.UI
             Add("Pathlength to Extractinator", vPathLength);
             Add("Pathlength to Magic/Ice Mirror", vPathLength);
             Add("Pathlength to Chest", vPathLength);
+            Add("Pathlength to Tree Chest", vPathLength);
             Add("Pathlength to Temple Door", vPathLength);
             Add("Pathlength to free ShadowOrb/Heart", vPathLength);  
+            Add("Pathlength into cavern layer", vPathLength);  
             Add("Pathlength into 40% cavern layer", vPathLength);  
             Add("Pathlength to 40% cavern entrance", vPathLength);  
             Add("Tiles to mine for 40% cavern", vTilesToMine);
@@ -942,6 +960,8 @@ namespace TheTerrariaSeedProject.UI
 
             Add("Temple Distance", vDistanceLong);            
             Add("Temple horizontal distance", vDistanceLong);
+            Add("Temple Tile horizontal distance", vDistanceLong);
+            Add("Temple Tile vertical distance", vDistanceShort);
             Add("Temple at player side of jungle (%)", v0to100);
             Add("Temple at ocean side of jungle (%)", v0to100);
             Add("Temple at height (%)", v0to100);
