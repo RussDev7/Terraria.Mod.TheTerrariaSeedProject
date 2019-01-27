@@ -1707,7 +1707,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Near Sunflower", 0);
             hasOBjectOrParam.Add("Near Altar", 0);
             hasOBjectOrParam.Add("Near Spider Web count", 0);
-            hasOBjectOrParam.Add("Near Mushroom Biome count", 0);
+            hasOBjectOrParam.Add("Near Mushroom Biome count", 0);            
             hasOBjectOrParam.Add("Near Chest", 0);
 
             hasOBjectOrParam.Add("Near Cloud", 0);
@@ -1831,7 +1831,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Spawn in Sky", 0);
 
             hasOBjectOrParam.Add("Open Temple", 0);
-
+            hasOBjectOrParam.Add("Mushroom Biome above surface count", 0);
 
             hasOBjectOrParam.Add("Evil Tiles for Mud", 0);
             hasOBjectOrParam.Add("Evil Tiles for Jungle Grass", 0);
@@ -3441,7 +3441,7 @@ namespace TheTerrariaSeedProject
                                 hasOBjectOrParam["Geyser"]++;
                             }
                             //Detonator
-                            else if (tile.type == TileID.Detonator && tile.frameX == 0 && tile.frameX == 0)
+                            else if (tile.type == TileID.Detonator && tile.frameX == 0 && tile.frameY == 0)
                             {                                
                                 hasOBjectOrParam["Detonator"]++;
                                 if (pathLength[x+1,y] < hasOBjectOrParam["Pathlength to Detonator"])
@@ -3450,12 +3450,29 @@ namespace TheTerrariaSeedProject
                                 }
                                 if (y+12 < Main.worldSurface)
                                 {
-                                    hasOBjectOrParam["Detonator at surface"]++;
-                                    writeDebugFile(" " + y + "  vs " + Main.worldSurface);
-                                    if(score.itemLocation.ContainsKey(ItemID.Detonator))
-                                        score.itemLocation[ItemID.Detonator] = new List<Tuple<int, int>> { new Tuple<int, int>(x, y) }; 
-                                    else
-                                        score.itemLocation.Add(ItemID.Detonator, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
+                                    int numfree = 0;
+                                    int total = 0;
+                                    for (int xi=x-10; xi<x+12; xi++)
+                                    {
+                                        for (int yi = y - 9; yi < y + 2; yi++)
+                                        {
+                                            total++;
+                                            if(Main.tile[xi,yi].wall == WallID.None && !Main.tile[xi, yi].active())
+                                            {
+                                                numfree++;
+                                            }
+
+                                        }
+                                    }
+                                    if( ((float)numfree)/ total > 0.55)
+                                    {
+                                        hasOBjectOrParam["Detonator at surface"]++;
+                                    
+                                        if(score.itemLocation.ContainsKey(ItemID.Detonator))
+                                            score.itemLocation[ItemID.Detonator].Add(new Tuple<int, int>(x, y) ); 
+                                        else
+                                            score.itemLocation.Add(ItemID.Detonator, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
+                                    }
                                 }
 
                             }
@@ -3465,6 +3482,10 @@ namespace TheTerrariaSeedProject
                                 if (checkIfNearSpawn(x, y, 150, 400))
                                 {
                                     hasOBjectOrParam["Near Mushroom Biome count"] += 1;
+                                }
+                                if (y < Main.worldSurface)
+                                {
+                                    hasOBjectOrParam["Mushroom Biome above surface count"] += 1;
                                 }
 
                             }
@@ -5955,6 +5976,9 @@ namespace TheTerrariaSeedProject
 
             double musCount = sumUp(hasOBjectOrParam["Near Mushroom Biome count"], 0.09, 0.9999);
             score += hasOBjectOrParam["Near Mushroom Biome count"] > 0 ? (musCount > 50 ? 50 : musCount) : -25;
+            musCount = sumUp(hasOBjectOrParam["Mushroom Biome above surface count"], 1.0, 0.999999);
+            score += hasOBjectOrParam["Mushroom Biome above surface count"] > 0 ? (musCount > 100 ? 100 : musCount) : 0;
+            
 
             allScoreText += System.Environment.NewLine + "Score Near Mushroom Biome count " + (int)score;
 
