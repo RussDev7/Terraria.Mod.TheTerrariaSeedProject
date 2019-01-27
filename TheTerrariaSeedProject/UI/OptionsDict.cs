@@ -170,6 +170,7 @@ namespace TheTerrariaSeedProject.UI
 
 
         public static readonly List<string> v0to6 = getPatern(0, 6);
+        public static readonly List<string> v0to9 = getPatern(0, 10);
         public static readonly List<string> v0to10 = getPatern(0, 11);
         public static readonly List<string> v0to15 = getPatern(0, 16);
         public static readonly List<string> v0to20 = getPatern(0, 21);
@@ -543,7 +544,7 @@ namespace TheTerrariaSeedProject.UI
             });
 
             Add("Number of Pyramids", v0to10);
-            Add("Number of Clouds", v0to10);
+            Add("Number of Clouds", v0to9);
             Add("Number of Living Trees", v0to5);
             Add("Pyramid Bottle", v0to5);
             Add("Pyramid Carpet", v0to5);
@@ -707,7 +708,7 @@ namespace TheTerrariaSeedProject.UI
                 "Free cavern to mid Jungle",
                 "Free cavern to deep Jungle",
                 "Jungle cavern not blocked by structure",
-                "Dungeon Distance",
+                "Dungeon Distance",                
                 "Temple Distance",
                 "Temple horizontal distance",
                 "Temple Tile horizontal distance",
@@ -721,6 +722,7 @@ namespace TheTerrariaSeedProject.UI
                 "Temple at height (%)",
                 "Temple at depth (%)",
                 "Open Temple",
+                "Mushroom Biome above surface count",
                 "neg. Pathlength to Temple Door",
                 "neg. Pathlength to Boots",
                 "neg. Pathlength to Iron/Lead Bar",
@@ -854,7 +856,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Very Near Enchanted Sword", v0to5);
             Add("Near Altar", v0to10);
             Add("Near Spider Web count", vNumTiles);
-            Add("Near Mushroom Biome count", vNumTiles);
+            Add("Near Mushroom Biome count", vNumTiles);            
             Add("Near Chest", v0to20);
             Add("Near Tree", v0to5);
             Add("Near Tree Chest", v0to5);
@@ -912,12 +914,13 @@ namespace TheTerrariaSeedProject.UI
             Add("Number noncraf. Statues", vStatuesTotal);
             Add("Floating Island without chest", v0to1);
             Add("Near Sunflower", v0to20);
-            Add("Nearest Teleportation Potion count", v0to5);
+            Add("Nearest Teleportation Potion count", v0to5);            
             Add("Free ShadowOrb/Heart", v0to5);
             Add("Free cavern to mid Jungle", v0to1);
             Add("Free cavern to deep Jungle", v0to1);
             Add("Jungle cavern not blocked by structure", v0to1);
             Add("Open Temple", v0to1);
+            Add("Mushroom Biome above surface count", vNumTiles);
 
             Add("neg. Pathlength to Temple Door", vPathLengthNeg);
             Add("neg. Pathlength to Boots", vPathLengthNeg);
