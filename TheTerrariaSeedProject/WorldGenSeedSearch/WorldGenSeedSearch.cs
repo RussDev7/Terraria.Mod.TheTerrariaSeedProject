@@ -1636,15 +1636,17 @@ namespace TheTerrariaSeedProject
             score.insertGenInfo(genInfo);
 
             //TODo better inclusion
-            localDungeonSide = Main.dungeonX < Main.spawnTileX ? -1 : 1;
+            localDungeonSide = Main.dungeonX < Main.maxTilesX / 2 ? -1 : 1; // changed from spawnx
             setDirectComputeValues();
 
+            const int oceanBiomeSizeX = 380; //from vanilla
 
             hasOBjectOrParam.Add("Max open air pyramid surface", 0);
             hasOBjectOrParam.Add("Max pyramid height", 0);
             hasOBjectOrParam.Add("Max pyramid tunnel height", 0);
             hasOBjectOrParam.Add("Max pyramid total height", 0);
             hasOBjectOrParam.Add("Max pyr. exit cav.-entr. distance", -100000);
+            hasOBjectOrParam.Add("Ocean Pyramid", 0);
 
             hasOBjectOrParam.Add("Enchanted Sword Shrine", 0);
             hasOBjectOrParam.Add("Enchanted Sword", 0);
@@ -1664,12 +1666,16 @@ namespace TheTerrariaSeedProject
 
             hasOBjectOrParam.Add("Cloud Chest", 0);
             hasOBjectOrParam.Add("Tree", 0);
-            hasOBjectOrParam.Add("Tree Chest", 0);        
-            hasOBjectOrParam.Add("Max Living Tree Size", 0);            
+            hasOBjectOrParam.Add("Tree Chest", 0);
+            hasOBjectOrParam.Add("Max Living Tree Size", 0);
             hasOBjectOrParam.Add("Min Living Tree Size", 0);
             hasOBjectOrParam.Add("Max Living Tree root Size", 0);
             hasOBjectOrParam.Add("Max Living Tree total Size", 0);
             hasOBjectOrParam.Add("Max Tree exit cav.-entr. distance", -100000);
+            hasOBjectOrParam.Add("Tree to cavern layer", 0);
+            hasOBjectOrParam.Add("Tree to cavern layer near mid", 0);
+            hasOBjectOrParam.Add("Tree close to cavern layer", 0);
+            hasOBjectOrParam.Add("Tree close to cavern layer near mid", 0);
 
             hasOBjectOrParam.Add("Trees near mid", 0);
             hasOBjectOrParam.Add("Tree chests near mid", 0);
@@ -1686,6 +1692,11 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Temple horizontal distance", 0);
             hasOBjectOrParam.Add("Temple Tile horizontal distance", 0);
             hasOBjectOrParam.Add("Temple Tile vertical distance", 0);
+            hasOBjectOrParam.Add("neg. Temple Distance", 0);
+            hasOBjectOrParam.Add("neg. Temple horizontal distance", 0);
+            hasOBjectOrParam.Add("neg. Temple Tile horizontal distance", 0);
+            hasOBjectOrParam.Add("neg. Temple Tile vertical distance", 0);
+
             hasOBjectOrParam.Add("Temple at player side of jungle (%)", 0);
             hasOBjectOrParam.Add("Temple at ocean side of jungle (%)", 0);
             hasOBjectOrParam.Add("Temple at height (%)", 0);
@@ -1734,6 +1745,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Pathlength to Cloud in a Bottle", 1000000);
             hasOBjectOrParam.Add("Pathlength to 2 Herb Bag Chest", 1000000);
             hasOBjectOrParam.Add("Pathlength to Extractinator", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Detonator", 1000000);
             hasOBjectOrParam.Add("Pathlength to Magic/Ice Mirror", 1000000);
             hasOBjectOrParam.Add("Pathlength to Chest", 1000000);
             hasOBjectOrParam.Add("Pathlength to Tree Chest", 1000000);
@@ -1784,6 +1796,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("neg. Pathlength to Cloud in a Bottle", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to 2 Herb Bag Chest", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Extractinator", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Detonator", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Magic/Ice Mirror", 1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Chest", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Tree Chest", -1000000);
@@ -1902,7 +1915,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Iron or Lead", score.ironOrLead.Equals("Iron") ? -1 : 1);
             hasOBjectOrParam.Add("Silver or Tungsten", score.silverOrTung.Equals("Silver") ? -1 : 1);
             hasOBjectOrParam.Add("Gold or Platinum", score.goldOrPlat.Equals("Gold") ? -1 : 1);
-                       
+
 
             hasOBjectOrParam.Add("Floating Island without chest", 0);//not scored
             hasOBjectOrParam.Add("Many Pyramids", 0);
@@ -1925,7 +1938,25 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Spear Trap", 0);
             hasOBjectOrParam.Add("Geyser", 0);
             hasOBjectOrParam.Add("Detonator", 0);
+            hasOBjectOrParam.Add("Detonator at surface", 0);
+            hasOBjectOrParam.Add("Green Pyramid", 0);
+            hasOBjectOrParam.Add("Lonely jungle tree", 0);
 
+            hasOBjectOrParam.Add("Wooden Chest", 0);
+            hasOBjectOrParam.Add("Wooden Chest Dungeon", 0);
+            hasOBjectOrParam.Add("Gold Chest", 0);
+            hasOBjectOrParam.Add("Gold Chest locked", 0);            
+            hasOBjectOrParam.Add("Ice Chest", 0);
+            hasOBjectOrParam.Add("Ivy Chest", 0);            
+            hasOBjectOrParam.Add("Water Chest", 0);
+            hasOBjectOrParam.Add("Skyware Chest", 0);
+            hasOBjectOrParam.Add("Web Covered Chest", 0);
+            hasOBjectOrParam.Add("Shadow Chest", 0);            
+            hasOBjectOrParam.Add("Lihzahrd Chest", 0);
+            hasOBjectOrParam.Add("Living Wood Chest", 0);
+
+
+            
 
             hasOBjectOrParam.Add("Score", 0);
 
@@ -1992,7 +2023,7 @@ namespace TheTerrariaSeedProject
 
 
             int[,] pathLength = null;
-
+            int mostSnowSideIvyChest = localDungeonSide < 0 ? Main.maxTilesX : 0;
 
             if (doFull)
             {
@@ -2000,14 +2031,14 @@ namespace TheTerrariaSeedProject
 
             }
 
-            
+
             //check chests
             for (int i = 0; i < 1000; i++)
             {
                 Chest chest = Main.chest[i];
-                if (chest != null )
+                if (chest != null)
                 {
-                    
+
                     //check if doubl chest
                     int cx = chest.x;
                     int cy = chest.y;
@@ -2041,7 +2072,7 @@ namespace TheTerrariaSeedProject
                         ((Main.tile[cx, cy - 1].active() && Main.tile[cx, cy - 1].type == TileID.ClosedDoor) ||
                         (Main.tile[cx + 1, cy - 1].active() && Main.tile[cx + 1, cy - 1].type == TileID.ClosedDoor) ||
                         !Main.tile[cx, cy + 2].active() || !Main.tile[cx + 1, cy + 2].active()
-                        ))                        
+                        ))
                     {
 
                         hasOBjectOrParam["Chest duplication Glitch"] += 1; //writeDebugFile("maybe found doubglitch (buggy) at " + cx + " " + cy + " in seed " + Main.ActiveWorldFileData.Seed + " can get overridden: " + (!doFull));
@@ -2052,7 +2083,7 @@ namespace TheTerrariaSeedProject
 
                     }
 
-                    
+
 
 
                     //TODO Grab distance trough walls not included yet,, edit: still not?
@@ -2137,6 +2168,63 @@ namespace TheTerrariaSeedProject
                         hasOBjectOrParam["Pathlength to Chest"] = pathl;
                     }
 
+                    if (doFull && chest.item[0] != null && Main.tile[cx, cy].frameY == 0)
+                    {
+                        
+                        if (Main.tile[cx, cy].frameX == 360)
+                        {
+                            hasOBjectOrParam["Ivy Chest"]++;
+                            if (localDungeonSide < 0)
+                                mostSnowSideIvyChest = Math.Min(mostSnowSideIvyChest, cx);
+                            else
+                                mostSnowSideIvyChest = Math.Max(mostSnowSideIvyChest, cx);
+                        }else if (Main.tile[cx, cy].frameX == 0)
+                        {
+                            if(chest.item[0].type == ItemID.GoldenKey)
+                                hasOBjectOrParam["Wooden Chest Dungeon"]++;
+                            else
+                                hasOBjectOrParam["Wooden Chest"]++;
+                        }
+                        else if (Main.tile[cx, cy].frameX == 36)
+                        {
+                            hasOBjectOrParam["Gold Chest"]++;
+                        }
+                        else if (Main.tile[cx, cy].frameX == 72)
+                        {
+                            hasOBjectOrParam["Gold Chest locked"]++;
+                        }
+                        else if (Main.tile[cx, cy].frameX == 396)
+                        {
+                            hasOBjectOrParam["Ice Chest"]++;
+                        }
+                        else if (Main.tile[cx, cy].frameX == 144)
+                        {
+                            hasOBjectOrParam["Shadow Chest"]++;
+                        }
+                        else if (Main.tile[cx, cy].frameX == 432)
+                        {
+                            hasOBjectOrParam["Living Wood Chest"]++;
+                        }
+                        else if (Main.tile[cx, cy].frameX == 468)
+                        {
+                            hasOBjectOrParam["Skyware Chest"]++;
+                        }
+                        else if (Main.tile[cx, cy].frameX == 540)
+                        {
+                            hasOBjectOrParam["Web Covered Chest"]++;
+                        }
+                        else if (Main.tile[cx, cy].frameX == 576)
+                        {
+                            hasOBjectOrParam["Lihzahrd Chest"]++;
+                        }
+                        else if (Main.tile[cx, cy].frameX == 612)
+                        {
+                            hasOBjectOrParam["Water Chest"]++;
+                        }
+
+
+                    }
+                    
 
                     for (int l = 0; l < 40; l++)
                     {
@@ -3354,8 +3442,15 @@ namespace TheTerrariaSeedProject
                             }
                             //Detonator
                             else if (tile.type == TileID.Detonator && tile.frameX == 0 && tile.frameX == 0)
-                            {
+                            {                                
                                 hasOBjectOrParam["Detonator"]++;
+                                if (pathLength[x+1,y] < hasOBjectOrParam["Pathlength to Detonator"])
+                                {
+                                    hasOBjectOrParam["Pathlength to Detonator"] = pathLength[x + 1, y];
+                                }
+                                if(y < Main.worldSurface)
+                                    hasOBjectOrParam["Detonator at surface"]++;
+
                             }
                             //Mushroom biome
                             else if (tile.type == TileID.MushroomGrass || tile.type == TileID.MushroomPlants || tile.type == TileID.MushroomTrees)
@@ -3468,7 +3563,11 @@ namespace TheTerrariaSeedProject
                                         score.itemLocation.Add(ItemID.Extractinator, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
 
                                 }
-                                                                
+                            }
+                            //green pyramid
+                            else if (Main.tile[x, y].type == TileID.Banners && Main.tile[x, y].frameY == 0 && Main.tile[x, y].wall == WallID.GrassUnsafe && (Main.tile[x, y].frameX == 72 || Main.tile[x, y].frameX == 90 || Main.tile[x, y].frameX == 108))
+                            {
+                                hasOBjectOrParam["Green Pyramid" ]= 1;
 
                             }
 
@@ -3476,10 +3575,10 @@ namespace TheTerrariaSeedProject
                             //Web
                             if (tile.wall == 62)
                             {
-                                if (checkIfNearSpawn(x, y, 150, 500))
-                                {
-                                    hasOBjectOrParam["Near Spider Web count"] += 1;
-                                }
+                            if (checkIfNearSpawn(x, y, 150, 500))
+                            {
+                                hasOBjectOrParam["Near Spider Web count"] += 1;
+                            }
 
                             }
 
@@ -3580,6 +3679,10 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["Max pyr. exit cav.-entr. distance"] = Math.Max(hasOBjectOrParam["Max pyr. exit cav.-entr. distance"], pinfo.Item3);
 
                 //writeDebugFile(seed + " " + stage + " p stats height:" + pinfo.Item1 + " tunnel:" + pinfo.Item2 + " total:" + (pinfo.Item1 + pinfo.Item2) + " dist:" + pinfo.Item3);
+
+                //check if pyramid is near ocean
+                if (pyrm.Item1 < oceanBiomeSizeX || pyrm.Item1 > Main.maxTilesX - oceanBiomeSizeX)
+                    hasOBjectOrParam["Ocean Pyramid"]++;
 
             }
 
@@ -3947,6 +4050,22 @@ namespace TheTerrariaSeedProject
                 ts.Hours, ts.Minutes, ts.Seconds,
                 ts.Milliseconds / 10);
 
+                if (localDungeonSide < 0)
+                {
+                    int val = Math.Min(leftmostCavernJungleTilex, leftmostSurfaceJungleTilex);
+                    if (val - mostSnowSideIvyChest > 100)
+                        hasOBjectOrParam["Lonely jungle tree"] = 1;
+                }
+                else
+                {
+                    int val = Math.Max(rightmostCavernJungleTilex, rightmostSurfaceJungleTilex);
+                    if (mostSnowSideIvyChest - val > 100)
+                        hasOBjectOrParam["Lonely jungle tree"] = 1;
+                }
+                    
+
+
+
 
                 int templeMidx = leftmostTempleTilex + ((rightmostTempleTilex - leftmostTempleTilex) / 2);
 
@@ -3968,7 +4087,9 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["Temple Tile horizontal distance"] = (localDungeonSide < 0) ? rightmostCavernJungleTilex - Main.spawnTileX : Main.spawnTileX - leftmostTempleTilex;
                 hasOBjectOrParam["Temple Tile vertical distance"] = Math.Abs(topmostTempleTiley - Main.spawnTileY);
 
-
+                hasOBjectOrParam["neg. Temple Tile horizontal distance"] = -hasOBjectOrParam["Temple Tile horizontal distance"];
+                hasOBjectOrParam["neg. Temple Tile vertical distance"] = -hasOBjectOrParam["Temple Tile vertical distance"];
+                
                 if (hasOBjectOrParam["Temple Distance"] == 0)
                 {
                     //no temple door
@@ -3976,6 +4097,8 @@ namespace TheTerrariaSeedProject
                     hasOBjectOrParam["Temple horizontal distance"] = Math.Abs(templeMidx - Main.spawnTileX);
                     hasOBjectOrParam["Open Temple"] = 1;
                 }
+                hasOBjectOrParam["neg. Temple Distance"] = -hasOBjectOrParam["Temple Distance"];
+                hasOBjectOrParam["neg. Temple horizontal distance"] = -hasOBjectOrParam["Temple horizontal distance"];
 
 
                 //################################################## use geninfo?
@@ -4112,6 +4235,8 @@ namespace TheTerrariaSeedProject
                                                                                 hasOBjectOrParam["Ice Mirror"] > 0 &&
                                                                                 hasOBjectOrParam["Flurry Boots"] > 0 &&
                                                                                 hasOBjectOrParam["Hermes Boots"] > 0 &&
+                                                                                hasOBjectOrParam["Shadow Chest"] > 4 &&  //ToDO more detailed
+                                                                                hasOBjectOrParam["Web Covered Chest"] > 0 &&  //ToDO more detailed
                                                                                 hasOBjectOrParam["Angel Statue placed"] + hasOBjectOrParam["Angel Statue chest"] > 0
                                                                                 ? 1 : 0);
                 //hasOBjectOrParam.Add("Has Alchemy, Sharpening, Enchanted",  );
@@ -4148,6 +4273,7 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["neg. Pathlength to Cloud in a Bottle"] = -hasOBjectOrParam["Pathlength to Cloud in a Bottle"];
                 hasOBjectOrParam["neg. Pathlength to 2 Herb Bag Chest"] = -hasOBjectOrParam["Pathlength to 2 Herb Bag Chest"];
                 hasOBjectOrParam["neg. Pathlength to Extractinator"] = -hasOBjectOrParam["Pathlength to Extractinator"];
+                hasOBjectOrParam["neg. Pathlength to Detonator"] = -hasOBjectOrParam["Pathlength to Detonator"];
                 hasOBjectOrParam["neg. Pathlength to Magic/Ice Mirror"] = -hasOBjectOrParam["Pathlength to Magic/Ice Mirror"];
                 hasOBjectOrParam["neg. Pathlength to Chest"] = -hasOBjectOrParam["Pathlength to Chest"];
                 hasOBjectOrParam["neg. Pathlength to Tree Chest"] = -hasOBjectOrParam["Pathlength to Tree Chest"];
@@ -5970,7 +6096,7 @@ namespace TheTerrariaSeedProject
             allScoreText += System.Environment.NewLine + "Score Sharpening Station " + (int)score;
 
 
-
+            
 
 
             //other rare stuff
@@ -6022,6 +6148,16 @@ namespace TheTerrariaSeedProject
 
             score += hasOBjectOrParam["Floating island cabin in Dungeon"] > 0 ? 420 : 0;
             if (hasOBjectOrParam["Floating island cabin in Dungeon"] > 0) allScoreText += System.Environment.NewLine + "Score Floating cabin in Dungeon " + (int)score;
+
+            score += hasOBjectOrParam["Detonator at surface"] > 0 ? 420* hasOBjectOrParam["Detonator at surface"] : 0;
+            if (hasOBjectOrParam["Detonator at surface"] > 0) allScoreText += System.Environment.NewLine + "Score Detonator at surface " + (int)score;
+
+            score += hasOBjectOrParam["Green Pyramid"] > 0 ? 420* hasOBjectOrParam["Green Pyramid"] : 0;
+            if (hasOBjectOrParam["Green Pyramid"] > 0) allScoreText += System.Environment.NewLine + "Score Green Pyramid " + (int)score;
+
+                   score += hasOBjectOrParam["Lonely jungle tree"] > 0 ? 777: 0;
+            if (hasOBjectOrParam["Lonely jungle tree"] > 0) allScoreText += System.Environment.NewLine + "Score Lonely jungle tree " + (int)score;
+            
 
 
             score += hasOBjectOrParam["Pre Skeletron Dungeon Chest Risky"] > 0 ? 100 * hasOBjectOrParam["Pre Skeletron Dungeon Chest Risky"] : 0;
@@ -6427,6 +6563,9 @@ namespace TheTerrariaSeedProject
             if (hasOBjectOrParam["Enchanted Sword near Pyramid"] - hasOBjectOrParam["Near Enchanted Sword near Pyramid"] > 0) strares += "_" + "ESnearPyramid";
             if (hasOBjectOrParam["Very Near Enchanted Sword"] - hasOBjectOrParam["Near Enchanted Sword near Tree"] - hasOBjectOrParam["Near Enchanted Sword near Pyramid"] > 0) strares += "_" + "VeryNearES";
             if (hasOBjectOrParam["Floating Island without chest"] > 0) strares += "_" + "CloudWithoutHouse";
+            if (hasOBjectOrParam["Detonator at surface"] > 0) strares += "_" + "DetonatorSurface";
+            if (hasOBjectOrParam["Green Pyramid"] > 0) strares += "_" + "GreenPyramid";
+            if (hasOBjectOrParam["Lonely jungle tree"] > 0) strares += "_" + "LonelyJungleTree";
             if (hasOBjectOrParam["All chest items you can't craft or fish"] > 0) strares += "_" + "AllChestItems";
             if (hasOBjectOrParam["Number of Pyramids"] > Main.maxTilesY / 600 + 1) strares += "_" + hasOBjectOrParam["Number of Pyramids"] + "Pyramids";
 
@@ -6512,19 +6651,37 @@ namespace TheTerrariaSeedProject
 
                 if (step >= 2)
                 {
-
-
-                    rares += checkAdd("Chest duplication Glitch");  //<--that might not find all int that step                    
-                    rares += checkAdd("Pre Skeletron Dungeon Chest Risky");
-                    rares += checkAdd("Pre Skeletron Dungeon Chest Grab");
+                    if (!omitRare.Contains(OptionsDict.GeneralOptions.omitBadRare) && !omitRare.Contains(OptionsDict.GeneralOptions.omitBaCRare))
+                    {
+                        rares += checkAdd("No Ocean");
+                    }
+                    if (!omitRare.Contains(OptionsDict.GeneralOptions.omitCommonRare) && !omitRare.Contains(OptionsDict.GeneralOptions.omitBaCRare))
+                    {
+                        rares += checkAdd("Chest duplication Glitch");  //<--that might not find all int that step                    
+                        
+                        rares += checkAdd("Pre Skeletron Dungeon Chest Grab");
+                    }
+                    else
+                    {
+                        if (hasOBjectOrParam["Pre Skeletron Muramasa Chest reachable"] > 0)
+                        {
+                            rares += checkAdd("Pre Skeletron Dungeon Chest Risky");
+                            rares += checkAdd("Pre Skeletron Dungeon Chest Grab");
+                        }
+                    }
+                    
+                    
                     rares += checkAdd("Biome Item in normal Chest"); //<--that might not find all int that step
-                    rares += checkAdd("No Ocean");
+                    
 
                     if (!omitRare.Contains("Omit " + "Dungeon has strange Pos"))
                     {
-                        rares += checkAdd("Dungeon in Snow Biome");
-                        rares += checkAdd("Dungeon far above surface");
-                        rares += checkAdd("Dungeon below ground");
+                        if (!omitRare.Contains(OptionsDict.GeneralOptions.omitCommonRare) && !omitRare.Contains(OptionsDict.GeneralOptions.omitBaCRare))
+                            rares += checkAdd("Dungeon in Snow Biome");
+                        if (!omitRare.Contains(OptionsDict.GeneralOptions.omitBadRare) && !omitRare.Contains(OptionsDict.GeneralOptions.omitBaCRare))
+                            rares += checkAdd("Dungeon far above surface");
+                        if ( (!omitRare.Contains(OptionsDict.GeneralOptions.omitBadRare) && !omitRare.Contains(OptionsDict.GeneralOptions.omitBaCRare)) || hasOBjectOrParam["Dungeon below ground tree"]>0 ) 
+                            rares += checkAdd("Dungeon below ground");
                     }
 
                     int pyramids = has(ref hasOBjectOrParam, ItemID.SandstorminaBottle) + has(ref hasOBjectOrParam, ItemID.PharaohsMask) + has(ref hasOBjectOrParam, ItemID.FlyingCarpet);
@@ -6536,25 +6693,30 @@ namespace TheTerrariaSeedProject
                 if (step >= 3)
                 {
                     //positive, check if can do in basic, do all in one?
-                    rares += checkAdd("Near Enchanted Sword");
+
+                    if (!omitRare.Contains(OptionsDict.GeneralOptions.omitCommonRare) && !omitRare.Contains(OptionsDict.GeneralOptions.omitBaCRare))
+                    {
+                        rares += checkAdd("Near Enchanted Sword");
+                        rares += checkAdd("Enchanted Sword near Tree");
+                        rares += checkAdd("Enchanted Sword near Pyramid");
+                        rares += checkAdd("Spawn in Snow biome");
+                    }
+
+                    if (!omitRare.Contains(OptionsDict.GeneralOptions.omitBadRare) && !omitRare.Contains(OptionsDict.GeneralOptions.omitBaCRare))
+                        rares += checkAdd("Floating Island without chest"); //bugged if you do large map first and small after they are forced to create
+                    
+
                     rares += checkAdd("Spawn in Sky");
-                    rares += checkAdd("Open Temple");
-
-                    rares += checkAdd("Enchanted Sword near Tree");
                     rares += checkAdd("Near Enchanted Sword near Tree");
-
-                    rares += checkAdd("Enchanted Sword near Pyramid");
                     rares += checkAdd("Near Enchanted Sword near Pyramid");
-
                     rares += checkAdd("Very Near Enchanted Sword");
-
                     rares += checkAdd("Spawn in Jungle biome");
-                    rares += checkAdd("Spawn in Snow biome");
-
                     rares += checkAdd("All chest items you can't craft or fish");
-
-                    rares += checkAdd("Floating Island without chest"); //bugged if you do large map first and small after they are forced to create
                     rares += checkAdd("Floating island cabin in Dungeon");
+                    rares += checkAdd("Detonator at surface");
+                    rares += checkAdd("Green Pyramid");
+                    rares += checkAdd("Lonely jungle tree");
+                    rares += checkAdd("Open Temple");
                 }
 
 
@@ -6617,7 +6779,7 @@ namespace TheTerrariaSeedProject
                 CheckAddItem("Spear Trap", "Spear Trap");
                 CheckAddItem("Geyser", "Geyser");
                 CheckAddItem("Detonator", "Detonator");
-
+                
 
                 CheckAddItem("Enchanted Sword", "Enchanted Sword");
 
@@ -7006,8 +7168,12 @@ namespace TheTerrariaSeedProject
                 int maxTreeRootSize = 0;
                 int maxTreeTotalSize = 0;
                 int maxDepth = -100000;
+                int deepCavernTreeNearMid = 0;
+                int deepCavernTree = 0;
+                int deepClostToCavernTreeNearMid = 0;
+                int deepClostToCavernTree = 0;
 
-                Func<int, int, bool> checkIfTree = (xt, yt) =>
+            Func<int, int, bool> checkIfTree = (xt, yt) =>
                 {
                     bool isTree = true;
 
@@ -7190,6 +7356,19 @@ namespace TheTerrariaSeedProject
                     maxTreeTotalSize = Math.Max(maxTreeTotalSize, treeRootSize + treeSize);
                     maxDepth = Math.Max(maxDepth, yEnd - (int)Main.rockLayer);
 
+                    if (yEnd + 43 > Main.rockLayer)
+                    {
+                        deepClostToCavernTree++;
+                        if (Math.Abs(Main.maxTilesX / 2 - treeX) < 300)
+                            deepClostToCavernTreeNearMid++;
+
+                        if (yEnd + 3 > Main.rockLayer)
+                        {
+                            deepCavernTree++;
+                            if (Math.Abs(Main.maxTilesX / 2 - treeX) < 300)
+                                deepCavernTreeNearMid++;
+                        }
+                    }
                 }
 
 
@@ -7206,7 +7385,10 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["Max Living Tree total Size"] = maxTreeTotalSize;
                 hasOBjectOrParam["Max Tree exit cav.-entr. distance"] = maxDepth;
 
-            
+                hasOBjectOrParam["Tree to cavern layer"] = deepCavernTree;
+                hasOBjectOrParam["Tree to cavern layer near mid"] = deepCavernTreeNearMid;
+                hasOBjectOrParam["Tree close to cavern layer"] = deepClostToCavernTree;
+                hasOBjectOrParam["Tree close to cavern layer near mid"] = deepClostToCavernTreeNearMid;
 
 
 
