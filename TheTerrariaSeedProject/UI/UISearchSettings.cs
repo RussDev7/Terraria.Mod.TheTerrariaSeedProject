@@ -280,7 +280,8 @@ namespace TheTerrariaSeedProject.UI
 
             Init();
             currentConfig = Configuration.GenerateConfiguration(infopanel.selectables);
-            
+            currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, OptionsDict.GeneralOptions.omitRareAll, "");
+            SetToConfiguration(currentConfig);
         }
 
         
@@ -999,8 +1000,7 @@ namespace TheTerrariaSeedProject.UI
             }            
         }
 
-
-
+      
         public void WriteTextToDescList() { 
             if(writeTextUpdating) return;
 

@@ -66,6 +66,10 @@ namespace TheTerrariaSeedProject.UI
             public const string naming = "Naming*";
             public const string omitRare = "OmitRare/";
             public const string omitRareAll = "Omit All";
+            public const string omitBaCRare = "Omit bad and more common rare";
+            public const string omitBadRare = "Omit bad rare";
+            public const string omitCommonRare = "Omit more common Rare";
+            
         }
 
         public static class Tools
@@ -121,9 +125,11 @@ namespace TheTerrariaSeedProject.UI
 
             public const string omitRareDescription = "Rares are as the name implies stuff which don’t happen that often during world generation, e.g. spawning at a floating island. If something rare got detected the map seed " +
                 "qualifies for complete generation without fulfilling the condition you made in the different phase sections. \n If you are looking for many different rares it gets quite common to find any of those. " +
-                "For that reason you can select rares here which you don’t want to grant access to full world generation anymore.  \n So even if the current seed has such a rare listed here, it still needs to fulfill the " +
+                "For that reason you can select rares here which you don’t want to grant access to full world generation anymore.  \n So even if the current seed has such a rare you listed here, it still needs to fulfill the " +
                 "other conditions you made. \n Some rares can only be detected during phase 3. So if a seed does not fulfill the conditions in phase 1 or 2 it won’t get detected. Same for phase 2 if phase 1 not fulfilled. " +
-                "It can’t detect any rare in phase 1.";
+                "It can’t detect any rare in phase 1. \n \n>> Omit All: no rare counts, each seed need to fulfill all conditions you set up \n>> Omit bad rare: omits no ocean, Dungeon far above surface or below ground " +
+                "(except there is also a living tree reaching to it), and also omits if a floating island got no chest \n>>Omit more common rare: omits Chest duplication Glitch, Pre Skeletron Dungeon Chest Risky/Grab " +
+                "(except its a Muramasa for NE), Dungeon in Snow Biome, Near Enchanted Sword, Enchanted Sword near Tree/Pyramid, Spawn in Snow biome \n>>Omit bad and more common rare: combines both";
 
 
 
@@ -163,14 +169,16 @@ namespace TheTerrariaSeedProject.UI
 
 
 
-
+        public static readonly List<string> v0to6 = getPatern(0, 6);
         public static readonly List<string> v0to10 = getPatern(0, 11);
         public static readonly List<string> v0to15 = getPatern(0, 16);
         public static readonly List<string> v0to20 = getPatern(0, 21);
         public static readonly List<string> v0to50 = getPatern(0, 51);
+        public static readonly List<string> v0to80 = getPatern(0, 81);
 
         public static readonly List<string> v0to100 = getPatern(0, 101);
         public static readonly List<string> v0to120 = getPatern(0, 121);
+        public static readonly List<string> v0to300_5 = getPatern(0, 61, 5);
         public static readonly List<string> v0to500_5 = getPatern(0, 101, 5);
         public static readonly List<string> v0to500_5_700_10 = getPatern(0, 100, 5).Concat(getPatern(500, 21, 10)).ToList();
         public static readonly List<string> v0to200_2 = getPatern(0, 101, 2);
@@ -185,7 +193,9 @@ namespace TheTerrariaSeedProject.UI
         public static readonly List<string> vDistance = getPatern(5, 4, 5).Concat(getPatern(25, 7, 25).Concat(getPatern(200, 4, 50).Concat(getPatern(400, 6, 100).Concat(getPatern(1000, 5, 200)).Concat(getPatern(2000, 9, 250))))).ToList();
         public static readonly List<string> vDistanceNeg = getPatern(-1000, 9, 100).Concat(getPatern(-100, 3, 25).Concat(getPatern(-25, 10, 5).Concat(getPatern(25, 3, 25).Concat(getPatern(100, 9, 100).Concat(getPatern(1000, 5, 200)).Concat(getPatern(2000, 9, 250)))))).ToList();
         public static readonly List<string> vDistanceShort = getPatern(25, 9, 25).Concat(getPatern(250, 4, 50)).Concat(getPatern(500, 16, 100)).ToList();
+        public static readonly List<string> vDistanceShortNeg = getPatern(-25, 9, -25).Concat(getPatern(-250, 4, -50)).Concat(getPatern(-500, 16, -100)).ToList();
         public static readonly List<string> vDistanceLong = getPatern(200, 8, 100).Concat(getPatern(1000, 17, 200)).ToList();
+        public static readonly List<string> vDistanceLongNeg = getPatern(-200, 8, -100).Concat(getPatern(-1000, 17, -200)).ToList();
         public static readonly List<string> vNumTiles = getPatern(0, 10, 10).Concat(getPatern(100, 9, 100)).Concat(getPatern(1000, 9, 1000).Concat(getPatern(10000, 9, 5000))).ToList();
         public static readonly List<string> vNumSearch = getPatern(1, 7).Concat(getPatern(10, 4, 5)).Concat(getPatern(50, 12, 0, 2, 5)).ToList();
         public static readonly List<string> vStepSize = (new string[] { "1000000000", "100000000", "10000000", "1000000", "100000", "10000", "1000", "100", "25", "10", "5", "3", "2", "1", "0", "-1", "-2", "-3", "-5", "-10", "-25", "-100", "-1000", "-10000", "-100000", "-1000000", "-10000000","-100000000", "-1000000000" }).ToList();
@@ -363,6 +373,9 @@ namespace TheTerrariaSeedProject.UI
             Add("Rares", vEmpty);
             Add(GeneralOptions.omitRare, new List<string> {
                 GeneralOptions.omitRareAll,
+                GeneralOptions.omitBaCRare,
+                GeneralOptions.omitBadRare,
+                GeneralOptions.omitCommonRare,
                 "Omit Chest duplication Glitch",
                 "Omit Dungeon has strange Pos",
                 "Omit Dungeon in Snow Biome",
@@ -385,6 +398,9 @@ namespace TheTerrariaSeedProject.UI
                 "Omit Spawn in Snow biome",
                 "Omit Floating Island without chest",
                 "Omit Open Temple",
+                "Omit Detonator at surface",
+                "Omit Green Pyramid",
+                "Omit Lonely jungle tree",
                 "Omit All chest items you can't craft or fish"
             });
                                     
@@ -419,15 +435,20 @@ namespace TheTerrariaSeedProject.UI
                 "Max pyramid tunnel height",
                 "Max pyramid total height",
                 "Max pyr. exit cav.-entr. distance",
+                "Ocean Pyramid",
                 "Tree Chest",
                 "Tree Chest Loom",
+                "Trees near mid",
+                "Tree chests near mid",
+                "Tree to cavern layer",
+                "Tree to cavern layer near mid",
+                "Tree close to cavern layer",
+                "Tree close to cavern layer near mid",
                 "Max Living Tree Size",
                 "Min Living Tree Size",
                 "Max Living Tree root Size",
                 "Max Living Tree total Size",
                 "Max Tree exit cav.-entr. distance",
-                "Trees near mid",
-                "Tree chests near mid",
                 "Lake near mid (guess)",
                 "Dungeon has good Pos",
                 "Dungeon has strange Pos",
@@ -522,27 +543,31 @@ namespace TheTerrariaSeedProject.UI
             });
 
             Add("Number of Pyramids", v0to10);
+            Add("Number of Clouds", v0to10);
+            Add("Number of Living Trees", v0to5);
+            Add("Pyramid Bottle", v0to5);
+            Add("Pyramid Carpet", v0to5);
+            Add("Pyramid Mask", v0to5);
             Add("Max open air pyramid surface", v0to200_2);            
             Add("Max pyramid height", v0to200_2);
             Add("Max pyramid tunnel height", v0to500_5);
             Add("Max pyramid total height", v0to500_5);
-            Add("Max pyr. exit cav.-entr. distance", vTreePyrExistCavernDist);
-            Add("Number of Clouds", v0to10);
-            Add("Number of Living Trees", v0to5);
+            Add("Max pyr. exit cav.-entr. distance", vTreePyrExistCavernDist);           
+            Add("Ocean Pyramid", v0to2);
+            Add("Tree Chest", v0to5);
+            Add("Tree Chest Loom", v0to5);
+            Add("Trees near mid", v0to5);
+            Add("Tree chests near mid", v0to5);
+            Add("Tree to cavern layer", v0to5);
+            Add("Tree to cavern layer near mid", v0to5);
+            Add("Tree close to cavern layer", v0to5);
+            Add("Tree close to cavern layer near mid", v0to5);
             Add("Max Living Tree Size", v0to120);
             Add("Min Living Tree Size", v0to120);
             Add("Max Living Tree root Size", v0to500_5);
             Add("Max Living Tree total Size", v0to500_5_700_10);
             Add("Max Tree exit cav.-entr. distance", vTreePyrExistCavernDist);
-            Add("Trees near mid", v0to5);
-            Add("Tree chests near mid", v0to5);
             Add("Lake near mid (guess)", v0to1);
-            
-            Add("Pyramid Bottle", v0to5);
-            Add("Pyramid Carpet", v0to5);
-            Add("Pyramid Mask", v0to5);
-            Add("Tree Chest", v0to5);
-            Add("Tree Chest Loom", v0to5);
             Add("Dungeon has good Pos", v0to1);
             Add("Dungeon has strange Pos", v0to1);
             Add("Dungeon in Snow Biome", v0to1);
@@ -613,10 +638,10 @@ namespace TheTerrariaSeedProject.UI
 
 
             //phase 3 content
-            Add(Phase3.positive, new List<string> {                
+            Add(Phase3.positive, new List<string> {
                 "Enchanted Sword Shrine",
                 "Enchanted Sword",
-                "Near Enchanted Sword",                
+                "Near Enchanted Sword",
                 "Enchanted Sword near Pyramid or Tree",
                 "Very Near Enchanted Sword",
                 "Near Sunflower",
@@ -657,7 +682,7 @@ namespace TheTerrariaSeedProject.UI
                 "Band of Regeneration",
                 "Shoe Spikes",
                 "Lava Charm",
-                "Water Walking Boots",                
+                "Water Walking Boots",
                 "All chest items you can't craft or fish",
                 "Aglet",
                 "Dart Trap",
@@ -666,7 +691,8 @@ namespace TheTerrariaSeedProject.UI
                 "Spiky Ball Trap",
                 "Spear Trap",
                 "Geyser",
-                "Detonator",                
+                "Detonator",
+                "Detonator at surface",
                 "Underground Distance to spawn",
                 "Cavern Distance to spawn",
                 "Meteorite Bar unlocked",
@@ -686,6 +712,10 @@ namespace TheTerrariaSeedProject.UI
                 "Temple horizontal distance",
                 "Temple Tile horizontal distance",
                 "Temple Tile vertical distance",
+                "neg. Temple Distance",
+                "neg. Temple horizontal distance",
+                "neg. Temple Tile horizontal distance",
+                "neg. Temple Tile vertical distance",
                 "Temple at player side of jungle (%)",
                 "Temple at ocean side of jungle (%)",
                 "Temple at height (%)",
@@ -712,12 +742,13 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Pathlength to Bee Hive",
                 "neg. Pathlength to Boomstick",
                 "neg. Pathlength to Slime Staute",
-                "neg. Pathlength to Shark Staute",                
+                "neg. Pathlength to Shark Staute",
                 "neg. Pathlength to Anvil",
                 "neg. Pathlength to Ruby",
                 "neg. Pathlength to Cloud in a Bottle",
                 "neg. Pathlength to 2 Herb Bag Chest",
                 "neg. Pathlength to Extractinator",
+                "neg. Pathlength to Detonator",
                 "neg. Pathlength to Magic/Ice Mirror",
                 "neg. Pathlength to Chest",
                 "neg. Pathlength to Tree Chest",
@@ -737,6 +768,18 @@ namespace TheTerrariaSeedProject.UI
                 "Spawn in Jungle biome",
                 "Spawn in Sky",
                 "Spawn in Evil biome",
+                "Wooden Chest",
+                "Wooden Chest Dungeon",
+                "Gold Chest",
+                "Gold Chest locked",
+                "Ice Chest", 
+                "Ivy Chest", 
+                "Water Chest", 
+                "Skyware Chest", 
+                "Web Covered Chest", 
+                "Shadow Chest", 
+                "Lihzahrd Chest", 
+                "Living Wood Chest", 
                 "Score",
                 OptionsDict.Tools.dummyPlus
                 });
@@ -749,6 +792,10 @@ namespace TheTerrariaSeedProject.UI
                 "Temple horizontal distance",
                 "Temple Tile horizontal distance",
                 "Temple Tile vertical distance",
+                "neg. Temple Distance",
+                "neg. Temple horizontal distance",
+                "neg. Temple Tile horizontal distance",
+                "neg. Temple Tile vertical distance",
                 "Temple at player side of jungle (%)",
                 "Temple at ocean side of jungle (%)",
                 "Temple at height (%)",
@@ -780,6 +827,7 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to Cloud in a Bottle",
                 "Pathlength to 2 Herb Bag Chest",
                 "Pathlength to Extractinator",
+                "Pathlength to Detonator",
                 "Pathlength to Magic/Ice Mirror",
                 "Pathlength to Chest",
                 "Pathlength to Tree Chest",                
@@ -851,6 +899,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Spear Trap", vSpearTrap);
             Add("Geyser", vGeyDetoTrap);
             Add("Detonator", vGeyDetoTrap);
+            Add("Detonator at surface", v0to5);
             Add("Meteorite Bar unlocked", v0to10);
             Add("Dungeon Distance", vDistanceLong);
             Add("Underground Distance to spawn", vDistanceShort);
@@ -898,6 +947,7 @@ namespace TheTerrariaSeedProject.UI
             Add("neg. Pathlength to Cloud in a Bottle", vPathLengthNeg);
             Add("neg. Pathlength to 2 Herb Bag Chest", vPathLengthNeg);
             Add("neg. Pathlength to Extractinator", vPathLengthNeg);
+            Add("neg. Pathlength to Detonator", vPathLengthNeg);
             Add("neg. Pathlength to Magic/Ice Mirror", vPathLengthNeg);
             Add("neg. Pathlength to Chest", vPathLengthNeg);
             Add("neg. Pathlength to Tree Chest", vPathLengthNeg);
@@ -944,6 +994,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Pathlength to Cloud in a Bottle", vPathLength);
             Add("Pathlength to 2 Herb Bag Chest", vPathLength);
             Add("Pathlength to Extractinator", vPathLength);
+            Add("Pathlength to Detonator", vPathLength);
             Add("Pathlength to Magic/Ice Mirror", vPathLength);
             Add("Pathlength to Chest", vPathLength);
             Add("Pathlength to Tree Chest", vPathLength);
@@ -962,6 +1013,11 @@ namespace TheTerrariaSeedProject.UI
             Add("Temple horizontal distance", vDistanceLong);
             Add("Temple Tile horizontal distance", vDistanceLong);
             Add("Temple Tile vertical distance", vDistanceShort);
+            Add("neg. Temple Distance", vDistanceLongNeg);
+            Add("neg. Temple horizontal distance", vDistanceLongNeg);
+            Add("neg. Temple Tile horizontal distance", vDistanceLongNeg);
+            Add("neg. Temple Tile vertical distance", vDistanceShortNeg);
+
             Add("Temple at player side of jungle (%)", v0to100);
             Add("Temple at ocean side of jungle (%)", v0to100);
             Add("Temple at height (%)", v0to100);
@@ -971,6 +1027,19 @@ namespace TheTerrariaSeedProject.UI
             Add("Spawn in Jungle biome", v0to1);            
             Add("Spawn in Sky", v0to1);
             Add("Spawn in Evil biome", v0to1);
+
+            Add("Wooden Chest", v0to100);
+            Add("Wooden Chest Dungeon", v0to20);
+            Add("Gold Chest", v0to300_5);
+            Add("Gold Chest locked", v0to50);
+            Add("Ice Chest", v0to80);
+            Add("Ivy Chest", v0to80);
+            Add("Water Chest", v0to50);
+            Add("Skyware Chest", v0to6);
+            Add("Web Covered Chest", v0to20);
+            Add("Shadow Chest", v0to20);
+            Add("Lihzahrd Chest", v0to20);
+            Add("Living Wood Chest", v0to5);
 
             Add("Score", vScore);
 

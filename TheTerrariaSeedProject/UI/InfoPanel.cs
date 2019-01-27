@@ -102,6 +102,8 @@ namespace TheTerrariaSeedProject.UI
                     (selt = this.AddSelectable(OptionsDict.SelectableList.name, OptionsDict.SelectableList.nameDescription)).setCustomColor(Color.LightGoldenrodYellow); break;
                 case listKindOmitRare:
                     (selt = this.AddSelectable(OptionsDict.SelectableList.omitRare, OptionsDict.SelectableList.omitRareDescription)).setCustomColor(Color.LightGoldenrodYellow); break;
+
+
                 default:
                     selt = this.AddSelectable("?VVVVVVV select VVVVVVV?", "here you can add what?"); break;
             }
