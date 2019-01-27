@@ -68,7 +68,7 @@ namespace TheTerrariaSeedProject.UI
             public const string omitRareAll = "Omit All";
             public const string omitBaCRare = "Omit bad and more common rare";
             public const string omitBadRare = "Omit bad rare";
-            public const string omitCommonRare = "Omit more common Rare";
+            public const string omitCommonRare = "Omit more common rare";
             
         }
 
