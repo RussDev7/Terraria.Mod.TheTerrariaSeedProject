@@ -3448,8 +3448,15 @@ namespace TheTerrariaSeedProject
                                 {
                                     hasOBjectOrParam["Pathlength to Detonator"] = pathLength[x + 1, y];
                                 }
-                                if(y < Main.worldSurface)
+                                if (y+12 < Main.worldSurface)
+                                {
                                     hasOBjectOrParam["Detonator at surface"]++;
+                                    writeDebugFile(" " + y + "  vs " + Main.worldSurface);
+                                    if(score.itemLocation.ContainsKey(ItemID.Detonator))
+                                        score.itemLocation[ItemID.Detonator] = new List<Tuple<int, int>> { new Tuple<int, int>(x, y) }; 
+                                    else
+                                        score.itemLocation.Add(ItemID.Detonator, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
+                                }
 
                             }
                             //Mushroom biome
