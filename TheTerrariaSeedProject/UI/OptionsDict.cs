@@ -129,7 +129,7 @@ namespace TheTerrariaSeedProject.UI
                 "other conditions you made. \n Some rares can only be detected during phase 3. So if a seed does not fulfill the conditions in phase 1 or 2 it won’t get detected. Same for phase 2 if phase 1 not fulfilled. " +
                 "It can’t detect any rare in phase 1. \n \n>> Omit All: no rare counts, each seed need to fulfill all conditions you set up \n>> Omit bad rare: omits no ocean, Dungeon far above surface or below ground " +
                 "(except there is also a living tree reaching to it), and also omits if a floating island got no chest \n>>Omit more common rare: omits Chest duplication Glitch, Pre Skeletron Dungeon Chest Risky/Grab " +
-                "(except its a Muramasa for NE), Dungeon in Snow Biome, Near Enchanted Sword, Enchanted Sword near Tree/Pyramid, Spawn in Snow biome \n>>Omit bad and more common rare: combines both";
+                "(except its a Muramasa for NE), Dungeon in Snow Biome, Near Enchanted Sword, Enchanted Sword near Tree/Pyramid, Spawn in Snow biome, Lonely jungle tree \n>>Omit bad and more common rare: combines both";
 
 
 
@@ -709,12 +709,12 @@ namespace TheTerrariaSeedProject.UI
                 "Free cavern to deep Jungle",
                 "Jungle cavern not blocked by structure",
                 "Dungeon Distance",                
-                "Temple Distance",
-                "Temple horizontal distance",
+                "Temple door distance",
+                "Temple door horizontal distance",
                 "Temple Tile horizontal distance",
                 "Temple Tile vertical distance",
-                "neg. Temple Distance",
-                "neg. Temple horizontal distance",
+                "neg. Temple door distance",
+                "neg. Temple door horizontal distance",
                 "neg. Temple Tile horizontal distance",
                 "neg. Temple Tile vertical distance",
                 "Temple at player side of jungle (%)",
@@ -790,12 +790,12 @@ namespace TheTerrariaSeedProject.UI
                 "Underground Distance to spawn",
                 "Cavern Distance to spawn",
                 "Dungeon Distance",
-                "Temple Distance",
-                "Temple horizontal distance",
+                "Temple door distance",
+                "Temple door horizontal distance",
                 "Temple Tile horizontal distance",
                 "Temple Tile vertical distance",
-                "neg. Temple Distance",
-                "neg. Temple horizontal distance",
+                "neg. Temple door distance",
+                "neg. Temple door horizontal distance",
                 "neg. Temple Tile horizontal distance",
                 "neg. Temple Tile vertical distance",
                 "Temple at player side of jungle (%)",
@@ -1012,12 +1012,12 @@ namespace TheTerrariaSeedProject.UI
             Add("Pathlength to cavern entrance to deep Jungle", vPathLength);
             Add("Tiles to mine for deep Jungle cavern", vTilesToMine);
 
-            Add("Temple Distance", vDistanceLong);            
-            Add("Temple horizontal distance", vDistanceLong);
+            Add("Temple door distance", vDistanceLong);            
+            Add("Temple door horizontal distance", vDistanceLong);
             Add("Temple Tile horizontal distance", vDistanceLong);
             Add("Temple Tile vertical distance", vDistanceShort);
-            Add("neg. Temple Distance", vDistanceLongNeg);
-            Add("neg. Temple horizontal distance", vDistanceLongNeg);
+            Add("neg. Temple door distance", vDistanceLongNeg);
+            Add("neg. Temple door horizontal distance", vDistanceLongNeg);
             Add("neg. Temple Tile horizontal distance", vDistanceLongNeg);
             Add("neg. Temple Tile vertical distance", vDistanceShortNeg);
 

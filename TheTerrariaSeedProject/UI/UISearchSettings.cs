@@ -845,7 +845,7 @@ namespace TheTerrariaSeedProject.UI
                     currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Staff of Regrowth", "1");
                     currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Flower Boots", "1");
 
-                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Temple Distance", (Main.maxTilesX / 16 * 6).ToString() );                    
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Temple door distance", (Main.maxTilesX / 16 * 6).ToString() );                    
                 }
                 else if (currentPositive == 4)
                 {
@@ -901,7 +901,7 @@ namespace TheTerrariaSeedProject.UI
                     currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Flower Boots", "1");
                     //currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListPositive, "Aglet", "1");
 
-                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Temple horizontal distance", (Main.maxTilesX / 16 * 3).ToString());
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Temple door horizontal distance", (Main.maxTilesX / 16 * 3).ToString());
                     currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Temple at depth (%)", "30");
                     //currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Pathlength to Boots", "1300");
                     
@@ -976,7 +976,7 @@ namespace TheTerrariaSeedProject.UI
 
                     
                     currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Dungeon Distance", (Main.maxTilesX / 16 * 6).ToString());
-                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Temple Distance", (Main.maxTilesX / 16 * 6).ToString());
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Temple door distance", (Main.maxTilesX / 16 * 6).ToString());
                     currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Pathlength to Boots", "1000" );
                     currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Pathlength to Iron/Lead Bar", "1000");
                     currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Pathlength to Gold/Platinum", "1000");
