@@ -1688,12 +1688,12 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Water Bolt before Skeletron", 0);
             hasOBjectOrParam.Add("Water Bolt", 0);
 
-            hasOBjectOrParam.Add("Temple Distance", 0);
-            hasOBjectOrParam.Add("Temple horizontal distance", 0);
+            hasOBjectOrParam.Add("Temple door distance", 0);
+            hasOBjectOrParam.Add("Temple door horizontal distance", 0);
             hasOBjectOrParam.Add("Temple Tile horizontal distance", 0);
             hasOBjectOrParam.Add("Temple Tile vertical distance", 0);
-            hasOBjectOrParam.Add("neg. Temple Distance", 0);
-            hasOBjectOrParam.Add("neg. Temple horizontal distance", 0);
+            hasOBjectOrParam.Add("neg. Temple door distance", 0);
+            hasOBjectOrParam.Add("neg. Temple door horizontal distance", 0);
             hasOBjectOrParam.Add("neg. Temple Tile horizontal distance", 0);
             hasOBjectOrParam.Add("neg. Temple Tile vertical distance", 0);
 
@@ -3226,8 +3226,8 @@ namespace TheTerrariaSeedProject
                             //Temple Door
                             if (tile.type == TileID.ClosedDoor && tile.frameY == 612)
                             {
-                                hasOBjectOrParam["Temple Distance"] = getDistanceToSpawn(x, y);
-                                hasOBjectOrParam["Temple horizontal distance"] = Math.Abs(x - Main.spawnTileX);
+                                hasOBjectOrParam["Temple door distance"] = getDistanceToSpawn(x, y);
+                                hasOBjectOrParam["Temple door horizontal distance"] = Math.Abs(x - Main.spawnTileX);
 
                                 int pathl = FindShortestPathInRange(ref pathLength, x, y, 1, 1, 1, 1);
                                 if (pathl < hasOBjectOrParam["Pathlength to Temple Door"])
@@ -4111,22 +4111,23 @@ namespace TheTerrariaSeedProject
                 ratio = (int)(diff / (Main.maxTilesY - Main.rockLayer - 200) * 100.0f);
                 hasOBjectOrParam["Temple at height (%)"] = 100 - ratio;
                 hasOBjectOrParam["Temple at depth (%)"] = ratio;
-    
-                hasOBjectOrParam["Temple Tile horizontal distance"] = (localDungeonSide < 0) ? rightmostCavernJungleTilex - Main.spawnTileX : Main.spawnTileX - leftmostTempleTilex;
+                
+
+                hasOBjectOrParam["Temple Tile horizontal distance"] = (localDungeonSide < 0) ? leftmostTempleTilex - Main.spawnTileX : Main.spawnTileX - rightmostTempleTilex;
                 hasOBjectOrParam["Temple Tile vertical distance"] = Math.Abs(topmostTempleTiley - Main.spawnTileY);
 
                 hasOBjectOrParam["neg. Temple Tile horizontal distance"] = -hasOBjectOrParam["Temple Tile horizontal distance"];
                 hasOBjectOrParam["neg. Temple Tile vertical distance"] = -hasOBjectOrParam["Temple Tile vertical distance"];
                 
-                if (hasOBjectOrParam["Temple Distance"] == 0)
+                if (hasOBjectOrParam["Temple door distance"] == 0)
                 {
                     //no temple door
-                    hasOBjectOrParam["Temple Distance"] = getDistanceToSpawn(templeMidx, templeMidy);
-                    hasOBjectOrParam["Temple horizontal distance"] = Math.Abs(templeMidx - Main.spawnTileX);
+                    hasOBjectOrParam["Temple door distance"] = getDistanceToSpawn(templeMidx, templeMidy);
+                    hasOBjectOrParam["Temple door horizontal distance"] = Math.Abs(templeMidx - Main.spawnTileX);
                     hasOBjectOrParam["Open Temple"] = 1;
                 }
-                hasOBjectOrParam["neg. Temple Distance"] = -hasOBjectOrParam["Temple Distance"];
-                hasOBjectOrParam["neg. Temple horizontal distance"] = -hasOBjectOrParam["Temple horizontal distance"];
+                hasOBjectOrParam["neg. Temple door distance"] = -hasOBjectOrParam["Temple door distance"];
+                hasOBjectOrParam["neg. Temple door horizontal distance"] = -hasOBjectOrParam["Temple door horizontal distance"];
 
 
                 //################################################## use geninfo?
@@ -5997,13 +5998,13 @@ namespace TheTerrariaSeedProject
 
             allScoreText += System.Environment.NewLine + "Score DungDist " + (int)score;
 
-            score += hasOBjectOrParam["Temple Distance"] < 600 ? 0.5 * (600 - hasOBjectOrParam["Temple Distance"]) : 0;//todo dist to open entrance not door
-            score += hasOBjectOrParam["Temple Distance"] < 750 ? 100 : 0;
-            score += hasOBjectOrParam["Temple Distance"] < 850 ? 40 : 0;
-            score += hasOBjectOrParam["Temple Distance"] < 900 ? 10 : 0;
-            score += hasOBjectOrParam["Temple Distance"] > 1350 ? -80 : 0;
+            score += hasOBjectOrParam["Temple door distance"] < 600 ? 0.5 * (600 - hasOBjectOrParam["Temple door distance"]) : 0;//todo dist to open entrance not door
+            score += hasOBjectOrParam["Temple door distance"] < 750 ? 100 : 0;
+            score += hasOBjectOrParam["Temple door distance"] < 850 ? 40 : 0;
+            score += hasOBjectOrParam["Temple door distance"] < 900 ? 10 : 0;
+            score += hasOBjectOrParam["Temple door distance"] > 1350 ? -80 : 0;
 
-            int dpf = (hasOBjectOrParam["Temple Distance"] * 2 * 100) / hasOBjectOrParam["Pathlength to Temple Door"];
+            int dpf = (hasOBjectOrParam["Temple door distance"] * 2 * 100) / hasOBjectOrParam["Pathlength to Temple Door"];
             score += (dpf - 100);
 
             allScoreText += System.Environment.NewLine + "Score TempleDistPath " + (int)score;
@@ -6186,7 +6187,7 @@ namespace TheTerrariaSeedProject
             score += hasOBjectOrParam["Green Pyramid"] > 0 ? 420* hasOBjectOrParam["Green Pyramid"] : 0;
             if (hasOBjectOrParam["Green Pyramid"] > 0) allScoreText += System.Environment.NewLine + "Score Green Pyramid " + (int)score;
 
-                   score += hasOBjectOrParam["Lonely jungle tree"] > 0 ? 777: 0;
+                   score += hasOBjectOrParam["Lonely jungle tree"] > 0 ? 420: 0;
             if (hasOBjectOrParam["Lonely jungle tree"] > 0) allScoreText += System.Environment.NewLine + "Score Lonely jungle tree " + (int)score;
             
 
@@ -6731,6 +6732,7 @@ namespace TheTerrariaSeedProject
                         rares += checkAdd("Enchanted Sword near Tree");
                         rares += checkAdd("Enchanted Sword near Pyramid");
                         rares += checkAdd("Spawn in Snow biome");
+                        rares += checkAdd("Lonely jungle tree");
                     }
 
                     if (!omitRare.Contains(OptionsDict.GeneralOptions.omitBadRare) && !omitRare.Contains(OptionsDict.GeneralOptions.omitBaCRare))
@@ -6745,8 +6747,7 @@ namespace TheTerrariaSeedProject
                     rares += checkAdd("All chest items you can't craft or fish");
                     rares += checkAdd("Floating island cabin in Dungeon");
                     rares += checkAdd("Detonator at surface");
-                    rares += checkAdd("Green Pyramid");
-                    rares += checkAdd("Lonely jungle tree");
+                    rares += checkAdd("Green Pyramid");                    
                     rares += checkAdd("Open Temple");
                 }
 
