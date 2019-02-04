@@ -19,32 +19,37 @@ namespace TheTerrariaSeedProject.UI
         public string fulltext;
         public List<UITextPhrase> entryList; // todo needed?
 
-        UISearchSettings uiss;
+        public UISearchSettings uiss; //made to public
 
+        public float maxSize;
 
         public UIListDescription(UISearchSettings uiss, float alignWidth = 100)
         {
             lastInd = 0; 
             fulltext = "";
             entryList = new List<UITextPhrase>();
-            this.SetPadding(4);
+            this.SetPadding(0);
+            this.MarginLeft = 0;
+            this.MarginRight = 0;
             this.alignWidth = alignWidth;
-            this.uiss = uiss;           
-                
+            this.uiss = uiss;
+            this.maxSize = 0;
+
+
         }
 
-
+        
         public void SetAlignWidth(float alignWidth)
         {
             this.alignWidth = alignWidth;
         }
 
-        public void AddText(string text, bool isReshape = false)
+        public void AddText(string text, bool isReshape = false, bool isList = false)
         {
             isUpdating = true;
         
             String[] lines = text.Split('\n');
-
+            maxSize = 0;
 
 
             for (int lineInd = 0; lineInd < lines.Length; lineInd++)
@@ -70,7 +75,7 @@ namespace TheTerrariaSeedProject.UI
 
 
 
-                    if (line.Length > 0 && line[0] == '@' && uiss.iconDict.ContainsKey(line))
+                    if (uiss!=null && line.Length > 0 && line[0] == '@' && uiss.iconDict.ContainsKey(line))
                     {
                         icon = uiss.iconDict[line];
                         line = "";
@@ -86,9 +91,11 @@ namespace TheTerrariaSeedProject.UI
                         UITextPhrase entry = new UITextPhrase(lastInd, line, icon);
                     entry.uitext.HAlign = 0;
 
+
                     entry.uitext.SetText(line);
-                    float wi = (entry.uitext.GetDimensions()).Width + iconwith; 
-                    if (wi > alignWidth)
+                    float wi = (entry.uitext.GetDimensions()).Width + iconwith;
+                    maxSize = Math.Max(maxSize, wi);
+                    if (wi > alignWidth && !isList)
                     {
                         if (lastline.Equals(""))
                         {
@@ -130,7 +137,7 @@ namespace TheTerrariaSeedProject.UI
             isUpdating = false; ;
         }
 
-        public void Rephrase(float alignWidth)
+        public void Rephrase(float alignWidth, bool isList=false)
         {
             //if (isUpdating ) return;
             //List<string> newFulltext = fulltext.ToList();
@@ -141,7 +148,7 @@ namespace TheTerrariaSeedProject.UI
             entryList.Clear();
 
             //foreach (string line in newFulltext)
-           AddText(fulltext, true);
+           AddText(fulltext, true, isList);
             //fulltext = newFulltext;
 
         }
@@ -158,25 +165,29 @@ namespace TheTerrariaSeedProject.UI
 
         }
 
-        public void UpdateText(List<string> newText)
+        public void UpdateText(List<string> newText, bool isList = true)
         {
+            if (newText.Count < 2) isList = false; //TODO something better ###############################
+
             isUpdating = true;
             ClearCurrent();
 
             foreach (string line in newText)
                 fulltext += "\n" + line;
-            Rephrase(alignWidth);
+            Rephrase(alignWidth, isList);
             isUpdating = false;
 
         }
         
-        public void UpdateText(string[] newText)
+        public void UpdateText(string[] newText, bool isList = true)
         {
+            if (newText.Length < 2) isList = false; //TODO something better ###############################
+
             isUpdating = true;
             ClearCurrent();
             foreach (string line in newText)
                 fulltext += "\n" + line;
-            Rephrase(alignWidth);
+            Rephrase(alignWidth, isList);
             isUpdating = false;
         }
         

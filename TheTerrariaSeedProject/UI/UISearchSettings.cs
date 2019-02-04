@@ -38,6 +38,8 @@ namespace TheTerrariaSeedProject.UI
         public UIPanel detailsPanel;
         public UIListDescription detailsList;
 
+        public UIPanel helpPanel;
+
         public UIImageButton searchButton;
         public UIImageButton optionsButton;
         public UIImageButton stopButton;
@@ -45,12 +47,13 @@ namespace TheTerrariaSeedProject.UI
         public UIImageButton configLoadButton;
         public UIImageButton configSaveButton;
         public UIImageButton clearButton;
+        public UIImageButton helpButton;
 
         public UIScrollbar optionListScrollbar;
         public UIScrollbar detailsListScrollbar;
         public float currentSize = 0;
 
-        WorldGenSeedSearch wgss;
+        public WorldGenSeedSearch wgss; //made to public
         public OptionsDict opdict;
         public InfoPanel infopanel;
 
@@ -70,6 +73,7 @@ namespace TheTerrariaSeedProject.UI
             public const string positive = "@iconPositive";
             public const string reset = "@iconReset";
             public const string stop = "@iconStop";
+            public const string help = "@iconHelp";
         }
 
 
@@ -115,11 +119,11 @@ namespace TheTerrariaSeedProject.UI
             iconDict.Add(IconNames.positive, mod.GetTexture("positive"));
             iconDict.Add(IconNames.reset, Main.trashTexture);
             iconDict.Add(IconNames.stop, mod.GetTexture("stop"));
+            iconDict.Add(IconNames.help, mod.GetTexture("help"));//
 
-            
             searchButton = new UIImageButton(mod.GetTexture("search"));
             optionsButton = new UIImageButton(mod.GetTexture("options"));
-
+          
 
             configLoadButton = new UIImageButton(mod.GetTexture("configLoad"));
             configSaveButton = new UIImageButton(mod.GetTexture("configSave"));
@@ -130,8 +134,30 @@ namespace TheTerrariaSeedProject.UI
 
             stopButton = new UIImageButton(mod.GetTexture("stop"));
 
-            
+            helpButton = new UIImageButton(mod.GetTexture("help"));
 
+            float spacing = 3f;
+
+
+            helpPanel = new UIPanel();
+            helpPanel.SetPadding(5);
+            helpPanel.HAlign = 0.0f;
+            helpPanel.VAlign = 0.25f;
+            helpPanel.Top.Pixels = -2*spacing - helpButton.Height.Pixels*2;
+            helpPanel.Left.Pixels = 20;                    
+            helpPanel.BackgroundColor = new Color(73, 94, 171);
+            helpPanel.Width.Set(helpButton.Width.Pixels + 2*spacing + helpPanel.PaddingLeft + helpPanel.PaddingRight, 0f);
+            helpPanel.Height.Set(helpButton.Height.Pixels + 2 * spacing + helpPanel.PaddingTop + helpPanel.PaddingBottom, 0f);           
+
+            helpButton.Left.Pixels = spacing;
+            helpButton.OnClick += helpClick;
+
+            helpButton.OnMouseOver += helpHoverIn;
+            helpButton.OnMouseOut += helpHoverOut;
+
+            helpPanel.Append(helpButton);
+            Append(helpPanel);
+            
 
             detailsPanel = new UIPanel();
             detailsPanel.SetPadding(5);
@@ -199,7 +225,7 @@ namespace TheTerrariaSeedProject.UI
 
             Append(optionPanel);
 
-            float spacing = 3f;
+            
             int spacingVFac = 4;
             buttonPanel = new UIPanel();
             buttonPanel.SetPadding(0);
@@ -215,7 +241,7 @@ namespace TheTerrariaSeedProject.UI
             buttonPanel.Append(searchButton);
             searchButton.OnClick += searchClick;
             searchButton.Left.Pixels = spacing;
-            searchButton.Top.Pixels = totalSpace;
+            searchButton.Top.Pixels = totalSpace;            
             totalSpace += spacing * spacingVFac + 32;
 
             buttonPanel.Append(optionsButton);
@@ -278,10 +304,14 @@ namespace TheTerrariaSeedProject.UI
             base.Append(this.progressBar);
             base.Append(this.progressMessage);
 
+            hoverUI = new HoverItem(this);
+
             Init();
             currentConfig = Configuration.GenerateConfiguration(infopanel.selectables);
             currentConfig.InsertSelectableText(0, Configuration.ConfigItemType.SelectableListOmitRare, OptionsDict.GeneralOptions.omitRareAll, "");
             SetToConfiguration(currentConfig);
+
+            
         }
 
         
@@ -329,7 +359,7 @@ namespace TheTerrariaSeedProject.UI
             addDictToInfo(OptionsDict.Phase1.hallowSide).SetValue("Random");
             addDictToInfo(OptionsDict.Phase1.dungeonWallColor).SetValue("Random");
             addDictToInfo(OptionsDict.Phase1.dungeonSide).SetValue("Random");
-
+            addDictToInfo(OptionsDict.Phase1.boost).SetValue("10");
 
 
             addFreeLine();
@@ -347,7 +377,9 @@ namespace TheTerrariaSeedProject.UI
 
 
             InitCountText();
-            writtenText = "";                       
+            writtenText = "";
+
+            
 
         }
 
@@ -517,7 +549,7 @@ namespace TheTerrariaSeedProject.UI
 
         public bool rephrasing = false;
         int lastOptionSize = 0;
-
+               
         public override void Update(GameTime gameTime)
         {
             if (detailsList != null && detailsPanel != null && detailsListScrollbar != null && !writeTextUpdating)
@@ -526,6 +558,7 @@ namespace TheTerrariaSeedProject.UI
                 {                    
                     rephrasing = true;
                     writeText = true;
+
                     float currentSize = getDescListWith();
                     detailsList.fulltext = writtenStats + Environment.NewLine + writtenText; //if alawys true
 
@@ -559,8 +592,25 @@ namespace TheTerrariaSeedProject.UI
                     //WorldGenSeedSearch.writeDebugFile(" updated size to " + lastOptionSize);
                 }
 
+                if (infopanel != null && hoverUI != null)
+                {
+                    if (hoverUI.waitTime > 0 )
+                    {
+                        hoverUI.waitTime -= gameTime.ElapsedGameTime.TotalSeconds;
+                        if ( (hoverUI.waitTime <= 0 && hoverUI.doUpdate) || hoverUI.hoverTitleNew.Length == 0 ) 
+                        {
+                            //hoverUI.doUpdate = true; //not needed, with those active it can happen ui does not go a away if you move close to border
+                            hoverUI.Update(); 
+                        }                       
+                    }
+                }
+                
+
                 if (this.progressBar!=null && lastProgessMargin != this.progressBar.MarginBottom)
                     this.Recalculate(); //something goes wrong herre with overhaul mod
+
+                                
+
 
             }
         }
@@ -719,6 +769,23 @@ namespace TheTerrariaSeedProject.UI
                     SetToConfiguration(config);
             }
         }
+
+        private void helpClick(UIMouseEvent evt, UIElement listeningElement)
+        {
+            if (!wgss.searchForSeed && opdict!=null)
+            {
+                string help = opdict.HelpDict[OptionsDict.Help.helpBut];
+                if (writeTextUpdating) return;
+
+                writeTextUpdating = true;
+                detailsList.Clear();
+                detailsList.UpdateText(help);
+                writeTextUpdating = false;
+
+            }
+        }
+
+
 
         int currentPositive = 0;
         private void positiveClick(UIMouseEvent evt, UIElement listeningElement)
@@ -1117,6 +1184,167 @@ namespace TheTerrariaSeedProject.UI
 
 
         }
+
+        HoverItem hoverUI = null;
+        class HoverItem
+        {
+            const int hoverInforBoxWidth = 500;
+            public UIPanel hoverInfo =null;            
+            UIListDescription elements = null;
+            UISearchSettings uiss = null;
+
+            const int mysteriousExtraSpace = 4;
+            public HoverItem(UISearchSettings uiss)
+            {
+                this.uiss = uiss;
+                hoverInfo = new UIPanel();
+                hoverInfo.SetPadding(6);
+                hoverInfo.PaddingBottom = 0;
+                hoverInfo.MarginLeft = 13370;
+                hoverInfo.MarginRight = 0;
+                hoverInfo.HAlign = 0;
+                hoverInfo.VAlign = 0;
+
+
+                elements = new UIListDescription(null, hoverInforBoxWidth);
+                elements.Width.Set(0, 1f);
+                elements.Height.Set(0f, 1f);
+                elements.ListPadding = 12f;
+                elements.MarginLeft = 0;
+                elements.MarginRight = 0;
+                elements.PaddingLeft = 0;
+                elements.PaddingRight = 0;
+
+
+                hoverInfo.Append(elements);
+                uiss.Append(hoverInfo);
+            }
+
+            public string hoverTitleCurrent = "abc";
+            public string hoverTitleNew = "";
+            public float locX = 0;
+            public float locY = 0;
+            public float offY = 0;
+
+            public bool doUpdate = false;
+            public double waitTime = 0;
+
+            public void Update()
+            {
+                string newTitle = hoverTitleNew;
+                string descText = newTitle;
+                bool containsNeg = false;
+                bool containsPathlength = false;
+                bool containsDistance = false;
+                waitTime = 0;
+                
+
+
+                if (descText.Contains("neg. "))
+                {
+                    containsNeg = true;
+                    descText = descText.Substring(("neg. ").Length);
+                }
+                else if (descText.Contains("Omit ") && !uiss.opdict.HelpDict.ContainsKey(descText))
+                {
+                    descText = descText.Substring(("Omit ").Length);
+                }
+                if (descText.Contains(OptionsDict.Phase3.pathlength))
+                {
+                    containsPathlength = true;
+                }
+                else if (descText.Contains(OptionsDict.GeneralOptions.distance) || descText.Contains(OptionsDict.GeneralOptions.distanceS))
+                {
+                    containsDistance = true;
+                }
+
+                if (newTitle.Length == 0 || descText.Length == 0 || uiss.opdict == null || uiss.opdict.HelpDict == null || (!uiss.opdict.HelpDict.ContainsKey(descText) && !containsNeg && !containsPathlength && !containsDistance))
+                {
+                    if (hoverInfo != null)
+                    {
+                        hoverInfo.MarginLeft = (hoverInfo.MarginLeft % 100000) + 100000;
+                        doUpdate = true;
+                    }
+                    hoverTitleCurrent = newTitle;
+                    //WorldGenSeedSearch.writeDebugFile(" it is 0 ");
+
+                    return;
+                }
+
+
+                if (uiss.opdict.HelpDict.ContainsKey(descText))
+                    descText = uiss.opdict.HelpDict[descText];
+                else
+                    descText = newTitle;
+                if (containsPathlength)
+                    descText += (descText.Length != 0 ? " \n" : "") + uiss.opdict.HelpDict[OptionsDict.Phase3.pathlength];
+                else if (containsDistance)
+                    descText += (descText.Length != 0 ? " \n" : "") + uiss.opdict.HelpDict[OptionsDict.GeneralOptions.distance];
+                if (containsNeg)
+                    descText += (descText.Length != 0 ? " \n" : "") + uiss.opdict.HelpDict["neg. "];
+
+
+                float totalH = uiss.GetOuterDimensions().Height;
+                float totalW = uiss.GetOuterDimensions().Width;
+                float mX = locX;
+                float mY = locY;
+
+                float panelWidth = hoverInforBoxWidth + hoverInfo.PaddingLeft + hoverInfo.PaddingRight + mysteriousExtraSpace;
+                hoverInfo.Width.Set(panelWidth, 0);
+                //hoverInfo.BackgroundColor = new Color(73, 94, 171);
+                hoverInfo.BackgroundColor = new Color(88, 109, 186);
+                hoverInfo.MarginLeft = mX - (mX > totalW - panelWidth ? panelWidth - (totalW - mX) : 0);
+                
+                elements.UpdateText(descText);
+                elements.Recalculate();
+                float boxH = elements.GetTotalHeight() + hoverInfo.PaddingTop + hoverInfo.PaddingBottom;
+                hoverInfo.Height.Set(boxH, 0);
+                hoverInfo.MarginTop = mY + ((mY > totalH - boxH) ? -offY - 0.5f * elements.ListPadding - boxH : offY + 0.5f * elements.ListPadding);
+
+                if(elements.maxSize < 0.95f*panelWidth)
+                    hoverInfo.Width.Set(elements.maxSize +hoverInfo.PaddingLeft + hoverInfo.PaddingRight + mysteriousExtraSpace, 0);
+
+
+                hoverTitleCurrent = newTitle;
+                
+                if(hoverTitleNew.Equals(newTitle))
+                    doUpdate = false;
+
+            }
+
+        }
+                       
+        
+        public void changeHoverUI(string lookUp, float mx, float my, float offsetH, float waitTime = 1.0f)
+        {
+            //if (!targetUIdesc.uiss.wgss.isInCreation && targetUIdesc.uiss.wgss.stage <= 1)
+            //    return;
+
+            //WorldGenSeedSearch.writeDebugFile(" do " + lookUp + " :l="+(lookUp.Length) +" at " + mx +":" +my  + " cur:" + hoverUI.hoverTitleCurrent + " new:" + hoverUI.hoverTitleNew);
+
+            if (lookUp.Equals(hoverUI.hoverTitleCurrent) && !hoverUI.doUpdate)
+                return;
+            //WorldGenSeedSearch.writeDebugFile(" passed ");
+
+            if (!lookUp.Equals(hoverUI.hoverTitleCurrent))
+                hoverUI.doUpdate = true;
+
+            hoverUI.hoverTitleNew = lookUp;
+            hoverUI.locX = mx;
+            hoverUI.locY = my;
+            hoverUI.offY = offsetH;           
+            hoverUI.waitTime = waitTime;
+        }
+
+        public void helpHoverIn(UIMouseEvent evt, UIElement listeningElement)
+        {
+            changeHoverUI(OptionsDict.Help.helpButHover, evt.MousePosition.X, evt.MousePosition.Y, listeningElement.Height.Pixels * 0.5f, 0.1f);
+        }
+        public void helpHoverOut(UIMouseEvent evt, UIElement listeningElement)
+        {
+            changeHoverUI("", 0, 0, 0);
+        }
+
 
     }
 

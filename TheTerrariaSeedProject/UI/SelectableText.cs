@@ -7,6 +7,9 @@ using Terraria.UI;
 using Terraria.GameContent.UI.Elements;
 using Microsoft.Xna.Framework;
 
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace TheTerrariaSeedProject.UI
 {
     class SelectableText
@@ -20,29 +23,32 @@ namespace TheTerrariaSeedProject.UI
         public SelectableList selList;
         InfoPanel infoPanel;
         Selectable thisAsSel;
+        
 
-        public SelectableText(UITextPhrase self, UIListDescription targetUIdesc, string header, string properties = "")
+        public SelectableText(UITextPhrase self, UIListDescription targetUIdesc, OptionsDict opdict, string header, string properties = "")
         {
             values = new List<string>();
             if(!properties.Equals("")) values.Add(properties);
-            Create(self, targetUIdesc, header, values);
+            Create(self, targetUIdesc, opdict, header, values);
         }
 
-        public SelectableText(UITextPhrase self, UIListDescription targetUIdesc, string header, string[] properties)
+        public SelectableText(UITextPhrase self, UIListDescription targetUIdesc, OptionsDict opdict, string header, string[] properties)
         {
             values = new List<string>();
             for (int i = 0; i < properties.Length; i++)
                 values.Add(properties[i]);
-            Create(self, targetUIdesc, header, values);
+            Create(self, targetUIdesc, opdict, header, values);
         }
-        public SelectableText(UITextPhrase self, UIListDescription targetUIdesc, string header, List<string> properties)
+        public SelectableText(UITextPhrase self, UIListDescription targetUIdesc, OptionsDict opdict, string header, List<string> properties)
         {
             values = properties;
-            Create(self, targetUIdesc, header, values);
+            Create(self, targetUIdesc, opdict, header, values);
         }
 
-        private void Create(UITextPhrase self, UIListDescription targetUIdesc, string header, List<string> properties)
+        private void Create(UITextPhrase self, UIListDescription targetUIdesc, OptionsDict opdict, string header, List<string> properties)
         {
+            
+            this.opdict = opdict;
             target = header;
             values = properties!=null? properties.ToList(): new List<string>();
             if (values.Count > 1) values.Insert(0, "# " + header);
@@ -54,6 +60,7 @@ namespace TheTerrariaSeedProject.UI
                 self.OnClick += select;               
                 self.OnMouseOver += ChangeToGrey;
                 self.OnMouseOut += ChangeToWhite;
+                
             }
         }
 
@@ -146,15 +153,24 @@ namespace TheTerrariaSeedProject.UI
         }
 
 
-
-
         private void ChangeToGrey(UIMouseEvent evt, UIElement listeningElement)
         {
+
+            
+            if(targetUIdesc!=null)
+                targetUIdesc.uiss.changeHoverUI((listeningElement as UITextPhrase).text , evt.MousePosition.X, evt.MousePosition.Y, (listeningElement as UITextPhrase).Height.Pixels);
+           
+
+
             Color cold = ((UITextPhrase)listeningElement).uitext.TextColor;
             ((UITextPhrase)listeningElement).uitext.TextColor = new Color(cold.R / 2, cold.G / 2, cold.B / 2, cold.A / 2);
         }
         private void ChangeToWhite(UIMouseEvent evt, UIElement listeningElement)
         {
+            
+            if (targetUIdesc != null)
+                targetUIdesc.uiss.changeHoverUI("", 0, 0, 0);
+
             Color cold = ((UITextPhrase)listeningElement).uitext.TextColor;
             ((UITextPhrase)listeningElement).uitext.TextColor = new Color(cold.R * 2, cold.G * 2, cold.B * 2, cold.A * 2); ;
         }

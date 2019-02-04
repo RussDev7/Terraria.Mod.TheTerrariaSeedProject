@@ -32,7 +32,7 @@ namespace TheTerrariaSeedProject.UI
         public SelectableText AddSelectable(string header, string properties = "")
         {
             UITextPhrase textHead = new UITextPhrase(uielem.Count+1, header);
-            SelectableText newSel = new SelectableText(textHead, uidesc, header, properties);
+            SelectableText newSel = new SelectableText(textHead, uidesc, opdict, header, properties);
             selectables.Add(new Selectable(newSel));
             uielem.Add(textHead);
             return newSel;
@@ -40,7 +40,7 @@ namespace TheTerrariaSeedProject.UI
         public SelectableText AddSelectable(string header, string[] properties)
         {
             UITextPhrase textHead = new UITextPhrase(uielem.Count + 1, header);
-            SelectableText newSel = new SelectableText(textHead, uidesc, header, properties);
+            SelectableText newSel = new SelectableText(textHead, uidesc, opdict, header, properties);
             selectables.Add(new Selectable(newSel));
             uielem.Add(textHead);
             return newSel;
@@ -49,7 +49,7 @@ namespace TheTerrariaSeedProject.UI
         {
             
             UITextPhrase textHead = new UITextPhrase(uielem.Count + 1, header);
-            SelectableText newSel = new SelectableText(textHead, uidesc, header, properties);
+            SelectableText newSel = new SelectableText(textHead, uidesc, opdict, header, properties);
             selectables.Add(new Selectable(newSel));
             uielem.Add(textHead);
             return newSel;
@@ -69,7 +69,7 @@ namespace TheTerrariaSeedProject.UI
                 n = (from + i* stepSize) * factor;
                 values.Add(n.ToString());
             }
-            SelectableText newSel = new SelectableText(textHead, uidesc, header, values);
+            SelectableText newSel = new SelectableText(textHead, uidesc, opdict, header, values);
             selectables.Add(new Selectable(newSel));
             uielem.Add(textHead);            
             return newSel;
@@ -102,8 +102,6 @@ namespace TheTerrariaSeedProject.UI
                     (selt = this.AddSelectable(OptionsDict.SelectableList.name, OptionsDict.SelectableList.nameDescription)).setCustomColor(Color.LightGoldenrodYellow); break;
                 case listKindOmitRare:
                     (selt = this.AddSelectable(OptionsDict.SelectableList.omitRare, OptionsDict.SelectableList.omitRareDescription)).setCustomColor(Color.LightGoldenrodYellow); break;
-
-
                 default:
                     selt = this.AddSelectable("?VVVVVVV select VVVVVVV?", "here you can add what?"); break;
             }
