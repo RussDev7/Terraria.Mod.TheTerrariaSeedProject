@@ -104,6 +104,11 @@ namespace TheTerrariaSeedProject
 
                 string head = headAndValue.Item1;
                 string value = headAndValue.Item2;
+
+                //legacy compabil
+                if (head.Equals(OptionsDict.Phase1.pyramidsPossibleLegacy))
+                    head = OptionsDict.Phase1.pyramidsPossible;
+
                 config.PorcessHeadAndValue(head, value);
             }
             
