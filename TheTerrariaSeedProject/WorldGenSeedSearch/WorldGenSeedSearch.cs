@@ -118,8 +118,12 @@ namespace TheTerrariaSeedProject
         string looking4dungeonWallColor = "";
         string looking4dungeonSide = "";
 
+        bool randomInverse = false;
 
         string mapSize = "0";
+
+        double boostValue = 0;
+        double boostValueSeed = 0;
 
         bool search4MoonOres = false;
         int localnumPyr = 0;
@@ -240,6 +244,7 @@ namespace TheTerrariaSeedProject
                 int numStopSearch = numSeedSearch;
                 stepsize = 1;
                 numSearched = 0;
+                
 
 
                 bool loadWorld = false;
@@ -329,6 +334,7 @@ namespace TheTerrariaSeedProject
                             {
                                 Main.maxTilesX = mapSize.Equals("Small") ? 4200 : mapSize.Equals("Medium") ? 6400 : mapSize.Equals("Large") ? 8400 : Main.maxTilesX;
                                 Main.maxTilesY = mapSize.Equals("Small") ? 1200 : mapSize.Equals("Medium") ? 1800 : mapSize.Equals("Large") ? 2400 : Main.maxTilesY;
+                                
                             }
 
                             string storeMM = currentConfiguration.FindConfigItemValue(OptionsDict.Configuration.storeMMPic, 0);
@@ -358,6 +364,15 @@ namespace TheTerrariaSeedProject
                             looking4dungeonWallColor = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.dungeonWallColor, 1);
                             looking4dungeonSide = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.dungeonSide, 1);
 
+                            int boostValueInt = 10;
+                            string boostString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boost, 1);
+                            if (boostString.Length > 0)
+                                if(!Int32.TryParse(boostString, out boostValueInt)) boostValueInt = 10;
+                           
+                            
+                            boostValue = 1.0 - (1.0 / (0.1 * ((double)boostValueInt)));
+                            //e.g. living trees can have 3 values for small if boost val =30 it only accept values greater than 0.6666
+                            // if one tree is ok too go for val = 20 and all values greater 0.3333 are fine
 
 
                             search4MoonOres = true;
@@ -372,6 +387,7 @@ namespace TheTerrariaSeedProject
                             WorldGen.setWorldSize();
                             string evilType = currentConfiguration.FindConfigItemValue(OptionsDict.WorldInformation.evilType, 0);
                             WorldGen.WorldGenParam_Evil = evilType.Equals("Corruption") ? 0 : evilType.Equals("Crimson") ? 1 : -1;
+                            randomInverse = evilType.Equals("Random inverse");
                             string diffi = currentConfiguration.FindConfigItemValue(OptionsDict.WorldInformation.difficulty, 0);
                             Main.expertMode = diffi.Equals("Normal") ? false : true;
                             continueEval = !currentConfiguration.FindConfigItemValue(OptionsDict.Phase3.continueEvaluation, 3).Equals(OptionsDict.Phase3.continueEvaluationResetTag);
@@ -402,10 +418,38 @@ namespace TheTerrariaSeedProject
                             paterScore = -10000000;
                             statsUpdated = false;
                             score.clear(); score.init();
+                            condsTrue = 0; //added here
 
                             double ratio = numPyramidChanceTrue == 0 ? 0 : ((float)numSearched) / ((float)numPyramidChanceTrue);
 
-                            if (!TryToGenerate()) continue; //--> genInfo ores
+                            
+                            Tuple<double,double,double> randVals = setDirectComputeValues(); //### boost values and set dungeon color and hallow side
+                            boostValueSeed = randVals.Item1;
+                            
+
+                            bool look4dungCol = false;
+                            bool dungColTrue = false;
+                            if (!looking4dungeonWallColor.Equals("Random"))
+                            {
+                                look4dungCol = true;
+                                if ((looking4dungeonWallColor.Equals("Blue") && dungeonColor == 0) ||
+                                    (looking4dungeonWallColor.Equals("Green") && dungeonColor == 1) ||
+                                    (looking4dungeonWallColor.Equals("Pink") && dungeonColor == 2))
+                                    dungColTrue = true;
+
+                            }
+                                                        
+
+                            //if(randVals.Item1 >95 && randVals.Item2 < 5 && randVals.Item3>90)
+                            //if (randVals.Item1 < 2 && randVals.Item2 < 2)
+                            //if (randVals.Item1 > 98 && randVals.Item2 < 1 && randVals.Item3 > 98)
+                            //if (randVals.Item1 > 86 && randVals.Item2 < 20 && randVals.Item3 > 80)
+                            //if (randVals.Item1 < 13 && randVals.Item2 > 80 && randVals.Item3 < 20)                               
+                            //if (randVals.Item1 < 13 && randVals.Item2 > 80 && randVals.Item3 < 20)
+                            //if (randVals.Item1 > 1e9-50)
+                            if (boostValueSeed >= boostValue) //the inverted boostValue can be a little smaller than original value >= --> > ?
+                                if (!look4dungCol || dungColTrue)
+                                if (!TryToGenerate()) continue; //--> genInfo ores
 
                             if (condsTrue == 1 && stage == 1)
                             {
@@ -485,12 +529,13 @@ namespace TheTerrariaSeedProject
                                 statsUpdated = true;
                             }
 
-                            writeToDescList(GenerateStatsText(), -2);
+                            
 
                             //if (condsTrue > 1) { Main.PlaySound(8, -1, -1, 1, 1f, 0f); }
-                            if (condsTrue > 2 || score.rare > 0) { passedStage[stage]++; stage = 42; }
+                            if (condsTrue > 2 || score.rare > 0) { passedStage[stage]++; writeToDescList(GenerateStatsText(), -2); stage = 42; }
                             else
                             {
+                                writeToDescList(GenerateStatsText(), -2);
                                 if (storeMMImg == 0 || storeMMImg == 1)
                                 {
                                     bool valid = true; // !tryAgain && trials < 2, legacy
@@ -499,7 +544,7 @@ namespace TheTerrariaSeedProject
                                 }
                                 if (storeStats == 0)
                                     StoreLastStats(true);
-
+                                
                                 startNextSeed();
                             }
 
@@ -980,6 +1025,9 @@ namespace TheTerrariaSeedProject
         string lastScoreText = "";
         private string GenerateStatsText(bool doFull = false, bool doLog = false, bool didNotfinishLast = false)
         {
+                       
+            
+
             int seed_ = seed;
             int stage_ = stage;
 
@@ -988,8 +1036,7 @@ namespace TheTerrariaSeedProject
                 seed_ = lastSeed;//todo test if also work for gotCreation
                 stage_ = lastStage;
             }
-
-
+            
 
             string stats = "";
             int didNotfinished = doFull == true || didNotfinishLast ? 0 : 1;
@@ -1041,7 +1088,6 @@ namespace TheTerrariaSeedProject
             if (lastScoreText.Length > 0)
                 stats += Environment.NewLine + Environment.NewLine;
             stats += lastScoreText;
-
 
 
 
@@ -1099,18 +1145,51 @@ namespace TheTerrariaSeedProject
             }
         }
 
-        public void setDirectComputeValues()
+        public Tuple<double, double, double> setDirectComputeValues()
         {
             //check hardmode evil biome side and dungeon wall color
             //that might not work in later terraria versions!!!! !!!!!!!
 
             UnifiedRandom dummy = new UnifiedRandom(seed);
-            int a = dummy.Next(200, 300);
-            a += dummy.Next(300, 400);
+            //int sandSpotDensity = WorldGen.genRand.Next((int)((double)Main.maxTilesX * 0.0008), (int)((double)Main.maxTilesX * 0.0025)); 
 
+            //random var 1
+            //+sand -> pyramids spots possible -> pyramids for small 7 (3 to 10[.5] +2),mid 11 (5 to 16 +2) large 15 (6 to 21 +2)
+            //+living trees : small 3
+            //+lakes small 19, mid 30, large 40
+            //+hive count small 3 (1+(5 to 8))
+            //+thin ice biome 3 (..)
+            //+marble count 5
+            //+granite count 6
+
+            //maybe
+            //dungeon distance something (only inital)
+            //+surface 20
+            //+jungel distance + rand2 value
+            //+full desert biome distance, first trial
+            //frist trial temple depth
+            double sandSpotDensity = dummy.NextDouble();
+            //int sandSpotDensity = dummy.Next(0, 100);
+
+            //2nd random 
+            //maybe 
+            //+cavern depth 20 ( cavern low to get small underground layer)
+            //first trial temple distance
+            //jungel distance
+            double a = dummy.NextDouble(); //dummy
+            //int a = dummy.Next(0, 100); //dummy
+
+            //3rd rand
+            //dungeon color
+            //jungle chest count small 5 (7 to 12) , large 10
+            //maybe jungle depth
             double randVar = dummy.NextDouble();
-            evilHMIsLeft = (int)(randVar * (double)2) == 0 && a > 0;
+            evilHMIsLeft = (int)(randVar * (double)2) == 0 && a > -1.0;
             dungeonColor = (int)(randVar * (double)3); // 0: blue, 1:green, 2: pink ===> evil hm side and dcolor correlated 
+
+            
+
+            return new Tuple<double,double,double>(sandSpotDensity, a, randVar );
         }
 
 
@@ -1232,9 +1311,14 @@ namespace TheTerrariaSeedProject
                         {
                             bool oreMoon = true;
 
-                            setDirectComputeValues();
+                            if (randomInverse == true)
+                            {                               
+                                WorldGen.WorldGenParam_Evil = WorldGen.crimson ? 0 : 1;  //setup inverse
+                                WorldGen.crimson = WorldGen.crimson? false: true;
+                            }
 
-
+                           //setDirectComputeValues(); //todo can be done earlier and faster for dungeon color
+                            
                             if (search4MoonOres)
                             {
                                 progress.Message = "Checking ore and moon type and dungeon side " + seed;
@@ -1260,16 +1344,18 @@ namespace TheTerrariaSeedProject
                                     }
                                     if (oreMoon)
                                     {
-                                        if (!looking4dungeonWallColor.Equals("Random"))
-                                            if ((looking4dungeonWallColor.Equals("Blue") && dungeonColor != 0) || (looking4dungeonWallColor.Equals("Green") && dungeonColor != 1) || (looking4dungeonWallColor.Equals("Pink") && dungeonColor != 2))
-                                                oreMoon = false;
+                                        //if (!looking4dungeonWallColor.Equals("Random"))
+                                        //{
+                                        //    if ((looking4dungeonWallColor.Equals("Blue") && dungeonColor != 0) || (looking4dungeonWallColor.Equals("Green") && dungeonColor != 1) || (looking4dungeonWallColor.Equals("Pink") && dungeonColor != 2))
+                                        //        oreMoon = false;  
+                                        //}
 
-                                        if (oreMoon)
-                                        {
+                                        //if (oreMoon)
+                                        //{
                                             if ((looking4dungeonSide.Equals("Left") && localDungeonSide > 0) || (looking4dungeonSide.Equals("Right") && localDungeonSide < 0))
                                                 oreMoon = false;
 
-                                        }
+                                        //}
                                     }
 
 
@@ -1645,7 +1731,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Max pyramid height", 0);
             hasOBjectOrParam.Add("Max pyramid tunnel height", 0);
             hasOBjectOrParam.Add("Max pyramid total height", 0);
-            hasOBjectOrParam.Add("Max pyr. exit cav.-entr. distance", -100000);
+            hasOBjectOrParam.Add(OptionsDict.Phase2.maxPyrExitCavDist, -100000);
             hasOBjectOrParam.Add("Ocean Pyramid", 0);
 
             hasOBjectOrParam.Add("Enchanted Sword Shrine", 0);
@@ -1671,7 +1757,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Min Living Tree Size", 0);
             hasOBjectOrParam.Add("Max Living Tree root Size", 0);
             hasOBjectOrParam.Add("Max Living Tree total Size", 0);
-            hasOBjectOrParam.Add("Max Tree exit cav.-entr. distance", -100000);
+            hasOBjectOrParam.Add(OptionsDict.Phase2.maxTreeExitCavDist, -100000);
             hasOBjectOrParam.Add("Tree to cavern layer", 0);
             hasOBjectOrParam.Add("Tree to cavern layer near mid", 0);
             hasOBjectOrParam.Add("Tree close to cavern layer", 0);
@@ -1823,6 +1909,14 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Distance ShadowOrb/Heart to mid", 1000000);
             hasOBjectOrParam.Add("Distance Lake to mid (guess)", 1000000);
 
+            hasOBjectOrParam.Add("neg. Distance Tree to mid", -1000000);
+            hasOBjectOrParam.Add("neg. Distance Tree Chest to mid", -1000000);
+            hasOBjectOrParam.Add("neg. Distance Cloud to mid", -1000000);
+            hasOBjectOrParam.Add("neg. Distance Pyramid to mid", -1000000);
+            hasOBjectOrParam.Add("neg. Distance Dungeon to mid", -1000000);
+            hasOBjectOrParam.Add("neg. Distance ShadowOrb/Heart to mid", -1000000);
+            hasOBjectOrParam.Add("neg. Distance Lake to mid (guess)", -1000000);
+
 
             hasOBjectOrParam.Add("Bee Hives", 0);
             hasOBjectOrParam.Add("High Hive", 0);
@@ -1830,8 +1924,9 @@ namespace TheTerrariaSeedProject
 
             hasOBjectOrParam.Add("Spawn in Sky", 0);
 
-            hasOBjectOrParam.Add("Open Temple", 0);
+            hasOBjectOrParam.Add(OptionsDict.Phase3.openTemple, 0);
             hasOBjectOrParam.Add("Mushroom Biome above surface count", 0);
+            
 
             hasOBjectOrParam.Add("Evil Tiles for Mud", 0);
             hasOBjectOrParam.Add("Evil Tiles for Jungle Grass", 0);
@@ -1886,9 +1981,9 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Dungeon far above surface", 0);
             hasOBjectOrParam.Add("Dungeon below ground", 0);
             hasOBjectOrParam.Add("Dungeon below ground tree", 0);
-            hasOBjectOrParam.Add("Dungeon has good Pos", 0);
+            hasOBjectOrParam.Add(OptionsDict.Phase2.dungeonGoodPos, 0);
             hasOBjectOrParam.Add("Dungeon in Snow Biome", 0);
-            hasOBjectOrParam.Add("Dungeon has strange Pos", 0);
+            hasOBjectOrParam.Add(OptionsDict.Phase2.dungeonStrangePos, 0);
             hasOBjectOrParam.Add("Floating island cabin in Dungeon", 0);
             hasOBjectOrParam.Add("Pre Skeletron Dungeon Chest Risky", 0);
             hasOBjectOrParam.Add("Pre Skeletron Dungeon Chest Grab", 0);
@@ -1939,8 +2034,10 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Geyser", 0);
             hasOBjectOrParam.Add("Detonator", 0);
             hasOBjectOrParam.Add("Detonator at surface", 0);
-            hasOBjectOrParam.Add("Green Pyramid", 0);
-            hasOBjectOrParam.Add("Lonely jungle tree", 0);
+            hasOBjectOrParam.Add(OptionsDict.Phase3.greenPyramid, 0);
+            hasOBjectOrParam.Add(OptionsDict.Phase3.lonelyJungleTree, 0);
+            hasOBjectOrParam.Add("Shadow Chest item in normal chest", 0);
+
 
             hasOBjectOrParam.Add("Wooden Chest", 0);
             hasOBjectOrParam.Add("Wooden Chest Dungeon", 0);
@@ -1955,8 +2052,10 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Lihzahrd Chest", 0);
             hasOBjectOrParam.Add("Living Wood Chest", 0);
 
+                        
+            hasOBjectOrParam.Add("random value seed *10000", (int)(10000.0 * boostValueSeed));
+            hasOBjectOrParam.Add("Boost random value seed", (int)(10.0/(1.0-boostValueSeed)));
 
-            
 
             hasOBjectOrParam.Add("Score", 0);
 
@@ -2538,7 +2637,18 @@ namespace TheTerrariaSeedProject
                                         score.itemLocation.Add(ItemID.MagicMirror, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
                                 }
                             }
+                            else if ( (item.type == ItemID.DarkLance || item.type == ItemID.Flamelash || item.type == ItemID.FlowerofFire 
+                                || item.type == ItemID.Sunfury || item.type == ItemID.HellwingBow) && Main.tile[cx, cy].frameX != 144 )
+                            {
+                                if (score.itemLocation.ContainsKey(item.type))
+                                    score.itemLocation[item.type].Add(new Tuple<int, int>(cx, cy));
+                                else
+                                    score.itemLocation.Add(item.type, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
 
+                                hasOBjectOrParam["Shadow Chest item in normal chest"]++;
+
+                                
+                            }
 
 
 
@@ -3159,7 +3269,7 @@ namespace TheTerrariaSeedProject
 
 
                             //ESS                    
-                            if ((tile.type == (ushort)187) && (tile.frameX == (short)918) && (tile.frameY == (short)0))
+                            if ((tile.type == TileID.LargePiles2) && (tile.frameX == (short)918) && (tile.frameY == (short)0))
                             {
 
                                 if (score.itemLocation.ContainsKey(ItemID.EnchantedSword))
@@ -3241,7 +3351,7 @@ namespace TheTerrariaSeedProject
                             {
                                 if (pathLength[x, y] < Int32.MaxValue)
                                 {
-                                    hasOBjectOrParam["Open Temple"] = 1;
+                                    hasOBjectOrParam[OptionsDict.Phase3.openTemple] = 1;
                                 }
 
                             }
@@ -3281,7 +3391,7 @@ namespace TheTerrariaSeedProject
 
                                 hasOBjectOrParam["Bee Hives"]++;
 
-
+                                //TODO do better
                                 if ((y - Main.worldSurface) < 200)
                                 {
                                     int yoff = 0;
@@ -3595,7 +3705,7 @@ namespace TheTerrariaSeedProject
                             //green pyramid
                             else if (Main.tile[x, y].type == TileID.Banners && Main.tile[x, y].frameY == 0 && Main.tile[x, y].wall == WallID.GrassUnsafe && (Main.tile[x, y].frameX == 72 || Main.tile[x, y].frameX == 90 || Main.tile[x, y].frameX == 108))
                             {
-                                hasOBjectOrParam["Green Pyramid" ]= 1;
+                                hasOBjectOrParam[OptionsDict.Phase3.greenPyramid ]= 1;
 
                             }
 
@@ -3680,7 +3790,8 @@ namespace TheTerrariaSeedProject
 
             //lake
 
-            hasOBjectOrParam["Distance Lake to mid (guess)"] = Math.Min(Math.Abs(Main.maxTilesX / 2 - liqf), Math.Abs(Main.maxTilesX / 2 - liqt));
+            hasOBjectOrParam["Distance Lake to mid (guess)"] = liqf< Main.maxTilesX / 2 && liqt> Main.maxTilesX / 2? 0: Math.Min(Math.Abs(Main.maxTilesX / 2 - liqf), Math.Abs(Main.maxTilesX / 2 - liqt));
+
             if (hasOBjectOrParam["Distance Lake to mid (guess)"] < 250) {
 
                 hasOBjectOrParam["Lake near mid (guess)"] = 1;                
@@ -3704,7 +3815,7 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["Max pyramid height"] = Math.Max(hasOBjectOrParam["Max pyramid height"], pinfo.Item1);
                 hasOBjectOrParam["Max pyramid tunnel height"] = Math.Max(hasOBjectOrParam["Max pyramid tunnel height"], pinfo.Item2);
                 hasOBjectOrParam["Max pyramid total height"] = Math.Max(hasOBjectOrParam["Max pyramid total height"], pinfo.Item1 + pinfo.Item2);
-                hasOBjectOrParam["Max pyr. exit cav.-entr. distance"] = Math.Max(hasOBjectOrParam["Max pyr. exit cav.-entr. distance"], pinfo.Item3);
+                hasOBjectOrParam[OptionsDict.Phase2.maxPyrExitCavDist] = Math.Max(hasOBjectOrParam[OptionsDict.Phase2.maxPyrExitCavDist], pinfo.Item3);
 
                 //writeDebugFile(seed + " " + stage + " p stats height:" + pinfo.Item1 + " tunnel:" + pinfo.Item2 + " total:" + (pinfo.Item1 + pinfo.Item2) + " dist:" + pinfo.Item3);
 
@@ -3827,13 +3938,13 @@ namespace TheTerrariaSeedProject
             int xOSD = Main.dungeonX < Main.maxTilesX / 2 ? xOSL : xOSR;
             if (Math.Abs(Main.maxTilesX / 2 - xOSD) - Math.Abs(Main.maxTilesX / 2 - Main.dungeonX) > 200 && hasOBjectOrParam["Dungeon below ground"] == 0 && hasOBjectOrParam["Dungeon tiles above surface"] == 0)
             {
-                hasOBjectOrParam["Dungeon has good Pos"] = 1;
+                hasOBjectOrParam[OptionsDict.Phase2.dungeonGoodPos] = 1;
             }
 
             hasOBjectOrParam["Dungeon far above surface"] = hasOBjectOrParam["Dungeon tiles above surface"] > 95 ? 1 : 0;
 
             if (hasOBjectOrParam["Dungeon below ground"] > 0 || hasOBjectOrParam["Dungeon far above surface"] > 0 || hasOBjectOrParam["Dungeon in Snow Biome"] > 0)
-                hasOBjectOrParam["Dungeon has strange Pos"] = 1;
+                hasOBjectOrParam[OptionsDict.Phase2.dungeonStrangePos] = 1;
 
 
 
@@ -3927,11 +4038,26 @@ namespace TheTerrariaSeedProject
 
             hasOBjectOrParam.Add("Distance Dungeon to mid", Math.Abs(Main.dungeonX - Main.maxTilesX / 2));
             hasOBjectOrParam.Add("Ice surface more than half evil", hasOBjectOrParam["Ice surface evil"] > (hasOBjectOrParam["Ice Surface"] + 50) ? 1 : 0);
+            hasOBjectOrParam.Add("Ice surface more than half not evil", 1- hasOBjectOrParam["Ice surface more than half evil"]);
+
 
             hasOBjectOrParam["Jungle biome distance to mid"] = localDungeonSide < 0 ? (leftmostSurfaceJungleTilex - Main.maxTilesX / 2) : (Main.maxTilesX / 2 - rightmostSurfaceJungleTilex);
             hasOBjectOrParam["Snow biome distance to mid"] = localDungeonSide > 0 ? (leftmostSurfaceSnowTilex - Main.maxTilesX / 2) : (Main.maxTilesX / 2 - rightmostSurfaceSnowTilex);
 
 
+
+            hasOBjectOrParam["neg. Distance Tree to mid"] = -hasOBjectOrParam["Distance Tree to mid"];
+            hasOBjectOrParam["neg. Distance Tree Chest to mid"] = -hasOBjectOrParam["Distance Tree Chest to mid"];
+            hasOBjectOrParam["neg. Distance Cloud to mid"] = -hasOBjectOrParam["Distance Cloud to mid"];
+            hasOBjectOrParam["neg. Distance Pyramid to mid"] = -hasOBjectOrParam["Distance Pyramid to mid"];
+            hasOBjectOrParam["neg. Distance Dungeon to mid"] = -hasOBjectOrParam["Distance Dungeon to mid"];
+            hasOBjectOrParam["neg. Distance ShadowOrb/Heart to mid"] = -hasOBjectOrParam["Distance ShadowOrb/Heart to mid"];
+            hasOBjectOrParam["neg. Distance Lake to mid (guess)"] = -hasOBjectOrParam["Distance Lake to mid (guess)"];
+
+            hasOBjectOrParam["neg. Evil Tiles for Jungle Grass"] = -hasOBjectOrParam["Evil Tiles for Jungle Grass"];
+            hasOBjectOrParam["neg. Evil Tiles for Sand"] = -hasOBjectOrParam["Evil Tiles for Sand"];
+            hasOBjectOrParam["neg. Evil Tiles for Ice"] = -hasOBjectOrParam["Evil Tiles for Ice"];
+            
 
 
             if (doFull)
@@ -4020,8 +4146,8 @@ namespace TheTerrariaSeedProject
                     hasOBjectOrParam["Pathlength to cavern entrance to mid of Jungle"] = pathLength[entrJ.Item1, entrJ.Item2] / pathNormFac;
                     hasOBjectOrParam["Tiles to mine for mid Jungle cavern"] = entrpathJ.Item2;
 
-                    if (jmex > leftmostSurfaceJungleTilex + jungleWideSurf / 10 && jmex < rightmostSurfaceJungleTilex + jungleWideSurf / 10 && entrpathJ.Item2 < Main.maxTilesY / 120 && entrpathJ.Item3 == 0)
-                        hasOBjectOrParam["Free cavern to mid Jungle"] = 1;
+                    if (jmex > leftmostSurfaceJungleTilex + jungleWideSurf / 10 && jmex < rightmostSurfaceJungleTilex - jungleWideSurf / 10 && entrpathJ.Item2 < Main.maxTilesY / 120 && entrpathJ.Item3 == 0)
+                        hasOBjectOrParam["Free cavern to mid Jungle"] = 1; //changed rightmostSurfaceJungleTilex + jungleWideSurf /10 -> rightmostSurfaceJungleTilex - jungleWideSurf /10
                 }
 
 
@@ -4082,13 +4208,13 @@ namespace TheTerrariaSeedProject
                 {
                     int val = Math.Min(leftmostCavernJungleTilex, leftmostSurfaceJungleTilex);
                     if (val - mostSnowSideIvyChest > 100)
-                        hasOBjectOrParam["Lonely jungle tree"] = 1;
+                        hasOBjectOrParam[OptionsDict.Phase3.lonelyJungleTree] = 1;
                 }
                 else
                 {
                     int val = Math.Max(rightmostCavernJungleTilex, rightmostSurfaceJungleTilex);
                     if (mostSnowSideIvyChest - val > 100)
-                        hasOBjectOrParam["Lonely jungle tree"] = 1;
+                        hasOBjectOrParam[OptionsDict.Phase3.lonelyJungleTree] = 1;
                 }
                     
 
@@ -4124,7 +4250,7 @@ namespace TheTerrariaSeedProject
                     //no temple door
                     hasOBjectOrParam["Temple door distance"] = getDistanceToSpawn(templeMidx, templeMidy);
                     hasOBjectOrParam["Temple door horizontal distance"] = Math.Abs(templeMidx - Main.spawnTileX);
-                    hasOBjectOrParam["Open Temple"] = 1;
+                    hasOBjectOrParam[OptionsDict.Phase3.openTemple] = 1;
                 }
                 hasOBjectOrParam["neg. Temple door distance"] = -hasOBjectOrParam["Temple door distance"];
                 hasOBjectOrParam["neg. Temple door horizontal distance"] = -hasOBjectOrParam["Temple door horizontal distance"];
@@ -4158,6 +4284,7 @@ namespace TheTerrariaSeedProject
                 int numJ = 0;
                 int numS = 0;
                 int numE = 0;
+                int numGM = 0;
                 for (int xi = Main.spawnTileX - 6; xi < Main.spawnTileX + 7; xi++)
                     for (int yi = Main.spawnTileY - 6; yi < Main.spawnTileY + 7; yi++)
                     {
@@ -4175,12 +4302,16 @@ namespace TheTerrariaSeedProject
                                 || Main.tile[xi, yi].type == TileID.CrimsonVines || Main.tile[xi, yi].type == TileID.Crimstone || Main.tile[xi, yi].type == TileID.CrimtaneThorns
                                 || Main.tile[xi, yi].type == TileID.FleshGrass || Main.tile[xi, yi].type == TileID.FleshIce || Main.tile[xi, yi].type == TileID.FleshWeeds || Main.tile[xi, yi].type == TileID.Shadewood)
                                 numE++; //maybe something missing here
+                            if (Main.tile[xi, yi].type == TileID.Granite || Main.tile[xi, yi].type == TileID.Marble || Main.tile[xi, yi].wall == WallID.GraniteUnsafe || Main.tile[xi, yi].wall == WallID.MarbleUnsafe)
+                                numGM++;
                         }
                     }
                 hasOBjectOrParam.Add("Spawn in Snow biome", numS > 10 ? 1 : 0);
                 hasOBjectOrParam.Add("Spawn in Jungle biome", numJ > 10 ? 1 : 0);
                 hasOBjectOrParam.Add("Spawn in Evil biome", numE > 10 ? 1 : 0);
+                hasOBjectOrParam.Add("Spawn in Marble or Granite biome", numGM > 4 ? 1 : 0);
 
+                hasOBjectOrParam.Add("Mushroom Biome above surface", hasOBjectOrParam["Mushroom Biome above surface count"] > 0 ? 1 : 0); //todo higher value if exist
 
                 //set unset for score
                 hasOBjectOrParam.Add("Cloud Ballon", has(ref hasOBjectOrParam, ItemID.ShinyRedBalloon));
@@ -4240,7 +4371,7 @@ namespace TheTerrariaSeedProject
 
 
 
-                hasOBjectOrParam.Add("All chest items you can't craft or fish", hasOBjectOrParam["All Pyramid Items"] > 0 &&
+                hasOBjectOrParam.Add(OptionsDict.Phase3.allChestItemsNoCraftFish, hasOBjectOrParam["All Pyramid Items"] > 0 &&
                                                                                 hasOBjectOrParam["Valor"] > 0 &&
                                                                                 hasOBjectOrParam["Bone Welder"] > 0 &&
                                                                                 hasOBjectOrParam["Flower Boots"] > 0 &&
@@ -4270,6 +4401,7 @@ namespace TheTerrariaSeedProject
                                                                                 ? 1 : 0);
                 //hasOBjectOrParam.Add("Has Alchemy, Sharpening, Enchanted",  );
 
+                hasOBjectOrParam.Add("All Paintings", hasOBjectOrParam["Number different Paintings"] > 50? 1 : 0 );
 
 
                 //negative value of pathlength for postive list
@@ -4988,7 +5120,7 @@ namespace TheTerrariaSeedProject
                 closestPyramidToMid = genInfo.minPyramidToMapMidDist;
                 trees = genInfo.numTree;
 
-                hasOBjectOrParam.Add("Pyramids possible", maxPyramidCountChance);
+                hasOBjectOrParam.Add(OptionsDict.Phase1.pyramidsPossible, maxPyramidCountChance);
                 hasOBjectOrParam.Add("Number of Pyramids", pyramids);
                 hasOBjectOrParam.Add("Number of Clouds", floatingIslands);
                 hasOBjectOrParam.Add("Number of Living Trees", trees);
@@ -6078,7 +6210,7 @@ namespace TheTerrariaSeedProject
 
             tval = 0.1 * (2000 - hasOBjectOrParam["Pathlength to free ShadowOrb/Heart"]);
             score += tval > 0 ? tval : 0;
-            score += hasOBjectOrParam["Pathlength to free ShadowOrb/Heart"] < 2500 && hasOBjectOrParam["Free ShadowOrb/Heart"] > 0 ? 40 + sumUp(hasOBjectOrParam["Free ShadowOrb/Heart"], 30, 0.725) : 0;
+            score += hasOBjectOrParam["Pathlength to free ShadowOrb/Heart"] < 2500 && hasOBjectOrParam["Free ShadowOrb/Heart"] > 0 ? 30 + sumUp(hasOBjectOrParam["Free ShadowOrb/Heart"], 30, 0.525) : 0;
             allScoreText += System.Environment.NewLine + "Score (Path) Exposed Orbs/Heart " + (int)score;
 
 
@@ -6097,7 +6229,7 @@ namespace TheTerrariaSeedProject
 
 
             //dungeon pos            
-            score += hasOBjectOrParam["Dungeon has good Pos"] > 0 ? 15 : -55;
+            score += hasOBjectOrParam[OptionsDict.Phase2.dungeonGoodPos] > 0 ? 15 : -55;
             allScoreText += System.Environment.NewLine + "Score Dungeon Pos " + (int)score;
 
             float wallNum = hasOBjectOrParam["Green Dungeon Walls"] + hasOBjectOrParam["Blue Dungeon Walls"] + hasOBjectOrParam["Pink Dungeon Walls"];
@@ -6144,7 +6276,7 @@ namespace TheTerrariaSeedProject
                 allScoreText += System.Environment.NewLine + "Score Spawn in Sky " + (int)score;
             }
 
-            if (hasOBjectOrParam["Open Temple"] > 0)
+            if (hasOBjectOrParam[OptionsDict.Phase3.openTemple] > 0)
             {
                 score += 420;
                 allScoreText += System.Environment.NewLine + "Score Open Temple " + (int)score;
@@ -6167,7 +6299,8 @@ namespace TheTerrariaSeedProject
                 allScoreText += System.Environment.NewLine + "Score Spawn in Snow biome " + (int)score;
             }
 
-
+            score += hasOBjectOrParam["Shadow Chest item in normal chest"] > 0 ? 420 * hasOBjectOrParam["Shadow Chest item in normal chest"] : 0;
+            if (hasOBjectOrParam["Shadow Chest item in normal chest"] > 0) allScoreText += System.Environment.NewLine + "Score ShadowChestItemInNormal " + (int)score;
 
             score += hasOBjectOrParam["Biome Item in normal Chest"] > 0 ? 1337 * hasOBjectOrParam["Biome Item in normal Chest"] : 0; //should be patched
             if (hasOBjectOrParam["Biome Item in normal Chest"] > 0) allScoreText += System.Environment.NewLine + "Score BiomeNormalChest " + (int)score;
@@ -6176,7 +6309,7 @@ namespace TheTerrariaSeedProject
             score += hasOBjectOrParam["Dungeon far above surface"] > 0 ? 42 : 0;
             score += hasOBjectOrParam["Dungeon below ground"] > 0 ? 420 : 0;
             score += hasOBjectOrParam["Dungeon below ground tree"] > 0 ? 420 : 0;
-            if (hasOBjectOrParam["Dungeon has strange Pos"] > 0) allScoreText += System.Environment.NewLine + "Score Dungeon has strange Pos " + (int)score;
+            if (hasOBjectOrParam[OptionsDict.Phase2.dungeonStrangePos] > 0) allScoreText += System.Environment.NewLine + "Score Dungeon has strange Pos " + (int)score;
 
             score += hasOBjectOrParam["Floating island cabin in Dungeon"] > 0 ? 420 : 0;
             if (hasOBjectOrParam["Floating island cabin in Dungeon"] > 0) allScoreText += System.Environment.NewLine + "Score Floating cabin in Dungeon " + (int)score;
@@ -6184,11 +6317,11 @@ namespace TheTerrariaSeedProject
             score += hasOBjectOrParam["Detonator at surface"] > 0 ? 420* hasOBjectOrParam["Detonator at surface"] : 0;
             if (hasOBjectOrParam["Detonator at surface"] > 0) allScoreText += System.Environment.NewLine + "Score Detonator at surface " + (int)score;
 
-            score += hasOBjectOrParam["Green Pyramid"] > 0 ? 420* hasOBjectOrParam["Green Pyramid"] : 0;
-            if (hasOBjectOrParam["Green Pyramid"] > 0) allScoreText += System.Environment.NewLine + "Score Green Pyramid " + (int)score;
+            score += hasOBjectOrParam[OptionsDict.Phase3.greenPyramid] > 0 ? 420* hasOBjectOrParam[OptionsDict.Phase3.greenPyramid] : 0;
+            if (hasOBjectOrParam[OptionsDict.Phase3.greenPyramid] > 0) allScoreText += System.Environment.NewLine + "Score Green Pyramid " + (int)score;
 
-                   score += hasOBjectOrParam["Lonely jungle tree"] > 0 ? 420: 0;
-            if (hasOBjectOrParam["Lonely jungle tree"] > 0) allScoreText += System.Environment.NewLine + "Score Lonely jungle tree " + (int)score;
+                   score += hasOBjectOrParam[OptionsDict.Phase3.lonelyJungleTree] > 0 ? 420: 0;
+            if (hasOBjectOrParam[OptionsDict.Phase3.lonelyJungleTree] > 0) allScoreText += System.Environment.NewLine + "Score Lonely jungle tree " + (int)score;
             
 
 
@@ -6203,12 +6336,17 @@ namespace TheTerrariaSeedProject
                 allScoreText += System.Environment.NewLine + "Score Chest duplication Glitch " + (int)score;
             }
 
-            if (hasOBjectOrParam["All chest items you can't craft or fish"] > 0)
+            if (hasOBjectOrParam[OptionsDict.Phase3.allChestItemsNoCraftFish] > 0)
             {
-                score += 1337;
-                allScoreText += System.Environment.NewLine + "Score  all chest items you can't craft or fish! " + (int)score;
+                score += 1337 * (5-mapScale);
+                allScoreText += System.Environment.NewLine + "Score all chest items you can't craft or fish! " + (int)score;
             }
 
+            if (hasOBjectOrParam["All Paintings"] > 0)
+            {
+                score += 1337 * (6 - mapScale);
+                allScoreText += System.Environment.NewLine + "Score all paintings! " + (int)score;
+            }
 
 
             allScoreText += System.Environment.NewLine + "Bonus Score:";
@@ -6563,7 +6701,7 @@ namespace TheTerrariaSeedProject
             if (hasOBjectOrParam["Chest duplication Glitch"] > 0) nextDigit = "D";
             else if (hasOBjectOrParam["Very Near Enchanted Sword"] > 0) nextDigit = "#";
             else if (hasOBjectOrParam["Spawn in Sky"] > 0) nextDigit = "Y";
-            else if (hasOBjectOrParam["All chest items you can't craft or fish"] > 0) nextDigit = "@";
+            else if (hasOBjectOrParam[OptionsDict.Phase3.allChestItemsNoCraftFish] > 0) nextDigit = "@";
             else if (allscore < 10 && hasOBjectOrParam["Near Enchanted Sword"] > 0) nextDigit = "N";
             else if (allscore < 10 && hasOBjectOrParam["Enchanted Sword near Tree"] > 0 || hasOBjectOrParam["Enchanted Sword near Pyramid"] > 0) nextDigit = "+";
             else if (allscore < 10 && hasOBjectOrParam["Many Pyramids"] > 0) nextDigit = "P";
@@ -6578,11 +6716,12 @@ namespace TheTerrariaSeedProject
             if (hasOBjectOrParam["Spawn in Sky"] > 0) strares += "_" + "SpawnSky";
             if (hasOBjectOrParam["Spawn in Jungle biome"] > 0) strares += "_" + "SpawnJungle";
             if (hasOBjectOrParam["Spawn in Snow biome"] > 0) strares += "_" + "SpawnSnow";
+            if (hasOBjectOrParam["Spawn in Marble or Granite biome"] > 0) strares += "_" + "SpawnMarbleGranite";
 
-            if (hasOBjectOrParam["Open Temple"] > 0) strares += "_" + "OpenTemple";
+            if (hasOBjectOrParam[OptionsDict.Phase3.openTemple] > 0) strares += "_" + "OpenTemple";
 
             if (hasOBjectOrParam["Biome Item in normal Chest"] > 0) strares += "_" + "BiomeChestNormal";
-            if (hasOBjectOrParam["Dungeon has strange Pos"] > 0) strares += "_" + "DungeonStrange";
+            if (hasOBjectOrParam[OptionsDict.Phase2.dungeonStrangePos] > 0) strares += "_" + "DungeonStrange";
             if (hasOBjectOrParam["Floating island cabin in Dungeon"] > 0) strares += "_" + "FloatingCabinDungeon";
             if (hasOBjectOrParam["Pre Skeletron Dungeon Chest Risky"] > 0) strares += "_" + "DungeonPreSkelChestRisky";
             if (hasOBjectOrParam["Pre Skeletron Dungeon Chest Grab"] > 0) strares += "_" + "DungeonPreSkelChestGrab";
@@ -6596,9 +6735,13 @@ namespace TheTerrariaSeedProject
             if (hasOBjectOrParam["Very Near Enchanted Sword"] - hasOBjectOrParam["Near Enchanted Sword near Tree"] - hasOBjectOrParam["Near Enchanted Sword near Pyramid"] > 0) strares += "_" + "VeryNearES";
             if (hasOBjectOrParam["Floating Island without chest"] > 0) strares += "_" + "CloudWithoutHouse";
             if (hasOBjectOrParam["Detonator at surface"] > 0) strares += "_" + "DetonatorSurface";
-            if (hasOBjectOrParam["Green Pyramid"] > 0) strares += "_" + "GreenPyramid";
-            if (hasOBjectOrParam["Lonely jungle tree"] > 0) strares += "_" + "LonelyJungleTree";
-            if (hasOBjectOrParam["All chest items you can't craft or fish"] > 0) strares += "_" + "AllChestItems";
+            if (hasOBjectOrParam[OptionsDict.Phase3.greenPyramid] > 0) strares += "_" + "GreenPyramid";
+            if (hasOBjectOrParam[OptionsDict.Phase3.lonelyJungleTree] > 0) strares += "_" + "LonelyJungleTree";
+            
+            if (hasOBjectOrParam["Mushroom Biome above surface"] > 0) strares += "_" + "MushroomSurface";
+            if (hasOBjectOrParam["Shadow Chest item in normal chest"] > 0) strares += "_" + "ShadowChestItemNormal";
+            if (hasOBjectOrParam["All Paintings"] > 0) strares += "_" + "AllPaintings";
+            if (hasOBjectOrParam[OptionsDict.Phase3.allChestItemsNoCraftFish] > 0) strares += "_" + "AllChestItems";
             if (hasOBjectOrParam["Number of Pyramids"] > Main.maxTilesY / 600 + 1) strares += "_" + hasOBjectOrParam["Number of Pyramids"] + "Pyramids";
 
 
@@ -6706,7 +6849,7 @@ namespace TheTerrariaSeedProject
                     rares += checkAdd("Biome Item in normal Chest"); //<--that might not find all int that step
                     
 
-                    if (!omitRare.Contains("Omit " + "Dungeon has strange Pos"))
+                    if (!omitRare.Contains("Omit " + OptionsDict.Phase2.dungeonStrangePos))
                     {
                         if (!omitRare.Contains(OptionsDict.GeneralOptions.omitCommonRare) && !omitRare.Contains(OptionsDict.GeneralOptions.omitBaCRare))
                             rares += checkAdd("Dungeon in Snow Biome");
@@ -6732,7 +6875,7 @@ namespace TheTerrariaSeedProject
                         rares += checkAdd("Enchanted Sword near Tree");
                         rares += checkAdd("Enchanted Sword near Pyramid");
                         rares += checkAdd("Spawn in Snow biome");
-                        rares += checkAdd("Lonely jungle tree");
+                        rares += checkAdd(OptionsDict.Phase3.lonelyJungleTree);
                     }
 
                     if (!omitRare.Contains(OptionsDict.GeneralOptions.omitBadRare) && !omitRare.Contains(OptionsDict.GeneralOptions.omitBaCRare))
@@ -6744,11 +6887,17 @@ namespace TheTerrariaSeedProject
                     rares += checkAdd("Near Enchanted Sword near Pyramid");
                     rares += checkAdd("Very Near Enchanted Sword");
                     rares += checkAdd("Spawn in Jungle biome");
-                    rares += checkAdd("All chest items you can't craft or fish");
+                    rares += checkAdd(OptionsDict.Phase3.allChestItemsNoCraftFish);
                     rares += checkAdd("Floating island cabin in Dungeon");
                     rares += checkAdd("Detonator at surface");
-                    rares += checkAdd("Green Pyramid");                    
-                    rares += checkAdd("Open Temple");
+                    rares += checkAdd(OptionsDict.Phase3.greenPyramid);                    
+                    rares += checkAdd(OptionsDict.Phase3.openTemple);
+
+                    rares += checkAdd("Spawn in Marble or Granite biome");
+                    rares += checkAdd("Shadow Chest item in normal chest");
+                    rares += checkAdd("Mushroom Biome above surface");
+                    rares += checkAdd("All Paintings");
+
                 }
 
 
@@ -6864,6 +7013,8 @@ namespace TheTerrariaSeedProject
             public string conditionCheck = "";
             public int checkConditions(ScoreWorld score, Configuration config, int step)
             {
+                //step == stage ==~phase
+
                 resetPoints(score);
                 conditionCheck = "";//debug
                 Dictionary<string, int> hasOBjectOrParam = score.hasOBjectOrParam;
@@ -6882,7 +7033,7 @@ namespace TheTerrariaSeedProject
                 bool isInPositive = false;
                 bool isInNegative = false;
                 bool isInOmitRare = false;
-                int cstep = -1;
+                int cstep = -1; //phase -1
 
 
                 int phase3Count = 0;
@@ -6896,6 +7047,15 @@ namespace TheTerrariaSeedProject
                 int dummyTool = 0; //adds /sub more than one point
                 bool dummySet = false;
 
+                int negativeListPointSize = 1;
+
+                const int CCcount = 21;
+                const int CCcountNeg = 5; // max number for negative count
+                int[] conditionConnectorIsTrue = new int[CCcount];
+                int[] conditionConnectorIsFalse = new int[CCcount];
+                bool[] conditionConnectorIsActive = new bool[CCcount];
+
+                bool isPoint = false;
 
                 Configuration.ConfigItemType lastType = Configuration.ConfigItemType.Other;
                 //cast to list to omit overwriting error
@@ -6916,11 +7076,23 @@ namespace TheTerrariaSeedProject
                                 if (cci.phase == 1 && !cci.name.Equals(OptionsDict.Phase1.pyramidsPossible)) break;
 
                                 int value = 0;
+                                int condCon = -1;
                                 if (!Int32.TryParse(cci.value, out value) && !cci.name.Equals(OptionsDict.Phase3.continueEvaluation))
                                 {
                                     writeDebugFile("could not parse value " + cci.value + " with lenght " + cci.value.Length + "for key " + cci.name + " in stage " + cstep + " cciphzzzase ");
                                 }
-                                if (!hasOBjectOrParam.ContainsKey(cci.name) && !cci.name.Equals(OptionsDict.Phase3.continueEvaluation) && !cci.name.Equals(OptionsDict.Tools.dummyPlus) && !cci.name.Equals(OptionsDict.Tools.dummyNeg))
+                                if (cci.name.Length > ((OptionsDict.Tools.conditionConnector).Length+1) && cci.name.Contains(OptionsDict.Tools.conditionConnector))
+                                {
+                                    if(!Int32.TryParse(cci.name.Substring((OptionsDict.Tools.conditionConnector).Length+1,1), out condCon) || condCon > CCcountNeg || condCon < 1)
+                                    {
+                                        writeDebugFile("could not parse value Condition Conector" + cci.name + " with substring :"+ cci.name.Substring((OptionsDict.Tools.conditionConnector).Length, 1) + ": in stage " + cstep + " cciphzzzase ");
+                                    }
+                                }
+
+                                if (!hasOBjectOrParam.ContainsKey(cci.name) && !cci.name.Equals(OptionsDict.Phase3.continueEvaluation) 
+                                    && !cci.name.Equals(OptionsDict.Tools.dummyPlus) && !cci.name.Equals(OptionsDict.Tools.dummyNeg) 
+                                    && condCon == -1 && !cci.name.Equals(OptionsDict.Tools.conditionConnector)
+                                    && !cci.name.Equals(OptionsDict.Tools.dummyNegEnhancer))
                                 {
                                     writeDebugFile("could not find key " + cci.name + " in stage " + cstep + " cciphase " + cci.phase);
                                 }
@@ -6932,6 +7104,14 @@ namespace TheTerrariaSeedProject
                                         dummyTool += value;
                                         dummySet = true;
                                         conditionCheck += "in positive cPquerry " + cPquerry + "  tested dummy " + cci.name + ": " + value + "   , points:" + points + " stage " + cstep + Environment.NewLine;
+                                    }
+                                    else if (cci.name.Equals(OptionsDict.Tools.conditionConnector))
+                                    {
+                                        if (cci.phase == 2)
+                                            conditionConnectorIsActive[value] = true;
+                                        else if (cci.phase == 3)
+                                            cPquerry = cPquerry && conditionConnectorIsTrue[value] > 0; //gets true if any of those in phase 2 where true too
+                                       conditionCheck += "in positive cPquerry " + cPquerry + "  tested condCon " + cci.name + ": " + value + "   , points:" + points + " stage " + cstep + Environment.NewLine;
                                     }
                                     else
                                     {
@@ -6945,10 +7125,17 @@ namespace TheTerrariaSeedProject
                                     {
                                         points -= value;
                                         conditionCheck += "in negative cPquerry " + cPquerry + "  tested dummy " + cci.name + ": " + value + "   , points:" + points + " stage " + cstep + Environment.NewLine;
+                                    }else if(condCon != -1 && cci.phase == 2) {
+                                        points -= conditionConnectorIsFalse[condCon] > value ? negativeListPointSize : 0;
+                                        conditionCheck += "in negative cPquerry " + cPquerry + "  tested condCon " + cci.name + ": id:"+condCon+" , falseVal:"+ conditionConnectorIsFalse[condCon] +" >" + value + "   , points:" + points + " stage " + cstep + Environment.NewLine;
+                                    }else if (cci.name.Equals(OptionsDict.Tools.dummyNegEnhancer))
+                                    {
+                                        negativeListPointSize = value;
+                                        conditionCheck += "in negative cPquerry " + cPquerry + "  tested " + cci.name + ": negate below by > " + value + "   , points:" + points + " stage " + cstep + Environment.NewLine;
                                     }
                                     else
                                     {
-                                        points -= hasOBjectOrParam[cci.name] > value ? 1 : 0;
+                                        points -= hasOBjectOrParam[cci.name] > value ? negativeListPointSize : 0;
                                         conditionCheck += "in negative cPquerry " + cPquerry + "  tested " + cci.name + ": " + hasOBjectOrParam[cci.name] + " > " + value + "   , points:" + points + " stage " + cstep + Environment.NewLine;
                                     }
                                 }
@@ -6972,26 +7159,49 @@ namespace TheTerrariaSeedProject
                                 }
 
                                 break;
-                            case Configuration.ConfigItemType.SelectableListPositive:
-                                isInPositive = true; isInNegative = false;
-                                points += cPquerry && lastType != Configuration.ConfigItemType.SelectableListPositive ? (dummySet ? dummyTool : 1) : 0;
-                                cPquerry = true;
+                            case Configuration.ConfigItemType.SelectableListPositive:                                
+                                isPoint = cPquerry && lastType != Configuration.ConfigItemType.SelectableListPositive;
+                                points += isPoint ? (dummySet ? dummyTool : 1) : 0;
+                                for(int condconi=1; condconi < CCcount; condconi++)
+                                {
+                                    if (!conditionConnectorIsActive[condconi]) continue;
+                                    conditionConnectorIsActive[condconi] = false;
+                                    if (isPoint) conditionConnectorIsTrue[condconi]++;
+                                    else conditionConnectorIsFalse[condconi]++;
+
+                                }
+                                cPquerry = true;                                
                                 dummyTool = 0; dummySet = false;
+                                isInPositive = true; isInNegative = false;
+                                negativeListPointSize = 1;
                                 conditionCheck += "positive now cPquerry " + cPquerry + "  tested   , points:" + points + " stage " + cstep + Environment.NewLine;
                                 break;
                             case Configuration.ConfigItemType.SelectableListNegative:
-                                points += cPquerry && lastType != Configuration.ConfigItemType.SelectableListPositive ? (dummySet ? dummyTool : 1) : 0;
-                                cPquerry = false;
-                                isInNegative = true; isInPositive = false;
+                                isPoint = cPquerry && lastType != Configuration.ConfigItemType.SelectableListPositive;
+                                points += isPoint ? (dummySet ? dummyTool : 1) : 0;
+                                for (int condconi = 1; condconi < CCcount; condconi++)
+                                {
+                                    if (!conditionConnectorIsActive[condconi]) continue;
+                                    conditionConnectorIsActive[condconi] = false; // not needed here
+                                    if (isPoint) conditionConnectorIsTrue[condconi]++;
+                                    else conditionConnectorIsFalse[condconi]++;
+
+                                }
+
+                                cPquerry = false;                                
                                 dummyTool = 0; dummySet = false;
+                                isInNegative = true; isInPositive = false;
+                                negativeListPointSize = 1;
                                 conditionCheck += "negative now cPquerry " + cPquerry + "  tested    , points:" + points + " stage " + cstep + Environment.NewLine;
                                 break;
                             case Configuration.ConfigItemType.Header:
                                 points += cPquerry && lastType != Configuration.ConfigItemType.SelectableListPositive ? (dummySet ? dummyTool : 1) : 0;
+
                                 phaseStartingpoints = points;
                                 cPquerry = false;
                                 isInNegative = false; isInPositive = false;
                                 dummyTool = 0; dummySet = false;
+                                negativeListPointSize = 1;
                                 cstep++;
                                 conditionCheck += "header now cPquerry " + cPquerry + "  tested    , points:" + points + " stage " + cstep + " zz " + Environment.NewLine;
                                 break;
@@ -7042,7 +7252,9 @@ namespace TheTerrariaSeedProject
                 if (phase3Count == 0 && (step != 1 || phase2Count == 0) && points > 1)
                     points++;
 
+                conditionCheck += "total points " + points + Environment.NewLine;
 
+                //writeDebugFile(conditionCheck);
                 //writeDebugFile(" step " + step + " " + phase2Count + " 3:" + phase3Count + " p" + points);
 
 
@@ -7415,7 +7627,7 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["Min Living Tree Size"] = minTreeSize;
                 hasOBjectOrParam["Max Living Tree root Size"] = maxTreeRootSize;
                 hasOBjectOrParam["Max Living Tree total Size"] = maxTreeTotalSize;
-                hasOBjectOrParam["Max Tree exit cav.-entr. distance"] = maxDepth;
+                hasOBjectOrParam[OptionsDict.Phase2.maxTreeExitCavDist] = maxDepth;
 
                 hasOBjectOrParam["Tree to cavern layer"] = deepCavernTree;
                 hasOBjectOrParam["Tree to cavern layer near mid"] = deepCavernTreeNearMid;
@@ -7460,6 +7672,7 @@ namespace TheTerrariaSeedProject
             List<Tuple<int,int>> hearts = new List<Tuple<int, int>>();
             List<Tuple<int, int>> demonAltars = new List<Tuple<int, int>>();
             List<Tuple<int, int>> rubies = new List<Tuple<int, int>>();
+            List<Tuple<int, int>> explosive = new List<Tuple<int, int>>();
 
 
             int indx = 0;
@@ -7480,6 +7693,8 @@ namespace TheTerrariaSeedProject
                             demonAltars.Add(new Tuple<int, int>(x, y));
                         else if (Main.tile[x, y].active() && Main.tile[x, y].type == TileID.Ruby || (Main.tile[x, y].type == TileID.ExposedGems && Main.tile[x, y].frameX == 72))
                             rubies.Add(new Tuple<int, int>(x, y));
+                        else if (Main.tile[x, y].active() && Main.tile[x, y].type == TileID.Explosives)
+                            explosive.Add(new Tuple<int, int>(x, y));
                     }
 
                     rgbValues[indx++] = cc.B;
@@ -7591,7 +7806,7 @@ namespace TheTerrariaSeedProject
                 if (score.itemLocation.ContainsKey(ItemID.Ectoplasm))
                     foreach (var spot in score.itemLocation[ItemID.Ectoplasm])
                     {
-                        DrawCircle(ref rgbValues, spot, scale, new Color(0, 200, 200));
+                        DrawCircle(ref rgbValues, spot, scale, new Color(0, 170, 170));
                     }
 
                 foreach (var altars in demonAltars)
@@ -7614,6 +7829,11 @@ namespace TheTerrariaSeedProject
                 foreach (var ruby in rubies)
                 {                    
                     DrawCircle(ref rgbValues, ruby, scale, new Color(255, 0, 0), 3);
+                }
+                foreach (var expl in explosive)
+                {
+                    DrawCircle(ref rgbValues, expl, scale, new Color(255, 240, 0), 3);
+                    DrawCircle(ref rgbValues, expl, scale, new Color(255, 255, 160), 5);
                 }
             }
 
@@ -7751,7 +7971,7 @@ namespace TheTerrariaSeedProject
 
 
             int x = where.Item1 / scale ;
-            int y = where.Item2 / scale - iconbgs/2+1;
+            int y = where.Item2 / scale - iconbgs/2;//+1 removed
 
 
             int maxoff = rgbValues.Length - 1;
