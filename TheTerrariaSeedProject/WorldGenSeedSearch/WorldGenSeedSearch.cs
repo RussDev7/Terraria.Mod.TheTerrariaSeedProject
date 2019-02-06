@@ -5580,7 +5580,7 @@ namespace TheTerrariaSeedProject
 
 
             if (!System.IO.File.Exists(path))
-                return null;
+                return (new Tuple<List<int>, bool>(null , false));
 
             string content = "";
             using (System.IO.StreamReader file =
@@ -5590,7 +5590,7 @@ namespace TheTerrariaSeedProject
             }
 
             if (content.Length == 0)
-                return null;
+                return (new Tuple<List<int>, bool>(null , false));
 
             content = content.Normalize();
 
