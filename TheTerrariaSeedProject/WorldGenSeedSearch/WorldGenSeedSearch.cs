@@ -175,8 +175,14 @@ namespace TheTerrariaSeedProject
             }
 
 
+            bool quickStart = false;
+            if (Main.menuMode == 0 && stage == 0 && !ended)
+            {
+                quickStart = true;
+                writeDebugFile("starting in quick mode");
+            }
 
-            if (Main.menuMode != 10) { stage = 0; return; }
+            if (Main.menuMode != 10 && !quickStart) { stage = 0; return; }
             saveLogSet = false;
 
             if (stage == 0 && !ended)
@@ -193,6 +199,8 @@ namespace TheTerrariaSeedProject
                 string callingFun = new StackFrame(3, true).GetMethod().Name;
                 string callingFun7 = new StackFrame(useOtherStackFrame, true).GetMethod().Name; //some people have different exe overhaul
 
+                
+
 
                 if (!callingFun.Equals("do_worldGenCallBack") && !callingFun7.Equals("do_worldGenCallBack")) return;
 
@@ -205,7 +213,7 @@ namespace TheTerrariaSeedProject
                 string seedText = Main.ActiveWorldFileData.SeedText;
 
                 //do seed search?
-                if (!((worldName.Length > 0 && worldName[0] == '?') || (seedText.Length > 0 && seedText[0] == '?')))
+                if (!((worldName.Length > 0 && worldName[0] == '?') || (seedText.Length > 0 && seedText[0] == '?' || quickStart)))
                     return;
                 if (worldName.Length > 0 && worldName[0] == '?')
                     worldName = worldName.Substring(1, worldName.Length - 1);
@@ -213,7 +221,8 @@ namespace TheTerrariaSeedProject
 
                 
 
-                itemIDdoNotWant = readConfigFile();
+                Tuple<List<int>,bool> conf= readConfigFile();
+                itemIDdoNotWant = conf.Item1;
 
                 //stuff only need to done once
                 acond = new AcceptConditons();
@@ -931,9 +940,17 @@ namespace TheTerrariaSeedProject
             } else
             if (uiss.optionsButton.ContainsPoint(mousPos) && Main.mouseLeft)
             {
-                //change settings
+                //change settings                
                 goToOptions();
             }
+            //else
+            //if (uiss.helpButton.ContainsPoint(mousPos) && Main.mouseLeft)
+            //{
+            //    //help                
+            //    uiss.helpClick(null, null);
+            ///}
+
+
 
         }
 
@@ -1802,6 +1819,13 @@ namespace TheTerrariaSeedProject
 
             hasOBjectOrParam.Add("Pathlength to Teleport Potion", 1000000);
             hasOBjectOrParam.Add("Pathlength to 2 Teleport Potion Chest", 1000000);
+
+            hasOBjectOrParam.Add("Pathlength to 2nd Teleport Potion", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Lava Charm", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Water Walking Boots", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Fish Pet", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Seaweed Pet", 1000000);
+
             hasOBjectOrParam.Add("Pathlength to Meteorite Bar", 1000000);
             hasOBjectOrParam.Add("Pathlength to Iron/Lead Bar", 1000000);
             hasOBjectOrParam.Add("Pathlength to 10 Iron/Lead Bar Chest", 1000000);
@@ -1852,6 +1876,13 @@ namespace TheTerrariaSeedProject
 
             hasOBjectOrParam.Add("neg. Pathlength to Teleport Potion", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to 2 Teleport Potion Chest", -1000000);
+
+            hasOBjectOrParam.Add("neg. Pathlength to 2nd Teleport Potion", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Lava Charm", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Water Walking Boots", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Fish Pet", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Seaweed Pet", -1000000);
+
             hasOBjectOrParam.Add("neg. Pathlength to Meteorite Bar", -1000000);
 
             hasOBjectOrParam.Add("neg. Pathlength to Iron/Lead Bar", -1000000);
@@ -1991,7 +2022,8 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Pre Skeletron Golden Key Risky", 0);
             hasOBjectOrParam.Add("Pre Skeletron Golden Key Grab", 0);
             hasOBjectOrParam.Add("Pre Skeletron Golden Key Any", 0);
-
+           
+            hasOBjectOrParam.Add("Pre Skeletron Muramasa good positon", 0);
             hasOBjectOrParam.Add("Pre Skeletron Muramasa Chest reachable", 0);
             hasOBjectOrParam.Add("Pre Skeletron Cobalt Shield Chest reachable", 0);
             hasOBjectOrParam.Add("Pre Skeletron Shadow Key Chest reachable", 0);
@@ -2129,6 +2161,8 @@ namespace TheTerrariaSeedProject
                 ComputePathlength(ref pathLength);
 
             }
+            List<Tuple<int, int>> goldenKeyReach = new List<Tuple<int, int>>();
+            List<Tuple<int, int>> muramasaKeyReach = new List<Tuple<int, int>>();
 
 
             //check chests
@@ -2218,12 +2252,19 @@ namespace TheTerrariaSeedProject
                             {
                                 hasOBjectOrParam["Pre Skeletron Dungeon Chest Grab"] += 1;
                                 //writeDebugFile("########### can grab dungeon item at " + cx + " " + cy + " " + seed);
+                                
+                                if(chest.item[0].type == ItemID.Muramasa)
+                                {                                    
+                                    hasOBjectOrParam["Pre Skeletron Muramasa good positon"]++;
+                                }
+
                             }
                             else if (Main.tile[cx, cy].frameX == 0 && chest.item[0].type == ItemID.GoldenKey && chest.y > Main.worldSurface + 2)
                             {
                                 //excluding golden keys above surface, they are counted at other place
                                 hasOBjectOrParam["Pre Skeletron Golden Key Grab"] += 1;
                                 //writeDebugFile("########### can grab golden key at " + cx + " " + cy + " " + seed);
+                                goldenKeyReach.Add(new Tuple<int,int> (cx,cy));
                             }
                             canget = true;
                         }
@@ -2239,6 +2280,10 @@ namespace TheTerrariaSeedProject
                             {
                                 hasOBjectOrParam["Pre Skeletron Dungeon Chest Risky"] += 1;
                                 //writeDebugFile("########### can get dungeon item at " + cx + " " + cy + " " + seed);
+                                if (chest.item[0].type == ItemID.Muramasa)
+                                {
+                                    muramasaKeyReach.Add(new Tuple<int, int>(cx, cy));
+                                }
                             }
                             else if (Main.tile[cx, cy].frameX == 0 && chest.item[0].type == ItemID.GoldenKey)
                             {
@@ -2430,29 +2475,41 @@ namespace TheTerrariaSeedProject
                         {
 
                             if (item.type == ItemID.TeleportationPotion && (!isInDungeon(cx, cy) || cy < Main.worldSurface + 2))
-                            {
-                                if (pathl < hasOBjectOrParam["Pathlength to Teleport Potion"])
-                                {
-
-                                    hasOBjectOrParam["Pathlength to Teleport Potion"] = pathl;
-                                    hasOBjectOrParam["Nearest Teleportation Potion count"] = item.stack;
-
-                                    if (score.itemLocation.ContainsKey(ItemID.TeleportationPotion))
-                                        score.itemLocation[ItemID.TeleportationPotion] = new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) };
-                                    else
-                                        score.itemLocation.Add(ItemID.TeleportationPotion, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
-                                }
-                                //neg. Pathlength to 2 Teleport Potion Chest
+                            {                                
                                 if (pathl < hasOBjectOrParam["Pathlength to 2 Teleport Potion Chest"] && item.stack > 1)
                                 {
 
-                                    hasOBjectOrParam["Pathlength to 2 Teleport Potion Chest"] = pathl;                                    
+                                    hasOBjectOrParam["Pathlength to 2 Teleport Potion Chest"] = pathl;
+
+                                    if (pathl < hasOBjectOrParam["Pathlength to 2nd Teleport Potion"]) hasOBjectOrParam["Pathlength to 2nd Teleport Potion"] = pathl;
 
                                     if (score.itemLocation.ContainsKey(ItemID.ChaosFish))
                                         score.itemLocation[ItemID.ChaosFish] = new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) };
                                     else
                                         score.itemLocation.Add(ItemID.ChaosFish, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
                                 }
+
+                                if (pathl < hasOBjectOrParam["Pathlength to Teleport Potion"])
+                                {
+                                    hasOBjectOrParam["Pathlength to 2nd Teleport Potion"] = hasOBjectOrParam["Pathlength to Teleport Potion"];
+                                    hasOBjectOrParam["Pathlength to Teleport Potion"] = pathl;
+
+                                    if (score.itemLocation.ContainsKey(item.type))
+                                    {
+                                        score.itemLocation[item.type] = new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy), new Tuple<int, int>(score.itemLocation[item.type].ElementAt(0).Item1, score.itemLocation[item.type].ElementAt(0).Item2) };
+                                    }
+                                    else
+                                        score.itemLocation.Add(item.type, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
+
+
+                                }
+                                else if (pathl < hasOBjectOrParam["Pathlength to 2nd Teleport Potion"])
+                                {
+                                    //gets removed if equal to 2 teleport chest
+                                    hasOBjectOrParam["Pathlength to 2nd Teleport Potion"] = pathl;
+                                    score.itemLocation[item.type] = new List<Tuple<int, int>> { new Tuple<int, int>(score.itemLocation[item.type].ElementAt(0).Item1, score.itemLocation[item.type].ElementAt(0).Item2), new Tuple<int, int>(cx, cy) };
+                                }
+
 
 
 
@@ -2645,12 +2702,26 @@ namespace TheTerrariaSeedProject
                                 else
                                     score.itemLocation.Add(item.type, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
 
+                                
                                 hasOBjectOrParam["Shadow Chest item in normal chest"]++;
 
                                 
+                            }else if(item.type == ItemID.LavaCharm)
+                            {
+                                pathl = Math.Min(pathl, hasOBjectOrParam["Pathlength to Lava Charm"]);
                             }
-
-
+                            else if (item.type == ItemID.LavaCharm)
+                            {
+                                pathl = Math.Min(pathl, hasOBjectOrParam["Pathlength to Water Walking Boots"]);
+                            }
+                            else if (item.type == ItemID.LavaCharm)
+                            {
+                                pathl = Math.Min(pathl, hasOBjectOrParam["Pathlength to Fish Pet"]);
+                            }
+                            else if (item.type == ItemID.LavaCharm)
+                            {
+                                pathl = Math.Min(pathl, hasOBjectOrParam["Pathlength to Seaweed Pet"]);
+                            }
 
 
 
@@ -2661,6 +2732,34 @@ namespace TheTerrariaSeedProject
                     }
                 }
             }
+
+            if(score.itemLocation.ContainsKey(ItemID.TeleportationPotion) && score.itemLocation[ItemID.TeleportationPotion].Count > 1 && score.itemLocation.ContainsKey(ItemID.ChaosFish))
+            {
+                if(score.itemLocation[ItemID.TeleportationPotion][1].Item1 == score.itemLocation[ItemID.ChaosFish][0].Item1 &&
+                    score.itemLocation[ItemID.TeleportationPotion][1].Item2 == score.itemLocation[ItemID.ChaosFish][0].Item2)
+                {
+                    //remove 2nd tp potion if equal to 2tp chest
+                    score.itemLocation[ItemID.TeleportationPotion] = new List<Tuple<int, int>> { new Tuple<int, int>(score.itemLocation[ItemID.TeleportationPotion][0].Item1, score.itemLocation[ItemID.TeleportationPotion][0].Item2) };
+                }
+            }
+
+            if(goldenKeyReach.Count > 0 && muramasaKeyReach.Count > 0)
+            {
+                foreach(var gp in goldenKeyReach)
+                {
+                    foreach (var mp in muramasaKeyReach)
+                    {                        
+                        if ( (gp.Item1-mp.Item1)* (gp.Item1 - mp.Item1) + (gp.Item2 - mp.Item2) * (gp.Item2 - mp.Item2) < 22500) //dist < 150 tiles, x,y 106 each
+                        {
+                            hasOBjectOrParam["Pre Skeletron Muramasa good positon"]++; 
+                        }
+                    }
+                }
+            }
+            goldenKeyReach.Clear();
+            goldenKeyReach = null;
+            muramasaKeyReach.Clear();
+            muramasaKeyReach = null;
 
 
             int goldenKeys = hasOBjectOrParam["Pre Skeletron Golden Key Grab"] + hasOBjectOrParam["Pre Skeletron Golden Key Risky"];
@@ -4421,6 +4520,13 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["neg. Pathlength to Snowball Cannon"] = -hasOBjectOrParam["Pathlength to Snowball Cannon"];
                 hasOBjectOrParam["neg. Pathlength to Teleport Potion"] = -hasOBjectOrParam["Pathlength to Teleport Potion"];
                 hasOBjectOrParam["neg. Pathlength to 2 Teleport Potion Chest"] = -hasOBjectOrParam["Pathlength to 2 Teleport Potion Chest"];
+
+                hasOBjectOrParam["neg. Pathlength to 2nd Teleport Potion"] = -hasOBjectOrParam["Pathlength to 2nd Teleport Potion"];
+                hasOBjectOrParam["neg. Pathlength to Lava Charm"] = -hasOBjectOrParam["Pathlength to Lava Charm"];
+                hasOBjectOrParam["neg. Pathlength to Water Walking Boots"] = -hasOBjectOrParam["Pathlength to Water Walking Boots"];
+                hasOBjectOrParam["neg. Pathlength to Fish Pet"] = -hasOBjectOrParam["Pathlength to Fish Pet"];
+                hasOBjectOrParam["neg. Pathlength to Seaweed Pet"] = -hasOBjectOrParam["Pathlength to Seaweed Pet"];
+              
                 hasOBjectOrParam["neg. Pathlength to Meteorite Bar"] = -hasOBjectOrParam["Pathlength to Meteorite Bar"];
                 hasOBjectOrParam["neg. Pathlength to Enchanted Sword"] = -hasOBjectOrParam["Pathlength to Enchanted Sword"];
                 hasOBjectOrParam["neg. Pathlength to Altar"] = -hasOBjectOrParam["Pathlength to Altar"];
@@ -5468,7 +5574,7 @@ namespace TheTerrariaSeedProject
             }
         }
 
-        private static List<int> readConfigFile()
+        public static Tuple<List<int>, bool> readConfigFile()
         {
             string path = Main.SavePath + OptionsDict.Paths.debugPath + @".\modconfig.txt";
 
@@ -5487,27 +5593,42 @@ namespace TheTerrariaSeedProject
                 return null;
 
             content = content.Normalize();
-            int ind = content.IndexOf(OptionsDict.ModConfig.dontShowItemIDs);
-            if (ind > -1)
+
+            string[] lines = content.Split(System.Environment.NewLine.ToCharArray());
+            List<int> idn = new List<int>();
+            bool quickStart = false;
+
+            for (int l = 0; l < lines.Length; l++)
             {
-                content = content.Substring(ind + OptionsDict.ModConfig.dontShowItemIDs.Length);
-                string[] ids = content.Split(',');
-
-                List<int> idn = new List<int>();
-
-                for (int i = 0; i < ids.Length; i++)
+                
+                if (lines[l].Length == 0)
+                    continue;
+               
+                int ind = lines[l].IndexOf(OptionsDict.ModConfig.dontShowItemIDs);
+                if (ind > -1)
                 {
-                    int idt = -1;
+                    string[] ids = (lines[l].Substring(ind + OptionsDict.ModConfig.dontShowItemIDs.Length)).Split(',');
 
-                    if (Int32.TryParse(ids[i], out idt))
-                        idn.Add(idt);
+                    for (int i = 0; i < ids.Length; i++)
+                    {
+                        int idt = -1;
+
+                        if (Int32.TryParse(ids[i], out idt))
+                            idn.Add(idt);
+                    }
+                    continue;
                 }
-
-                return idn;
-
+                ind = lines[l].IndexOf(OptionsDict.ModConfig.quickStart);
+                
+                if (ind > -1)
+                {
+                    string doOrNot = lines[l].Substring(ind + OptionsDict.ModConfig.quickStart.Length);
+                    quickStart = doOrNot.Trim().Length > 0;
+                    continue;
+                }
             }
 
-            return null;
+            return (new Tuple<List<int>, bool> ( (idn.Count == 0 ? null : idn), quickStart ));
         }
 
 
@@ -6327,6 +6448,7 @@ namespace TheTerrariaSeedProject
 
             score += hasOBjectOrParam["Pre Skeletron Dungeon Chest Risky"] > 0 ? 100 * hasOBjectOrParam["Pre Skeletron Dungeon Chest Risky"] : 0;
             score += hasOBjectOrParam["Pre Skeletron Dungeon Chest Grab"] > 0 ? 200 * hasOBjectOrParam["Pre Skeletron Dungeon Chest Grab"] : 0;
+            score += hasOBjectOrParam["Pre Skeletron Muramasa good positon"] > 0 ? 50 * hasOBjectOrParam["Pre Skeletron Muramasa good positon"] : 0;
             if (hasOBjectOrParam["Pre Skeletron Dungeon Chest Grab"] > 0 || hasOBjectOrParam["Pre Skeletron Dungeon Chest Risky"] > 0)
                 allScoreText += System.Environment.NewLine + "Score Pre Skeletron Dungeon Chest " + (int)score;
 
@@ -6835,10 +6957,12 @@ namespace TheTerrariaSeedProject
                         rares += checkAdd("Chest duplication Glitch");  //<--that might not find all int that step                    
                         
                         rares += checkAdd("Pre Skeletron Dungeon Chest Grab");
+                        rares += checkAdd("Pre Skeletron Dungeon Chest Risky");                        
+
                     }
                     else
                     {
-                        if (hasOBjectOrParam["Pre Skeletron Muramasa Chest reachable"] > 0)
+                        if (hasOBjectOrParam["Pre Skeletron Muramasa good positon"] > 0)
                         {
                             rares += checkAdd("Pre Skeletron Dungeon Chest Risky");
                             rares += checkAdd("Pre Skeletron Dungeon Chest Grab");
@@ -6876,6 +7000,7 @@ namespace TheTerrariaSeedProject
                         rares += checkAdd("Enchanted Sword near Pyramid");
                         rares += checkAdd("Spawn in Snow biome");
                         rares += checkAdd(OptionsDict.Phase3.lonelyJungleTree);
+                        rares += checkAdd(OptionsDict.Phase3.openTemple);
                     }
 
                     if (!omitRare.Contains(OptionsDict.GeneralOptions.omitBadRare) && !omitRare.Contains(OptionsDict.GeneralOptions.omitBaCRare))
@@ -6891,8 +7016,7 @@ namespace TheTerrariaSeedProject
                     rares += checkAdd("Floating island cabin in Dungeon");
                     rares += checkAdd("Detonator at surface");
                     rares += checkAdd(OptionsDict.Phase3.greenPyramid);                    
-                    rares += checkAdd(OptionsDict.Phase3.openTemple);
-
+                    
                     rares += checkAdd("Spawn in Marble or Granite biome");
                     rares += checkAdd("Shadow Chest item in normal chest");
                     rares += checkAdd("Mushroom Biome above surface");
@@ -7924,6 +8048,26 @@ namespace TheTerrariaSeedProject
                     y += iconbgs-1;
                 
             }
+
+            if(y >= Main.maxTilesY / scale - 4 * iconbgs)
+            {
+                while (x < Main.maxTilesX / scale - 4 * iconbgs)
+                {
+                    int offt = (y + 4) * Main.maxTilesX * 4 / scale + x * 4;
+                    //if (rgbValues[offt + 0] != (byte)255 || rgbValues[offt + 1] != (byte)255 || rgbValues[offt + 2] != (byte)255)
+
+                    if (offt + 3 > maxoff)
+                        continue;
+
+                    if (rgbValues[offt + 3] != (byte)254)
+                        break;
+                    else
+                        x += iconbgs - 1;
+
+                }
+            }
+
+
 
             for (int h = 0; h < iconbgs; h++)
                 for (int w = 0; w < iconbgs; w++)
