@@ -86,6 +86,7 @@ namespace TheTerrariaSeedProject.UI
 
             public const string openTemple = "Open Temple";
             public const string greenPyramid = "Green Pyramid";
+            public const string frozenTemple = "Frozen Temple";
             public const string lonelyJungleTree = "Lonely jungle tree";
             public const string allChestItemsNoCraftFish = "All chest items you can't craft or fish";
 
@@ -254,13 +255,15 @@ namespace TheTerrariaSeedProject.UI
         public static readonly List<string> v0to2 = getPatern(0, 3);
         public static readonly List<string> vboost = getPatern(10, 40).Concat(getPatern(50, 11, 5).Concat(new string[] {"110","134","150","190","200","300","400" }.ToList())).ToList();
         public static readonly List<string> vDungeonWalls = getPatern(10000, 19, 5000);
-        public static readonly List<string> vDungeonALLWalls = getPatern(0, 4, 250).Concat(getPatern(1000, 9, 1000)).Concat(getPatern(10000, 21, 2000)).ToList();
+        public static readonly List<string> vDungeonALLWalls = getPatern(0, 3, 50, 1 , 2).Concat(getPatern(250, 3, 250).Concat(getPatern(1000, 9, 1000)).Concat(getPatern(10000, 21, 2000))).ToList();
         public static readonly List<string> vNearEvilOcean = getPatern(0, 8, 25).Concat(getPatern(400, 5, 100)).Concat(getPatern(1000, 10, 200)).ToList();
         public static readonly List<string> vBeachPenalty = getPatern(100, 9, 100).Concat(getPatern(1000, 4, 250)).Concat(getPatern(2000, 16, 500)).Concat(getPatern(10000, 11, 1000)).ToList();
         public static readonly List<string> vEvilTiles = getPatern(0, 10, 10).Concat(getPatern(100, 9, 100)).Concat(getPatern(1000, 9, 1000)).Concat(getPatern(10000, 9, 5000)).ToList();
         public static readonly List<string> vEvilTilesNeg = getPatern(-50000, 8, 5000).Concat(getPatern(-10000, 9, 1000)).Concat(getPatern(-1000, 9, 100)).Concat(getPatern(-100, 11, 10)).ToList();
         public static readonly List<string> vDistance = getPatern(5, 4, 5).Concat(getPatern(25, 7, 25).Concat(getPatern(200, 4, 50).Concat(getPatern(400, 6, 100).Concat(getPatern(1000, 5, 200)).Concat(getPatern(2000, 9, 250))))).ToList();
-        public static readonly List<string> vDistanceNeg = getPatern(-1000, 9, 100).Concat(getPatern(-100, 3, 25).Concat(getPatern(-25, 10, 5).Concat(getPatern(25, 3, 25).Concat(getPatern(100, 9, 100).Concat(getPatern(1000, 5, 200)).Concat(getPatern(2000, 9, 250)))))).ToList();
+        public static readonly List<string> vDistanceNeg = getPatern(-5, 4, -5).Concat(getPatern(-25, 7, -25).Concat(getPatern(-200, 4, -50).Concat(getPatern(-400, 6, -100).Concat(getPatern(-1000, 5, -200)).Concat(getPatern(-2000, 9, -250))))).ToList();
+        public static readonly List<string> vDistanceOverlap = getPatern(-1000, 9, 100).Concat(getPatern(-100, 3, 25).Concat(getPatern(-25, 10, 5).Concat(getPatern(25, 3, 25).Concat(getPatern(100, 9, 100).Concat(getPatern(1000, 5, 200)).Concat(getPatern(2000, 9, 250)))))).ToList();
+        public static readonly List<string> vDistanceOverlapNeg = getPatern(1000, 9, -100).Concat(getPatern(100, 3, -25).Concat(getPatern(25, 10, -5).Concat(getPatern(-25, 3, -25).Concat(getPatern(-100, 9, -100).Concat(getPatern(-1000, 5, -200)).Concat(getPatern(-2000, 9, -250)))))).ToList();
         public static readonly List<string> vDistanceShort = getPatern(25, 9, 25).Concat(getPatern(250, 4, 50)).Concat(getPatern(500, 16, 100)).ToList();
         public static readonly List<string> vDistanceShortNeg = getPatern(-25, 9, -25).Concat(getPatern(-250, 4, -50)).Concat(getPatern(-500, 16, -100)).ToList();
         public static readonly List<string> vDistanceLong = getPatern(200, 8, 100).Concat(getPatern(1000, 17, 200)).ToList();
@@ -499,6 +502,7 @@ namespace TheTerrariaSeedProject.UI
                 "Omit Shadow Chest item in normal chest",
                 "Omit Mushroom Biome above surface",
                 "Omit Spawn in Marble or Granite biome",
+                "Omit "+ Phase3.frozenTemple,
                 "Omit All Paintings",
                 "Omit "+ Phase3.allChestItemsNoCraftFish,
                 
@@ -603,6 +607,9 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Distance Dungeon to mid", 
                 "neg. Distance ShadowOrb/Heart to mid",
                 "neg. Distance Lake to mid (guess)",
+                "neg. Jungle biome distance to mid",
+                "neg. Snow biome distance to mid",
+                "neg. Evil biome distance to mid",
                 "neg. Evil Tiles for Jungle Grass",
                 "neg. Evil Tiles for Sand",
                 "neg. Evil Tiles for Ice",
@@ -723,8 +730,8 @@ namespace TheTerrariaSeedProject.UI
             Add("Evil only one side", v0to1);
             Add("Snow biome surface overlap mid", vNumTiles);
             Add("Jungle biome surface overlap mid", vNumTiles);
-            Add("Jungle biome distance to mid", vDistanceNeg);
-            Add("Snow biome distance to mid", vDistanceNeg);
+            Add("Jungle biome distance to mid", vDistanceOverlap);
+            Add("Snow biome distance to mid", vDistanceOverlap);
             Add("Evil biome distance to mid", vDistance);
             Add("Surface average height (aprox.)", vMeanHeight);
             Add("Surface height (sqrt) variance", v0to120);
@@ -756,6 +763,10 @@ namespace TheTerrariaSeedProject.UI
             Add("neg. Distance Dungeon to mid", vDistanceShortNeg);
             Add("neg. Distance ShadowOrb/Heart to mid", vDistanceShortNeg);
             Add("neg. Distance Lake to mid (guess)", vDistanceShortNeg);
+
+            Add("neg. Jungle biome distance to mid", vDistanceOverlapNeg);
+            Add("neg. Snow biome distance to mid", vDistanceOverlapNeg);
+            Add("neg. Evil biome distance to mid", vDistanceNeg);
 
 
             Add("neg. Evil Tiles for Jungle Grass", vEvilTilesNeg);
@@ -1345,7 +1356,7 @@ namespace TheTerrariaSeedProject.UI
                 "(except there is also a living tree reaching to it),\n Floating Island without chest");
 
             HelpDict.Add(GeneralOptions.omitCommonRare, "Omits \nChest duplication Glitch,\n Pre Skeletron Dungeon Chest Risky/Grab " +
-                "(except its a Muramasa (for NE) you can grab or has a near golden key you can grab),\n Dungeon in Snow Biome,\n Near Enchanted Sword,\n Enchanted Sword near Tree/Pyramid,\n Spawn in Snow biome,\n " + Phase3.lonelyJungleTree + ",\n " + Phase3.openTemple);
+                "(except its a Muramasa (for NE) you can grab or has a near golden key you can grab),\n Dungeon in Snow Biome,\n Near Enchanted Sword,\n Enchanted Sword near Tree/Pyramid,\n Spawn in Snow biome,\n Shadow Chest item in normal chest, \n" + Phase3.lonelyJungleTree + ",\n " + Phase3.openTemple);
 
             HelpDict.Add(GeneralOptions.omitBaCRare, "Combines omitting bad and more common rare. Look there for me details.");
 
@@ -1516,6 +1527,7 @@ namespace TheTerrariaSeedProject.UI
             //phase 3
 
             HelpDict.Add(Phase3.greenPyramid, "A pyramid with green interiority.");
+            HelpDict.Add(Phase3.frozenTemple, "A Jungle Temple which has snow biome around.");
 
             
 
@@ -1623,7 +1635,12 @@ namespace TheTerrariaSeedProject.UI
             HelpDict.Add("Underground Distance to spawn", "How many tiles downwards until end of world");
             HelpDict.Add("Cavern Distance to spawn", "How many tiles downwards until start of cavern layer");
 
-            
+
+
+            HelpDict.Add("neg. Jungle biome distance to mid", "Negative amount of blocks until Jungle biome starts. The value is positive if Jungle biome overlap mid");
+            HelpDict.Add("neg. Snow biome distance to mid", "Negative amount of blocks until Snow biome starts. The value is positive if Snow biome overlap mid");
+                    
+
 
         }
 

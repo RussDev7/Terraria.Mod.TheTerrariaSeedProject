@@ -1253,7 +1253,7 @@ namespace TheTerrariaSeedProject.UI
                 
 
 
-                if (descText.Contains("neg. "))
+                if (descText.Contains("neg. ") && !uiss.opdict.HelpDict.ContainsKey(descText))
                 {
                     containsNeg = true;
                     descText = descText.Substring(("neg. ").Length);
