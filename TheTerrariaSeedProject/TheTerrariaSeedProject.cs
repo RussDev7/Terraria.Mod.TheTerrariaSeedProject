@@ -50,7 +50,16 @@ namespace TheTerrariaSeedProject
         }
         public override void Load()
         {
-            
+
+            Tuple<List<int>, bool> conf = WorldGenSeedSearch.readConfigFile();
+
+            if (conf.Item2 == true)
+            {
+                Main.menuMode = 10; //does not work            
+                WorldGen.CreateNewWorld(null);
+            }
+
+
 
         }
         public override void Unload()
@@ -61,7 +70,7 @@ namespace TheTerrariaSeedProject
             {
                 System.IO.File.Delete(olddbf);
             }
-
+            WorldGen.saveLock = false;
         }
 
 
