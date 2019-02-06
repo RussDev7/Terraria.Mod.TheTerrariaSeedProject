@@ -1093,11 +1093,11 @@ namespace TheTerrariaSeedProject.UI
             Add("neg. Pathlength to Snowball Cannon", vPathLengthNeg);
             Add("neg. Pathlength to Teleport Potion", vPathLengthNeg);
             Add("neg. Pathlength to 2 Teleport Potion Chest", vPathLengthNeg);
-            Add("neg. Pathlength to 2nd Teleport Potion", vPathLength);
-            Add("neg. Pathlength to Lava Charm", vPathLength);
-            Add("neg. Pathlength to Water Walking Boots", vPathLength);
-            Add("neg. Pathlength to Fish Pet", vPathLength);
-            Add("neg. Pathlength to Seaweed Pet", vPathLength);
+            Add("neg. Pathlength to 2nd Teleport Potion", vPathLengthNeg);
+            Add("neg. Pathlength to Lava Charm", vPathLengthNeg);
+            Add("neg. Pathlength to Water Walking Boots", vPathLengthNeg);
+            Add("neg. Pathlength to Fish Pet", vPathLengthNeg);
+            Add("neg. Pathlength to Seaweed Pet", vPathLengthNeg);
             Add("neg. Pathlength to Meteorite Bar", vPathLengthNeg);
             Add("neg. Pathlength to Enchanted Sword", vPathLengthNeg);
             Add("neg. Pathlength to Altar", vPathLengthNeg);
