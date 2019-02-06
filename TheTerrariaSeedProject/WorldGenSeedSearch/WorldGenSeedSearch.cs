@@ -6414,7 +6414,7 @@ namespace TheTerrariaSeedProject
             allScoreText += System.Environment.NewLine + "Score Paintings " + (int)score;
 
 
-            score += hasOBjectOrParam["Different functional noncraf. Statues"] == 26 ? hasOBjectOrParam["Number functional noncraf. Statues"] * (0.25f / (mapScale - 1)) : -100;
+            score += hasOBjectOrParam["Different functional noncraf. Statues"] == 26 - (Main.expertMode ? 0 : 2) ? hasOBjectOrParam["Number functional noncraf. Statues"] * (0.25f / (mapScale - 1)) : -100;
             score += hasOBjectOrParam["Different noncraf. Statues"] == 56 ? hasOBjectOrParam["Number noncraf. Statues"] * (0.05f / (mapScale - 1)) : -50;
             allScoreText += System.Environment.NewLine + "Score Statues " + (int)score;
 
@@ -6586,7 +6586,7 @@ namespace TheTerrariaSeedProject
             if (hasOBjectOrParam["Alchemy Table"] < 1) multiWorldNeg++;
             if (hasOBjectOrParam["Sharpening Station"] < 2) multiWorldNeg++;
             if (hasOBjectOrParam["Sharpening Station"] < 1) multiWorldNeg++;
-            if (hasOBjectOrParam["Different functional noncraf. Statues"] < 26) multiWorldNeg++;
+            if (hasOBjectOrParam["Different functional noncraf. Statues"] < 26 - (Main.expertMode ? 0 : 2) ) multiWorldNeg++;
             if (hasOBjectOrParam["Jungle cavern not blocked by structure"] == 0) multiWorldNeg++;
             if (hasOBjectOrParam["Pathlength to 40% cavern entrance"] > 350 || hasOBjectOrParam["Tiles to mine for 40% cavern"] > 20) multiWorldNeg++;
             multiWorldNeg = (float)Math.Ceiling(0.5 * multiWorldNeg);
@@ -7049,6 +7049,7 @@ namespace TheTerrariaSeedProject
                         rares += checkAdd("Spawn in Snow biome");
                         rares += checkAdd(OptionsDict.Phase3.lonelyJungleTree);
                         rares += checkAdd(OptionsDict.Phase3.openTemple);
+                        rares += checkAdd("Shadow Chest item in normal chest");
                     }
 
                     if (!omitRare.Contains(OptionsDict.GeneralOptions.omitBadRare) && !omitRare.Contains(OptionsDict.GeneralOptions.omitBaCRare))
@@ -7068,7 +7069,7 @@ namespace TheTerrariaSeedProject
                     
 
                     rares += checkAdd("Spawn in Marble or Granite biome");
-                    rares += checkAdd("Shadow Chest item in normal chest");
+                    
                     rares += checkAdd("Mushroom Biome above surface");
                     rares += checkAdd("All Paintings");
 
@@ -7141,9 +7142,9 @@ namespace TheTerrariaSeedProject
                 CheckAddItem("All Dungeon Walls", "Not all Dungeon walls present");
 
 
-                if (hasOBjectOrParam["Different functional noncraf. Statues"] < 26)
+                if (hasOBjectOrParam["Different functional noncraf. Statues"] < 26 - (Main.expertMode ? 0 : 2) )
                 {
-                    itemlist += (26 - hasOBjectOrParam["Different functional noncraf. Statues"]).ToString() + " functional statue" + Environment.NewLine;
+                    itemlist += (26 - (Main.expertMode ? 0 : 2) - hasOBjectOrParam["Different functional noncraf. Statues"]).ToString() + " functional statue" + Environment.NewLine;
                     missingCount++;
                 }
                 else missingCountNot++;
