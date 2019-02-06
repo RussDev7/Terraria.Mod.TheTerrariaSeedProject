@@ -139,24 +139,7 @@ namespace TheTerrariaSeedProject.UI
             float spacing = 3f;
 
 
-            helpPanel = new UIPanel();
-            helpPanel.SetPadding(5);
-            helpPanel.HAlign = 0.0f;
-            helpPanel.VAlign = 0.25f;
-            helpPanel.Top.Pixels = -2*spacing - helpButton.Height.Pixels*2;
-            helpPanel.Left.Pixels = 20;                    
-            helpPanel.BackgroundColor = new Color(73, 94, 171);
-            helpPanel.Width.Set(helpButton.Width.Pixels + 2*spacing + helpPanel.PaddingLeft + helpPanel.PaddingRight, 0f);
-            helpPanel.Height.Set(helpButton.Height.Pixels + 2 * spacing + helpPanel.PaddingTop + helpPanel.PaddingBottom, 0f);           
-
-            helpButton.Left.Pixels = spacing;
-            helpButton.OnClick += helpClick;
-
-            helpButton.OnMouseOver += helpHoverIn;
-            helpButton.OnMouseOut += helpHoverOut;
-
-            helpPanel.Append(helpButton);
-            Append(helpPanel);
+      
             
 
             detailsPanel = new UIPanel();
@@ -184,6 +167,8 @@ namespace TheTerrariaSeedProject.UI
             detailsList.ListPadding = 12f;
             detailsList.MarginRight = 10;
             detailsPanel.Append(detailsList);
+
+         
 
             detailsPanel.Append(detailsListScrollbar);
             detailsList.SetScrollbar(detailsListScrollbar);
@@ -221,9 +206,34 @@ namespace TheTerrariaSeedProject.UI
             opdict = new OptionsDict();
             infopanel = new InfoPanel(optionList, detailsList, opdict);
 
-
-
             Append(optionPanel);
+
+                             
+            
+            helpPanel = new UIPanel();
+            helpPanel.SetPadding(5);
+            helpPanel.HAlign = 0.0f;
+            helpPanel.VAlign = 0.25f;
+            helpPanel.Top.Pixels = -2 * spacing - helpButton.Height.Pixels * 2;
+            helpPanel.Left.Pixels = 20;
+            helpPanel.BackgroundColor = new Color(73, 94, 171);
+            helpPanel.Width.Set(helpButton.Width.Pixels + 2 * spacing + helpPanel.PaddingLeft + helpPanel.PaddingRight, 0f);
+            helpPanel.Height.Set(helpButton.Height.Pixels + 2 * spacing + helpPanel.PaddingTop + helpPanel.PaddingBottom, 0f);
+
+            helpButton.Left.Pixels = spacing;
+
+            helpButton.OnMouseOver += helpHoverIn;
+            helpButton.OnMouseOut += helpHoverOut;
+
+            SelectableText tt = new SelectableText(new UITextPhrase(0, ""), detailsList, opdict, "", opdict.HelpDict[OptionsDict.Help.helpBut]);
+            helpButton.OnClick += tt.select; //direct select without tt dummy don't work if you do it right after a seed was done -> collection changing size TODO
+            helpPanel.Append(tt.self);
+
+            helpPanel.Append(helpButton);
+            Append(helpPanel);
+
+
+            
 
             
             int spacingVFac = 4;
@@ -378,8 +388,8 @@ namespace TheTerrariaSeedProject.UI
 
             InitCountText();
             writtenText = "";
+            writtenStats = "";
 
-            
 
         }
 
@@ -554,7 +564,9 @@ namespace TheTerrariaSeedProject.UI
         {
             if (detailsList != null && detailsPanel != null && detailsListScrollbar != null && !writeTextUpdating)
             {
-                if (!writeTextUpdating && !detailsList.isUpdating && !rephrasing && (!wgss.inSearch || wgss.isInCreation) && (this.currentSize != (this.GetDimensions()).Width || writeText || ((detailsList.entryList.Count == 0) && writeStats) || (detailsList.entryList.Count == 0 && wgss.isInCreation && writtenText.Length > 0)))
+                //changed to not write long list if select option
+                //if (!writeTextUpdating && !detailsList.isUpdating && !rephrasing && (!wgss.inSearch || wgss.isInCreation) && (this.currentSize != (this.GetDimensions()).Width || writeText || ((detailsList.entryList.Count == 0) && writeStats) || (detailsList.entryList.Count == 0 && wgss.isInCreation && writtenText.Length > 0)))
+                if (!writeTextUpdating && !detailsList.isUpdating && !rephrasing && (!wgss.inSearch || wgss.isInCreation) && ( (this.currentSize != (this.GetDimensions()).Width && detailsList.entryList.Count != 0) || writeText || ((detailsList.entryList.Count == 0) && writeStats) ))
                 {                    
                     rephrasing = true;
                     writeText = true;
@@ -569,18 +581,26 @@ namespace TheTerrariaSeedProject.UI
                     rephrasing = false;
                 }
                 else
-                if (!writeTextUpdating && !detailsList.isUpdating && !rephrasing && !wgss.inSearch && writeStats && !writeText && this.currentSize == (this.GetDimensions()).Width)
+                if (!writeTextUpdating && !detailsList.isUpdating && !rephrasing && !wgss.inSearch && writeStats && !writeText )
                 {
+                    //if (!writeTextUpdating && !detailsList.isUpdating && !rephrasing && !wgss.inSearch && writeStats && !writeText && this.currentSize == (this.GetDimensions()).Width)
 
                     //also throws erro
-                    rephrasing = true;
-                    writeText = true;
-                    if (detailsList.entryList.Count > 0)
-                        detailsList.entryList[0].SetTo(writtenStats);
-
-                    writeStats = false;
-                    writeText = false;
-                    rephrasing = false;
+                    if (this.currentSize == (this.GetDimensions()).Width)
+                    {
+                        rephrasing = true;
+                        writeText = true;
+                        if (detailsList.entryList.Count > 0)
+                            detailsList.entryList[0].SetTo(writtenStats);
+                        
+                        writeStats = false;
+                        writeText = false;
+                        rephrasing = false;
+                    }
+                    else
+                    {
+                        this.currentSize = (this.GetDimensions()).Width;
+                    }
                 }
                 
                 if (infopanel != null && infopanel.uielem.Count != lastOptionSize && wgss.isInCreation)
@@ -731,9 +751,17 @@ namespace TheTerrariaSeedProject.UI
 
         private void optionsClick(UIMouseEvent evt, UIElement listeningElement)
         {
-            if (wgss.inSearch)
-            {                
-                wgss.goToOptions(true); 
+            if (wgss.inSearch && !wgss.isInCreation)
+            {
+                wgss.goToOptions(true);
+            }
+            else if (wgss.isInCreation)
+            {
+                if (detailsList != null && detailsList.entryList != null && detailsList.entryList.Count == 0 && !writeText && !writeStats)
+                {
+                    writeText = true;
+                    writeStats = true;
+                }
             }
         }
 
@@ -770,22 +798,7 @@ namespace TheTerrariaSeedProject.UI
             }
         }
 
-        private void helpClick(UIMouseEvent evt, UIElement listeningElement)
-        {
-            if (!wgss.searchForSeed && opdict!=null)
-            {
-                string help = opdict.HelpDict[OptionsDict.Help.helpBut];
-                if (writeTextUpdating) return;
-
-                writeTextUpdating = true;
-                detailsList.Clear();
-                detailsList.UpdateText(help);
-                writeTextUpdating = false;
-
-            }
-        }
-
-
+      
 
         int currentPositive = 0;
         private void positiveClick(UIMouseEvent evt, UIElement listeningElement)
@@ -1063,7 +1076,7 @@ namespace TheTerrariaSeedProject.UI
 
                 currentPositive++;
                 if (currentPositive > 6) currentPositive = 0;
-                writeText = true; 
+                //writeText = true; 
             }            
         }
 

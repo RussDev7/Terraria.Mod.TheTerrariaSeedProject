@@ -28,7 +28,8 @@ namespace TheTerrariaSeedProject.UI
         {
             public const string configName = "Config file name";
             public const string startingSeed = "Starting seed search at";
-            public const string searchSeedNum = "Search until starting seed +";
+            public const string searchSeedNumLegacy = "Search until starting seed +";
+            public const string searchSeedNum = "Search seed count";
             public const string stopSearchNum = "Stop search if found";
             public const string stepSize = "Seed cycle step size";
             public const string storeMMPic = "Store mini map as picture";
@@ -148,7 +149,8 @@ namespace TheTerrariaSeedProject.UI
 
         public static class ModConfig
         {
-            public const string dontShowItemIDs = "#dontShowItemIDs:";            
+            public const string dontShowItemIDs = "#dontShowItemIDs:";
+            public const string quickStart = "#quickStart:";
         }
 
         public static class Help
@@ -296,7 +298,7 @@ namespace TheTerrariaSeedProject.UI
 
             Add(title, new List<string> {
                 "If you search for a seed the search starts at the entered. It will continue searching until it reached the selected max amount or found as many you like. After finishing one seed" +
-                "it will increase it by the selected cycle step size and continue there. For some quick overview you can also store a picture of the world and a text file containg (nearly) all " +
+                " it will increase it by the selected cycle step size and continue there. For some quick overview you can also store a picture of the world and a text file containg (nearly) all " +
                 "information gathered about the world, the configuration and the current search stats. \n \n"+
 
 
@@ -556,7 +558,8 @@ namespace TheTerrariaSeedProject.UI
                 "Pre Skeletron Dungeon Chest Risky",
                 "Pre Skeletron Dungeon Chest Grab",
                 "Pre Skeletron Dungeon Chest Any",
-                "Pre Skeletron Muramasa Chest reachable",
+                "Pre Skeletron Muramasa good positon",
+                "Pre Skeletron Muramasa Chest reachable",                
                 "Pre Skeletron Cobalt Shield Chest reachable",
                 "Pre Skeletron Shadow Key Chest reachable",
                 "Pre Skeletron Golden Key Grab",
@@ -692,7 +695,8 @@ namespace TheTerrariaSeedProject.UI
             Add("Pre Skeletron Dungeon Chest Risky", v0to10);
             Add("Pre Skeletron Dungeon Chest Grab", v0to10);
             Add("Pre Skeletron Dungeon Chest Any", v0to10);
-            Add("Pre Skeletron Muramasa Chest reachable", v0to5);
+            Add("Pre Skeletron Muramasa good positon", v0to5);
+            Add("Pre Skeletron Muramasa Chest reachable", v0to5);      
             Add("Pre Skeletron Cobalt Shield Chest reachable", v0to5);
             Add("Pre Skeletron Shadow Key Chest reachable", v0to5);
             Add("Pre Skeletron Golden Key Grab", v0to5);
@@ -860,6 +864,7 @@ namespace TheTerrariaSeedProject.UI
                 "Temple at height (%)",
                 "Temple at depth (%)",
                 Phase3.openTemple,
+                Phase3.lonelyJungleTree,
                 "Mushroom Biome above surface count",
                 "neg. Pathlength to Temple Door",
                 "neg. Pathlength to Boots",
@@ -876,6 +881,11 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Pathlength to Snowball Cannon",
                 "neg. Pathlength to Teleport Potion",
                 "neg. Pathlength to 2 Teleport Potion Chest",
+                "neg. Pathlength to 2nd Teleport Potion",
+                "neg. Pathlength to Lava Charm",
+                "neg. Pathlength to Water Walking Boots",
+                "neg. Pathlength to Fish Pet",
+                "neg. Pathlength to Seaweed Pet",
                 "neg. Pathlength to Meteorite Bar",
                 "neg. Pathlength to Enchanted Sword",
                 "neg. Pathlength to Altar",
@@ -956,6 +966,11 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to Snowball Cannon",
                 "Pathlength to Teleport Potion",
                 "Pathlength to 2 Teleport Potion Chest",
+                "Pathlength to 2nd Teleport Potion",
+                "Pathlength to Lava Charm",
+                "Pathlength to Water Walking Boots",
+                "Pathlength to Fish Pet",
+                "Pathlength to Seaweed Pet",
                 "Pathlength to Meteorite Bar",
                 "Pathlength to Enchanted Sword",
                 "Pathlength to Altar",
@@ -1060,6 +1075,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Free cavern to deep Jungle", v0to1);
             Add("Jungle cavern not blocked by structure", v0to1);
             Add(OptionsDict.Phase3.openTemple, v0to1);
+            Add(OptionsDict.Phase3.lonelyJungleTree, v0to1);
             Add("Mushroom Biome above surface count", vNumTiles);
 
             Add("neg. Pathlength to Temple Door", vPathLengthNeg);
@@ -1077,6 +1093,11 @@ namespace TheTerrariaSeedProject.UI
             Add("neg. Pathlength to Snowball Cannon", vPathLengthNeg);
             Add("neg. Pathlength to Teleport Potion", vPathLengthNeg);
             Add("neg. Pathlength to 2 Teleport Potion Chest", vPathLengthNeg);
+            Add("neg. Pathlength to 2nd Teleport Potion", vPathLength);
+            Add("neg. Pathlength to Lava Charm", vPathLength);
+            Add("neg. Pathlength to Water Walking Boots", vPathLength);
+            Add("neg. Pathlength to Fish Pet", vPathLength);
+            Add("neg. Pathlength to Seaweed Pet", vPathLength);
             Add("neg. Pathlength to Meteorite Bar", vPathLengthNeg);
             Add("neg. Pathlength to Enchanted Sword", vPathLengthNeg);
             Add("neg. Pathlength to Altar", vPathLengthNeg);
@@ -1125,6 +1146,12 @@ namespace TheTerrariaSeedProject.UI
             Add("Pathlength to Snowball Cannon", vPathLength);
             Add("Pathlength to Teleport Potion", vPathLength);
             Add("Pathlength to 2 Teleport Potion Chest", vPathLength);
+            Add("Pathlength to 2nd Teleport Potion", vPathLength);
+            Add("Pathlength to Lava Charm", vPathLength);
+            Add("Pathlength to Water Walking Boots", vPathLength);
+            Add("Pathlength to Fish Pet", vPathLength);
+            Add("Pathlength to Seaweed Pet", vPathLength);
+
             Add("Pathlength to Meteorite Bar", vPathLength);
             Add("Pathlength to Enchanted Sword", vPathLength);
             Add("Pathlength to Altar", vPathLength);
@@ -1196,7 +1223,7 @@ namespace TheTerrariaSeedProject.UI
             HelpDict.Add(Help.helpBut, "The Terraria Seed Project is a mod which allows you to search for a world with specific properties you are looking for. \n" +
                 "First some quick reference for the buttons: \n \n" +
                 UISearchSettings.IconNames.search + " Start the seed search. \n" +
-                UISearchSettings.IconNames.options + " The search stops after finishing the current world gen step. \n" +
+                UISearchSettings.IconNames.options + " The search stops after finishing the current world gen step. If not searching it restores the stats text from last search.\n" +
                 UISearchSettings.IconNames.configLoad + " Loads configuration file. Overrides current settings. \n" +
                 UISearchSettings.IconNames.configSave + " Saves configuration file. Overrides config file with that name if exist. \n" +
                 UISearchSettings.IconNames.positive + " Some configurations examples. Clicking again cycles through them.  \n" +
@@ -1301,8 +1328,11 @@ namespace TheTerrariaSeedProject.UI
 
             HelpDict.Add("only for stored worlds", "Store it for each seed which passed all Phases.");
             HelpDict.Add("only for stored worlds + item info", "Same as 'only for stored worlds' but also adds some item icons, circles and other enhancements which gives you more information about the world.");
-                       
 
+            HelpDict.Add(Configuration.stepSize, "Continue search at the seed which is that value higher than the prior." );
+            HelpDict.Add(Configuration.searchSeedNum, "Search ends after this amount of seed unless it found the value selected in '"+Configuration.stopSearchNum+ "' with all conditions you set up.");
+            HelpDict.Add(Configuration.stopSearchNum, "If search found that many seeds which fulfill the conditions you set up the search will end. If you have rare search active, those seeds which" +
+                " contain rares but fulfill not your conditions will not count.");
 
             HelpDict.Add("neg. ", "neg. means negative value. Same as positive but different sign. With this e.g. pathlength or distance can also be used in positive list. If you are looking for "+
                 "a distance less than 100 you can insert the positive value in negative list or the negative value in positive list. If seed has value 42, negative would be -42 which is greater than -100.");
@@ -1315,7 +1345,7 @@ namespace TheTerrariaSeedProject.UI
                 "(except there is also a living tree reaching to it),\n Floating Island without chest");
 
             HelpDict.Add(GeneralOptions.omitCommonRare, "Omits \nChest duplication Glitch,\n Pre Skeletron Dungeon Chest Risky/Grab " +
-                "(except its a Muramasa for NE),\n Dungeon in Snow Biome,\n Near Enchanted Sword,\n Enchanted Sword near Tree/Pyramid,\n Spawn in Snow biome,\n "+Phase3.lonelyJungleTree );
+                "(except its a Muramasa (for NE) you can grab or has a near golden key you can grab),\n Dungeon in Snow Biome,\n Near Enchanted Sword,\n Enchanted Sword near Tree/Pyramid,\n Spawn in Snow biome,\n " + Phase3.lonelyJungleTree + ",\n " + Phase3.openTemple);
 
             HelpDict.Add(GeneralOptions.omitBaCRare, "Combines omitting bad and more common rare. Look there for me details.");
 
@@ -1423,6 +1453,9 @@ namespace TheTerrariaSeedProject.UI
             HelpDict.Add("Pre Skeletron Muramasa Chest reachable", dungeonChestTextReach);
             HelpDict.Add("Pre Skeletron Cobalt Shield Chest reachable", dungeonChestTextReach);
             HelpDict.Add("Pre Skeletron Shadow Key Chest reachable", dungeonChestTextReach);
+            HelpDict.Add("Pre Skeletron Muramasa good positon", "If you can grab a Muramasa chest without entering the dungeon or a golden key which you can get without entering the dungeon is nearby (<150 blocks distance). For 2nd case " +
+                "you might summon dungeon guardian.");
+
 
             string dungeonChestTextGold = " In this case the chest will contain a golden key. You can use this together with reachable chest options to be sure also obtaining a key. 'Dungeon Chest Grab/Risky/Any' checks by itself if there is also a golden key in reach.";
 
