@@ -876,6 +876,7 @@ namespace TheTerrariaSeedProject.UI
                 "Temple at depth (%)",
                 Phase3.openTemple,
                 Phase3.lonelyJungleTree,
+                "Shadow Chest item in normal chest",
                 "Mushroom Biome above surface count",
                 "neg. Pathlength to Temple Door",
                 "neg. Pathlength to Boots",
@@ -1087,6 +1088,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Jungle cavern not blocked by structure", v0to1);
             Add(OptionsDict.Phase3.openTemple, v0to1);
             Add(OptionsDict.Phase3.lonelyJungleTree, v0to1);
+            Add("Shadow Chest item in normal chest", v0to5);
             Add("Mushroom Biome above surface count", vNumTiles);
 
             Add("neg. Pathlength to Temple Door", vPathLengthNeg);
