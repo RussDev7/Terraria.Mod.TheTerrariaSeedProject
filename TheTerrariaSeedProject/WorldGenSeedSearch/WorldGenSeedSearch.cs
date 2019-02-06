@@ -1948,6 +1948,12 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("neg. Distance ShadowOrb/Heart to mid", -1000000);
             hasOBjectOrParam.Add("neg. Distance Lake to mid (guess)", -1000000);
 
+            hasOBjectOrParam.Add("neg. Jungle biome distance to mid", -1000000);
+            hasOBjectOrParam.Add("neg. Snow biome distance to mid", -1000000);
+            hasOBjectOrParam.Add("neg. Evil biome distance to mid", -1000000);
+
+           
+
 
             hasOBjectOrParam.Add("Bee Hives", 0);
             hasOBjectOrParam.Add("High Hive", 0);
@@ -2069,6 +2075,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add(OptionsDict.Phase3.greenPyramid, 0);
             hasOBjectOrParam.Add(OptionsDict.Phase3.lonelyJungleTree, 0);
             hasOBjectOrParam.Add("Shadow Chest item in normal chest", 0);
+            hasOBjectOrParam.Add(OptionsDict.Phase3.frozenTemple, 0);
 
 
             hasOBjectOrParam.Add("Wooden Chest", 0);
@@ -2710,15 +2717,15 @@ namespace TheTerrariaSeedProject
                             {
                                 hasOBjectOrParam["Pathlength to Lava Charm"] = Math.Min(pathl, hasOBjectOrParam["Pathlength to Lava Charm"]);
                             }
-                            else if (item.type == ItemID.LavaCharm)
+                            else if (item.type == ItemID.WaterWalkingBoots)
                             {
                                 hasOBjectOrParam["Pathlength to Water Walking Boots"] = Math.Min(pathl, hasOBjectOrParam["Pathlength to Water Walking Boots"]);
                             }
-                            else if (item.type == ItemID.LavaCharm)
+                            else if (item.type == ItemID.Fish)
                             {
                                 hasOBjectOrParam["Pathlength to Fish Pet"] = Math.Min(pathl, hasOBjectOrParam["Pathlength to Fish Pet"]);
                             }
-                            else if (item.type == ItemID.LavaCharm)
+                            else if (item.type == ItemID.Seaweed)
                             {
                                 hasOBjectOrParam["Pathlength to Seaweed Pet"] = Math.Min(pathl, hasOBjectOrParam["Pathlength to Seaweed Pet"]);
                             }
@@ -3757,6 +3764,15 @@ namespace TheTerrariaSeedProject
                                 if (y < topmostTempleTiley) topmostTempleTiley = y;
                                 if (y > botmostTempleTiley) botmostTempleTiley = y;
 
+                                if(tile.wall != WallID.LihzahrdBrickUnsafe)
+                                {
+                                    if(checkIfNearTiles(x, y, new List<ushort> {TileID.SnowBlock, TileID.IceBlock, TileID.FleshIce, TileID.CorruptIce, TileID.BreakableIce }))
+                                    {
+                                        hasOBjectOrParam[OptionsDict.Phase3.frozenTemple] = 1;                                        
+                                    }
+                                }
+
+
                             }
                             else if (tile.type == TileID.Anvils && tile.frameY == 0 && (tile.frameX == 0 || tile.frameX == 36))
                             {
@@ -4152,6 +4168,12 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam["neg. Distance Dungeon to mid"] = -hasOBjectOrParam["Distance Dungeon to mid"];
             hasOBjectOrParam["neg. Distance ShadowOrb/Heart to mid"] = -hasOBjectOrParam["Distance ShadowOrb/Heart to mid"];
             hasOBjectOrParam["neg. Distance Lake to mid (guess)"] = -hasOBjectOrParam["Distance Lake to mid (guess)"];
+
+            hasOBjectOrParam["neg. Jungle biome distance to mid"] = -hasOBjectOrParam["Jungle biome distance to mid"];
+            hasOBjectOrParam["neg. Snow biome distance to mid"] = -hasOBjectOrParam["Snow biome distance to mid"];
+            hasOBjectOrParam["neg. Evil biome distance to mid"] = -hasOBjectOrParam["Evil biome distance to mid"];
+
+            
 
             hasOBjectOrParam["neg. Evil Tiles for Jungle Grass"] = -hasOBjectOrParam["Evil Tiles for Jungle Grass"];
             hasOBjectOrParam["neg. Evil Tiles for Sand"] = -hasOBjectOrParam["Evil Tiles for Sand"];
@@ -5508,6 +5530,28 @@ namespace TheTerrariaSeedProject
             return hasOBjectOrParam[name];
         }
 
+        private static bool checkIfNearTiles(int tileX, int tileY, List<ushort> tilesToCheck, int radiusAround = 1)
+        {
+            for(int x = tileX-radiusAround; x < tileX + radiusAround +1; x++)
+            {
+                for (int y = tileY - radiusAround; y < tileY + radiusAround + 1; y++)
+                {
+                    ushort type = Main.tile[x, y].type;
+                    foreach(ushort id in tilesToCheck)
+                    {
+                        if (type == id)
+                            return true;
+
+                    }
+
+                }
+
+            }
+            return false;
+
+        }
+
+
         private static bool checkIfNearTree(int curX, int curY, int xlookLR, int yaboveLook)
         {
             bool near = false;
@@ -6441,7 +6485,10 @@ namespace TheTerrariaSeedProject
             score += hasOBjectOrParam[OptionsDict.Phase3.greenPyramid] > 0 ? 420* hasOBjectOrParam[OptionsDict.Phase3.greenPyramid] : 0;
             if (hasOBjectOrParam[OptionsDict.Phase3.greenPyramid] > 0) allScoreText += System.Environment.NewLine + "Score Green Pyramid " + (int)score;
 
-                   score += hasOBjectOrParam[OptionsDict.Phase3.lonelyJungleTree] > 0 ? 420: 0;
+            score += hasOBjectOrParam[OptionsDict.Phase3.frozenTemple] > 0 ? 420 * hasOBjectOrParam[OptionsDict.Phase3.frozenTemple] : 0;
+            if (hasOBjectOrParam[OptionsDict.Phase3.frozenTemple] > 0) allScoreText += System.Environment.NewLine + "Score Frozen Temple " + (int)score;
+
+            score += hasOBjectOrParam[OptionsDict.Phase3.lonelyJungleTree] > 0 ? 420: 0;
             if (hasOBjectOrParam[OptionsDict.Phase3.lonelyJungleTree] > 0) allScoreText += System.Environment.NewLine + "Score Lonely jungle tree " + (int)score;
             
 
@@ -6858,6 +6905,7 @@ namespace TheTerrariaSeedProject
             if (hasOBjectOrParam["Floating Island without chest"] > 0) strares += "_" + "CloudWithoutHouse";
             if (hasOBjectOrParam["Detonator at surface"] > 0) strares += "_" + "DetonatorSurface";
             if (hasOBjectOrParam[OptionsDict.Phase3.greenPyramid] > 0) strares += "_" + "GreenPyramid";
+            if (hasOBjectOrParam[OptionsDict.Phase3.frozenTemple] > 0) strares += "_" + "FrozenPyramid";
             if (hasOBjectOrParam[OptionsDict.Phase3.lonelyJungleTree] > 0) strares += "_" + "LonelyJungleTree";
             
             if (hasOBjectOrParam["Mushroom Biome above surface"] > 0) strares += "_" + "MushroomSurface";
@@ -7016,7 +7064,9 @@ namespace TheTerrariaSeedProject
                     rares += checkAdd("Floating island cabin in Dungeon");
                     rares += checkAdd("Detonator at surface");
                     rares += checkAdd(OptionsDict.Phase3.greenPyramid);                    
+                    rares += checkAdd(OptionsDict.Phase3.frozenTemple);                    
                     
+
                     rares += checkAdd("Spawn in Marble or Granite biome");
                     rares += checkAdd("Shadow Chest item in normal chest");
                     rares += checkAdd("Mushroom Biome above surface");
