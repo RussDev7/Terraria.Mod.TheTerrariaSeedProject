@@ -2708,19 +2708,19 @@ namespace TheTerrariaSeedProject
                                 
                             }else if(item.type == ItemID.LavaCharm)
                             {
-                                pathl = Math.Min(pathl, hasOBjectOrParam["Pathlength to Lava Charm"]);
+                                hasOBjectOrParam["Pathlength to Lava Charm"] = Math.Min(pathl, hasOBjectOrParam["Pathlength to Lava Charm"]);
                             }
                             else if (item.type == ItemID.LavaCharm)
                             {
-                                pathl = Math.Min(pathl, hasOBjectOrParam["Pathlength to Water Walking Boots"]);
+                                hasOBjectOrParam["Pathlength to Water Walking Boots"] = Math.Min(pathl, hasOBjectOrParam["Pathlength to Water Walking Boots"]);
                             }
                             else if (item.type == ItemID.LavaCharm)
                             {
-                                pathl = Math.Min(pathl, hasOBjectOrParam["Pathlength to Fish Pet"]);
+                                hasOBjectOrParam["Pathlength to Fish Pet"] = Math.Min(pathl, hasOBjectOrParam["Pathlength to Fish Pet"]);
                             }
                             else if (item.type == ItemID.LavaCharm)
                             {
-                                pathl = Math.Min(pathl, hasOBjectOrParam["Pathlength to Seaweed Pet"]);
+                                hasOBjectOrParam["Pathlength to Seaweed Pet"] = Math.Min(pathl, hasOBjectOrParam["Pathlength to Seaweed Pet"]);
                             }
 
 
