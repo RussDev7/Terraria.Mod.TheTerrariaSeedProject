@@ -109,7 +109,7 @@ namespace TheTerrariaSeedProject
                 if (head.Equals(OptionsDict.Phase1.pyramidsPossibleLegacy))
                     head = OptionsDict.Phase1.pyramidsPossible;
                 else if (head.Equals(OptionsDict.Configuration.searchSeedNumLegacy))
-                    head = OptionsDict.Configuration.stopSearchNum;
+                    head = OptionsDict.Configuration.searchSeedNum;
 
                 config.PorcessHeadAndValue(head, value);
             }
