@@ -62,6 +62,8 @@ namespace TheTerrariaSeedProject
 
         //int seed = 200369066;
         public int seed;
+        public int lastSeedPhase2 = -1;
+        public int lastSeedPhase3 = -1;
         public int lastSeed = 0;
         public int lastStage = 0;
 
@@ -176,10 +178,12 @@ namespace TheTerrariaSeedProject
 
 
             bool quickStart = false;
+            string quickStartConf = "";
             if (Main.menuMode == 0 && stage == 0 && !ended)
             {
                 quickStart = true;
-                writeDebugFile("starting in quick mode");
+                               
+                writeDebugFile("starting in quick mode ");
             }
 
             if (Main.menuMode != 10 && !quickStart) { stage = 0; return; }
@@ -219,10 +223,12 @@ namespace TheTerrariaSeedProject
                     worldName = worldName.Substring(1, worldName.Length - 1);
                 Main.worldName = worldName.Length == 0 ? "SeedSearch" : worldName;
 
-                
 
-                Tuple<List<int>,bool> conf= readConfigFile();
+
+                
+                Tuple<List<int>,bool, string> conf= readConfigFile();
                 itemIDdoNotWant = conf.Item1;
+                quickStartConf = conf.Item3;
 
                 //stuff only need to done once
                 acond = new AcceptConditons();
@@ -241,8 +247,32 @@ namespace TheTerrariaSeedProject
 
                 score = new ScoreWorld(); score.init();
                 genProg = new GenerationProgress();
-                uiss = new UISearchSettings(genProg, mod, this);
+                uiss = new UISearchSettings(genProg, mod, this); //also inits config
 
+                if (quickStart && quickStartConf.Length > 0)
+                {
+                    
+                    Configuration cconf = Configuration.LoadConfiguration(Main.SavePath + OptionsDict.Paths.configPath + "config" + quickStartConf + ".txt");
+                    if (cconf != null)
+                    {
+                        Random rnd = new Random();
+                        int qseed = rnd.Next(0, Int32.MaxValue);
+                        cconf.startSeed = qseed.ToString(); //set this dont set seed, should be read only, or?
+                        cconf.ChangeValueOfSelectableText(0, Configuration.ConfigItemType.SelectableText, OptionsDict.Configuration.startingSeed, qseed.ToString());
+
+                        Selectable seedIbox = uiss.infopanel.Search4ElementWithHeaderName(OptionsDict.Configuration.startingSeed);
+                        seedIbox.SetValue(qseed.ToString());
+                        Main.ActiveWorldFileData.SetSeed(cconf.startSeed);
+                        seed = qseed;
+
+                        rnd = null;                        
+                        uiss.currentConfig = cconf;
+                        currentConfiguration = cconf;                      
+                        uiss.SetToConfiguration(currentConfiguration);
+                        writeDebugFile("reading quickstart config file :" + quickStartConf + " seed:" + currentConfiguration.FindConfigItemValue(OptionsDict.Configuration.startingSeed, 0));
+
+                    }
+                }
 
                 stage++;
 
@@ -316,6 +346,12 @@ namespace TheTerrariaSeedProject
                             //avoid cureent vanilla bug
                             BugAvoidCloudChest(true);
 
+                            if (quickStart)
+                            {
+                                searchForSeed = true;
+                                quickStart = false;
+                            }
+
                             if (!TryToGenerate()) continue;
                             didNotfinishLast = true;
                             if (ended || searchForSeed == false || gotToMain || stage < 0) continue;
@@ -323,6 +359,7 @@ namespace TheTerrariaSeedProject
                             //TODO set up config values, still needed?
 
                             seed = ParseAndSetSeed(currentConfiguration.FindConfigItemValue(OptionsDict.Configuration.startingSeed, 0));
+                           
 
 
                             worldName = currentConfiguration.FindConfigItemValue(OptionsDict.WorldInformation.worldName, 0);
@@ -499,6 +536,8 @@ namespace TheTerrariaSeedProject
 
                         if (stage > 1 && !ended && searchForSeed && !gotoCreation)
                         {
+                            lastSeedPhase2 = seed;
+                            
                             writeToDescList(GenerateSeedStateText(), 1);
 
 
@@ -528,6 +567,7 @@ namespace TheTerrariaSeedProject
                             condsTrue = paterCondsTrue;
 
                             lastSeed = seed; lastStage = 3;
+                            lastSeedPhase3 = seed;
 
                             if (!statsUpdated)
                             {
@@ -1799,6 +1839,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("neg. Temple door horizontal distance", 0);
             hasOBjectOrParam.Add("neg. Temple Tile horizontal distance", 0);
             hasOBjectOrParam.Add("neg. Temple Tile vertical distance", 0);
+            
 
             hasOBjectOrParam.Add("Temple at player side of jungle (%)", 0);
             hasOBjectOrParam.Add("Temple at ocean side of jungle (%)", 0);
@@ -1827,6 +1868,9 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Pathlength to Seaweed Pet", 1000000);
 
             hasOBjectOrParam.Add("Pathlength to Meteorite Bar", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Obsidian Skin Potion", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Battle Potion", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Lifeforce Potion", 1000000);
             hasOBjectOrParam.Add("Pathlength to Iron/Lead Bar", 1000000);
             hasOBjectOrParam.Add("Pathlength to 10 Iron/Lead Bar Chest", 1000000);
             hasOBjectOrParam.Add("Pathlength to Gold/Platinum Bar", 1000000);
@@ -1843,6 +1887,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Pathlength to Altar", 1000000);
             hasOBjectOrParam.Add("Pathlength to Bee Hive", 1000000);
             hasOBjectOrParam.Add("Pathlength to Temple Door", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Temple Tile", 1000000);
             hasOBjectOrParam.Add("Pathlength to free ShadowOrb/Heart", 1000000);
             hasOBjectOrParam.Add("Pathlength to Boomstick", 1000000);
             hasOBjectOrParam.Add("Pathlength to Suspicious Looking Eye", 1000000);
@@ -1858,6 +1903,10 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Pathlength to Detonator", 1000000);
             hasOBjectOrParam.Add("Pathlength to Magic/Ice Mirror", 1000000);
             hasOBjectOrParam.Add("Pathlength to Chest", 1000000);
+            hasOBjectOrParam.Add("Pathlength to 2nd Chest", 1000000);
+            hasOBjectOrParam.Add("Pathlength to 3rd Chest", 1000000);
+            hasOBjectOrParam.Add("Pathlength to 4th Chest", 1000000);
+            hasOBjectOrParam.Add("Pathlength to 5th Chest", 1000000);
             hasOBjectOrParam.Add("Pathlength to Tree Chest", 1000000);
 
             hasOBjectOrParam.Add("Pathlength into cavern layer", 1000000);
@@ -1884,6 +1933,9 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("neg. Pathlength to Seaweed Pet", -1000000);
 
             hasOBjectOrParam.Add("neg. Pathlength to Meteorite Bar", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Obsidian Skin Potion", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Battle Potion", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Lifeforce Potion", -1000000);
 
             hasOBjectOrParam.Add("neg. Pathlength to Iron/Lead Bar", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to 10 Iron/Lead Bar Chest", -1000000);
@@ -1901,6 +1953,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("neg. Pathlength to Altar", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Bee Hive", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Temple Door", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Temple Tile", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to free ShadowOrb/Heart", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Boomstick", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Suspicious Looking Eye", -1000000);
@@ -1916,6 +1969,10 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("neg. Pathlength to Detonator", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Magic/Ice Mirror", 1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Chest", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to 2nd Chest", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to 3rd Chest", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to 4th Chest", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to 5th Chest", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Tree Chest", -1000000);
 
             hasOBjectOrParam.Add("neg. Pathlength into cavern layer", -1000000);
@@ -2094,6 +2151,8 @@ namespace TheTerrariaSeedProject
                         
             hasOBjectOrParam.Add("random value seed *10000", (int)(10000.0 * boostValueSeed));
             hasOBjectOrParam.Add("Boost random value seed", (int)(10.0/(1.0-boostValueSeed)));
+            hasOBjectOrParam.Add("Last seed in Phase 2", lastSeedPhase2);
+            hasOBjectOrParam.Add("Last seed in Phase 3", lastSeedPhase3);
 
 
             hasOBjectOrParam.Add("Score", 0);
@@ -2314,9 +2373,26 @@ namespace TheTerrariaSeedProject
 
                     int pathl = doFull ? FindShortestPathInRange(ref pathLength, cx, cy) : 1000000;
 
-                    if (chest.item[0] != null && pathl < hasOBjectOrParam["Pathlength to Chest"])
-                    {
-                        hasOBjectOrParam["Pathlength to Chest"] = pathl;
+                    if (chest.item[0] != null)                        
+                    {                        
+                        if (pathl < hasOBjectOrParam["Pathlength to 5th Chest"])                        
+                        {
+                            List<int> pl = new List<int>
+                            {
+                                hasOBjectOrParam["Pathlength to Chest"],
+                                hasOBjectOrParam["Pathlength to 2nd Chest"],
+                                hasOBjectOrParam["Pathlength to 3rd Chest"],
+                                hasOBjectOrParam["Pathlength to 4th Chest"],
+                                pathl
+                            };
+                            pl.Sort();
+                            hasOBjectOrParam["Pathlength to Chest"] = pl[0];
+                            hasOBjectOrParam["Pathlength to 2nd Chest"] = pl[1];
+                            hasOBjectOrParam["Pathlength to 3rd Chest"] = pl[2];
+                            hasOBjectOrParam["Pathlength to 4th Chest"] = pl[3];
+                            hasOBjectOrParam["Pathlength to 5th Chest"] = pl[4];
+                        }
+                        
                     }
 
                     if (doFull && chest.item[0] != null && Main.tile[cx, cy].frameY == 0)
@@ -2702,7 +2778,8 @@ namespace TheTerrariaSeedProject
                                 }
                             }
                             else if ( (item.type == ItemID.DarkLance || item.type == ItemID.Flamelash || item.type == ItemID.FlowerofFire 
-                                || item.type == ItemID.Sunfury || item.type == ItemID.HellwingBow) && Main.tile[cx, cy].frameX != 144 )
+                                || item.type == ItemID.Sunfury || item.type == ItemID.HellwingBow                                 
+                                ) && Main.tile[cx, cy].frameX != 144 )
                             {
                                 if (score.itemLocation.ContainsKey(item.type))
                                     score.itemLocation[item.type].Add(new Tuple<int, int>(cx, cy));
@@ -2729,7 +2806,41 @@ namespace TheTerrariaSeedProject
                             {
                                 hasOBjectOrParam["Pathlength to Seaweed Pet"] = Math.Min(pathl, hasOBjectOrParam["Pathlength to Seaweed Pet"]);
                             }
+                            else if (item.type == ItemID.LifeforcePotion && Main.tile[cx, cy].frameX != 144 )
+                            {
+                                if (pathl < hasOBjectOrParam["Pathlength to Lifeforce Potion"])
+                                {
+                                    hasOBjectOrParam["Pathlength to Lifeforce Potion"] = pathl;
+                                    if (score.itemLocation.ContainsKey(item.type))
+                                        score.itemLocation[item.type] = new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) };
+                                    else
+                                        score.itemLocation.Add(item.type, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
+                                }
+                            }
+                            else if (item.type == ItemID.BattlePotion && Main.tile[cx, cy].frameX != 144)
+                            {
+                                if (pathl < hasOBjectOrParam["Pathlength to Battle Potion"])
+                                {
+                                    hasOBjectOrParam["Pathlength to Battle Potion"] = pathl;
+                                    if (score.itemLocation.ContainsKey(item.type))
+                                        score.itemLocation[item.type] = new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) };
+                                    else
+                                        score.itemLocation.Add(item.type, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
+                                }
+                            }
+                            else if (item.type == ItemID.ObsidianSkinPotion && Main.tile[cx, cy].frameX != 144)
+                            {
+                                if (pathl < hasOBjectOrParam["Pathlength to Obsidian Skin Potion"])
+                                {
+                                    hasOBjectOrParam["Pathlength to Obsidian Skin Potion"] = pathl;
+                                    if (score.itemLocation.ContainsKey(item.type))
+                                        score.itemLocation[item.type] = new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) };
+                                    else
+                                        score.itemLocation.Add(item.type, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
+                                }
+                            }
 
+                            
 
 
                         }
@@ -3770,6 +3881,10 @@ namespace TheTerrariaSeedProject
                                     {
                                         hasOBjectOrParam[OptionsDict.Phase3.frozenTemple] = 1;                                        
                                     }
+                                    int bestPL = FindShortestPathInRange(ref pathLength, x, y, 1, 1, 1, 1);
+                                    if (bestPL < hasOBjectOrParam["Pathlength to Temple Tile"])
+                                        hasOBjectOrParam["Pathlength to Temple Tile"] = bestPL;
+
                                 }
 
 
@@ -4239,7 +4354,7 @@ namespace TheTerrariaSeedProject
 
                 startx = leftmostCavernJungleTilex + borderOff;
                 endx = rightmostCavernJungleTilex - borderOff;
-                if (localDungeonSide > 0)
+                if (localDungeonSide > 0) 
                     endx -= (int)(0.15 * jungleWide);
                 else
                     startx += (int)(0.15 * jungleWide);
@@ -4257,7 +4372,7 @@ namespace TheTerrariaSeedProject
                 int jmey = 0;
                 if (jmp < Int32.MaxValue)
                 {
-                    Tuple<List<Tuple<int, int>>, int, int> entrpathJ = FindCaveEntrance(ref pathLength, jmxi, jy, true, leftmostCavernJungleTilex + jungleWide / 10, rightmostCavernJungleTilex + jungleWide / 10);
+                    Tuple<List<Tuple<int, int>>, int, int> entrpathJ = FindCaveEntrance(ref pathLength, jmxi, jy, true, leftmostCavernJungleTilex + jungleWide / 10, rightmostCavernJungleTilex - jungleWide / 10); // changed from + to -
                     score.itemLocation.Add(ItemID.JungleShirt, entrpathJ.Item1);
 
                     Tuple<int, int> entrJ = entrpathJ.Item1.Last();
@@ -4304,7 +4419,7 @@ namespace TheTerrariaSeedProject
                 int jmeyd = 100;
                 if (jmp < Int32.MaxValue)
                 {
-                    Tuple<List<Tuple<int, int>>, int, int> entrpathJB = FindCaveEntrance(ref pathLength, jmxi, jmyi, true, leftmostCavernJungleTilex + jungleWide / 10, rightmostCavernJungleTilex + jungleWide / 10);
+                    Tuple<List<Tuple<int, int>>, int, int> entrpathJB = FindCaveEntrance(ref pathLength, jmxi, jmyi, true, leftmostCavernJungleTilex + jungleWide / 10, rightmostCavernJungleTilex - jungleWide / 10); //changed + to -
                     score.itemLocation.Add(ItemID.JunglePants, entrpathJB.Item1);
 
                     Tuple<int, int> entrJB = entrpathJB.Item1.Last();
@@ -4313,8 +4428,8 @@ namespace TheTerrariaSeedProject
                     hasOBjectOrParam["Pathlength to cavern entrance to deep Jungle"] = pathLength[jmexd, jmeyd] / pathNormFac;
                     hasOBjectOrParam["Tiles to mine for deep Jungle cavern"] = entrpathJB.Item2;
 
-                    if (jmexd > leftmostSurfaceJungleTilex + jungleWideSurf / 10 && jmexd < rightmostSurfaceJungleTilex + jungleWideSurf / 10 && entrpathJB.Item2 < Main.maxTilesY / 60 && entrpathJB.Item3 == 0)
-                        hasOBjectOrParam["Free cavern to deep Jungle"] = 1;
+                    if (jmexd > leftmostSurfaceJungleTilex + jungleWideSurf / 10 && jmexd < rightmostSurfaceJungleTilex - jungleWideSurf / 10 && entrpathJB.Item2 < Main.maxTilesY / 60 && entrpathJB.Item3 == 0)
+                        hasOBjectOrParam["Free cavern to deep Jungle"] = 1; //changed + to -
                 }
                 if (Math.Abs(jmexd - jmex) < 5 && Math.Abs(jmeyd - jmey) < 5 && hasOBjectOrParam["Free cavern to deep Jungle"] == 1 && hasOBjectOrParam["Free cavern to mid Jungle"] == 1)
                     hasOBjectOrParam["Jungle cavern not blocked by structure"] = 1;
@@ -4527,6 +4642,7 @@ namespace TheTerrariaSeedProject
 
                 //negative value of pathlength for postive list
                 hasOBjectOrParam["neg. Pathlength to Temple Door"] = -hasOBjectOrParam["Pathlength to Temple Door"];
+                hasOBjectOrParam["neg. Pathlength to Temple Tile"] = -hasOBjectOrParam["Pathlength to Temple Tile"];
                 hasOBjectOrParam["neg. Pathlength to Boots"] = -hasOBjectOrParam["Pathlength to Boots"];
                 hasOBjectOrParam["neg. Pathlength to Iron/Lead Bar"] = -hasOBjectOrParam["Pathlength to Iron/Lead Bar"];
                 hasOBjectOrParam["neg. Pathlength to 10 Iron/Lead Bar Chest"] = -hasOBjectOrParam["Pathlength to 10 Iron/Lead Bar Chest"];
@@ -4550,6 +4666,12 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["neg. Pathlength to Seaweed Pet"] = -hasOBjectOrParam["Pathlength to Seaweed Pet"];
               
                 hasOBjectOrParam["neg. Pathlength to Meteorite Bar"] = -hasOBjectOrParam["Pathlength to Meteorite Bar"];
+                hasOBjectOrParam["neg. Pathlength to Obsidian Skin Potion"] = -hasOBjectOrParam["Pathlength to Obsidian Skin Potion"];
+                hasOBjectOrParam["neg. Pathlength to Battle Potion"] = -hasOBjectOrParam["Pathlength to Battle Potion"];
+                hasOBjectOrParam["neg. Pathlength to Lifeforce Potion"] = -hasOBjectOrParam["Pathlength to Lifeforce Potion"];
+
+                
+
                 hasOBjectOrParam["neg. Pathlength to Enchanted Sword"] = -hasOBjectOrParam["Pathlength to Enchanted Sword"];
                 hasOBjectOrParam["neg. Pathlength to Altar"] = -hasOBjectOrParam["Pathlength to Altar"];
                 hasOBjectOrParam["neg. Pathlength to Bee Hive"] = -hasOBjectOrParam["Pathlength to Bee Hive"];
@@ -4565,6 +4687,10 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["neg. Pathlength to Detonator"] = -hasOBjectOrParam["Pathlength to Detonator"];
                 hasOBjectOrParam["neg. Pathlength to Magic/Ice Mirror"] = -hasOBjectOrParam["Pathlength to Magic/Ice Mirror"];
                 hasOBjectOrParam["neg. Pathlength to Chest"] = -hasOBjectOrParam["Pathlength to Chest"];
+                hasOBjectOrParam["neg. Pathlength to 2nd Chest"] = -hasOBjectOrParam["Pathlength to 2nd Chest"];
+                hasOBjectOrParam["neg. Pathlength to 3rd Chest"] = -hasOBjectOrParam["Pathlength to 3rd Chest"];
+                hasOBjectOrParam["neg. Pathlength to 4th Chest"] = -hasOBjectOrParam["Pathlength to 4th Chest"];
+                hasOBjectOrParam["neg. Pathlength to 5th Chest"] = -hasOBjectOrParam["Pathlength to 5th Chest"];
                 hasOBjectOrParam["neg. Pathlength to Tree Chest"] = -hasOBjectOrParam["Pathlength to Tree Chest"];
 
                 hasOBjectOrParam["neg. Pathlength to free ShadowOrb/Heart"] = -hasOBjectOrParam["Pathlength to free ShadowOrb/Heart"];
@@ -5618,13 +5744,13 @@ namespace TheTerrariaSeedProject
             }
         }
 
-        public static Tuple<List<int>, bool> readConfigFile()
+        public static Tuple<List<int>, bool, string> readConfigFile()
         {
             string path = Main.SavePath + OptionsDict.Paths.debugPath + @".\modconfig.txt";
 
 
             if (!System.IO.File.Exists(path))
-                return (new Tuple<List<int>, bool>(null , false));
+                return (new Tuple<List<int>, bool, string>(null , false, ""));
 
             string content = "";
             using (System.IO.StreamReader file =
@@ -5634,13 +5760,14 @@ namespace TheTerrariaSeedProject
             }
 
             if (content.Length == 0)
-                return (new Tuple<List<int>, bool>(null , false));
+                return (new Tuple<List<int>, bool, string>(null , false, ""));
 
             content = content.Normalize();
 
             string[] lines = content.Split(System.Environment.NewLine.ToCharArray());
             List<int> idn = new List<int>();
             bool quickStart = false;
+            string configName = "";
 
             for (int l = 0; l < lines.Length; l++)
             {
@@ -5668,11 +5795,12 @@ namespace TheTerrariaSeedProject
                 {
                     string doOrNot = lines[l].Substring(ind + OptionsDict.ModConfig.quickStart.Length);
                     quickStart = doOrNot.Trim().Length > 0;
+                    configName = doOrNot.Trim();
                     continue;
                 }
             }
 
-            return (new Tuple<List<int>, bool> ( (idn.Count == 0 ? null : idn), quickStart ));
+            return (new Tuple<List<int>, bool, string> ( (idn.Count == 0 ? null : idn), quickStart, configName));
         }
 
 
@@ -6302,8 +6430,10 @@ namespace TheTerrariaSeedProject
             score += hasOBjectOrParam["Temple door distance"] > 1350 ? -80 : 0;
 
             int dpf = (hasOBjectOrParam["Temple door distance"] * 2 * 100) / hasOBjectOrParam["Pathlength to Temple Door"];
-            score += (dpf - 100);
-
+            score += (dpf - 100)/2;            
+            dpf = (int)(( Math.Sqrt((double)hasOBjectOrParam["Temple Tile horizontal distance"] * hasOBjectOrParam["Temple Tile horizontal distance"] +
+                (double)hasOBjectOrParam["Temple Tile vertical distance"] * hasOBjectOrParam["Temple Tile vertical distance"]) * 100) / hasOBjectOrParam["Pathlength to Temple Tile"]);
+            score += (dpf - 100) / 2;
             allScoreText += System.Environment.NewLine + "Score TempleDistPath " + (int)score;
 
 
@@ -6905,7 +7035,7 @@ namespace TheTerrariaSeedProject
             if (hasOBjectOrParam["Floating Island without chest"] > 0) strares += "_" + "CloudWithoutHouse";
             if (hasOBjectOrParam["Detonator at surface"] > 0) strares += "_" + "DetonatorSurface";
             if (hasOBjectOrParam[OptionsDict.Phase3.greenPyramid] > 0) strares += "_" + "GreenPyramid";
-            if (hasOBjectOrParam[OptionsDict.Phase3.frozenTemple] > 0) strares += "_" + "FrozenPyramid";
+            if (hasOBjectOrParam[OptionsDict.Phase3.frozenTemple] > 0) strares += "_" + "FrozenTemple";
             if (hasOBjectOrParam[OptionsDict.Phase3.lonelyJungleTree] > 0) strares += "_" + "LonelyJungleTree";
             
             if (hasOBjectOrParam["Mushroom Biome above surface"] > 0) strares += "_" + "MushroomSurface";
