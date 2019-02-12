@@ -51,7 +51,7 @@ namespace TheTerrariaSeedProject
         public override void Load()
         {
 
-            Tuple<List<int>, bool> conf = WorldGenSeedSearch.readConfigFile();
+            Tuple<List<int>, bool, string> conf = WorldGenSeedSearch.readConfigFile();
 
             if (conf.Item2 == true)
             {
