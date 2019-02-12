@@ -281,8 +281,8 @@ namespace TheTerrariaSeedProject.UI
         public static readonly List<string> vSpikyTrap = getPatern(0, 31, 5);
         public static readonly List<string> vSpearTrap = getPatern(0, 21, 5);
         public static readonly List<string> vGeyDetoTrap = getPatern(0, 50).Concat(getPatern(50, 11, 10)).ToList();
-        public static readonly List<string> vPathLength = getPatern(10, 9, 10).Concat(getPatern(100, 9, 100).Concat(getPatern(1000, 14, 250)).Concat(getPatern(5000, 6, 1000))).ToList();
-        public static readonly List<string> vPathLengthNeg = getPatern(-10, 9, -10).Concat(getPatern(-100, 9, -100).Concat(getPatern(-1000, 14, -250)).Concat(getPatern(-5000, 6, -1000))).ToList();
+        public static readonly List<string> vPathLength = getPatern(10, 9, 10).Concat(getPatern(100, 15, 25).Concat(getPatern(500, 4, 100).Concat(getPatern(1000, 14, 250)).Concat(getPatern(5000, 6, 1000)))).ToList();
+        public static readonly List<string> vPathLengthNeg = getPatern(-10, 9, -10).Concat(getPatern(-100, 15, -25).Concat(getPatern(-500, 4, -100).Concat(getPatern(-1000, 14, -250)).Concat(getPatern(-5000, 6, -1000)))).ToList();
         public static readonly List<string> vTilesToMine = getPatern(0, 50).Concat(getPatern(50, 11, 10)).ToList();
         public static readonly List<string> vAltarBeach = (new string[] { "0", "10", "25", "50", "75", "100", "150", "200", "250", "300" } ).Concat(getPatern(400, 12, 100)).ToList();
         public static readonly List<string> vdummy = getPatern(0, 21).Concat(new string[] { "50","100","200","500","1000"}).ToList();
@@ -375,11 +375,12 @@ namespace TheTerrariaSeedProject.UI
                 "marble: 5 \n" +
                 "granite: 6 \n" +
                 "lakes: small 19, medium 30, large 40 \n" +
-                "sand spots: small 7, medium 11, large 15 \n \n" +
+                "sand spots: small 7, medium 11, large 15 \n" +
+                "In mean it need to test that many seeds to get a value higher than this (e.g max value 40(0) has chance 1 out of 40).\n \n" +
                 "So in short: you are doing good selecting a value of 60, or if you are at pyramid hunting you can go for 70 (small), 110 (medium), 150 (large world). With this pyramids (should) have the best "+
                 "start conditions. Only if you want more lakes or" +
                 " do some tests about other effects of this value some greater values are needed. \n" +
-                "As the name implies it's an experimental feature. It may not work anymore with futher Terraria update. Also there might be some mistakes in those values. Have fun testing."
+                "As the name implies it's an experimental feature. It may not work anymore with futher Terraria update. Also there might be some mistakes in those values above. Have fun testing."
 
 
                 });
@@ -558,6 +559,7 @@ namespace TheTerrariaSeedProject.UI
                 Phase2.dungeonStrangePos,
                 "Dungeon in Snow Biome",
                 "Dungeon tiles above surface",
+                "Dungeon below ground",
                 "Dungeon below ground tree",
                 "Pre Skeletron Dungeon Chest Risky",
                 "Pre Skeletron Dungeon Chest Grab",
@@ -698,6 +700,7 @@ namespace TheTerrariaSeedProject.UI
             Add(Phase2.dungeonStrangePos, v0to1);
             Add("Dungeon in Snow Biome", v0to1);
             Add("Dungeon tiles above surface", v0to120);    
+            Add("Dungeon below ground", v0to1);
             Add("Dungeon below ground tree", v0to1);
             Add("Pre Skeletron Dungeon Chest Risky", v0to10);
             Add("Pre Skeletron Dungeon Chest Grab", v0to10);
@@ -879,6 +882,7 @@ namespace TheTerrariaSeedProject.UI
                 "Shadow Chest item in normal chest",
                 "Mushroom Biome above surface count",
                 "neg. Pathlength to Temple Door",
+                "neg. Pathlength to Temple Tile",
                 "neg. Pathlength to Boots",
                 "neg. Pathlength to Iron/Lead Bar",
                 "neg. Pathlength to 10 Iron/Lead Bar Chest",
@@ -899,6 +903,9 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Pathlength to Fish Pet",
                 "neg. Pathlength to Seaweed Pet",
                 "neg. Pathlength to Meteorite Bar",
+                "neg. Pathlength to Obsidian Skin Potion", 
+                "neg. Pathlength to Battle Potion",
+                "neg. Pathlength to Lifeforce Potion",
                 "neg. Pathlength to Enchanted Sword",
                 "neg. Pathlength to Altar",
                 "neg. Pathlength to Bee Hive",
@@ -912,7 +919,11 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Pathlength to Extractinator",
                 "neg. Pathlength to Detonator",
                 "neg. Pathlength to Magic/Ice Mirror",
-                "neg. Pathlength to Chest",
+                "neg. Pathlength to Chest",                
+                "neg. Pathlength to 2nd Chest",
+                "neg. Pathlength to 3rd Chest",
+                "neg. Pathlength to 4th Chest",
+                "neg. Pathlength to 5th Chest",
                 "neg. Pathlength to Tree Chest",
                 "neg. Pathlength to free ShadowOrb/Heart",
                 "neg. Pathlength into cavern layer",
@@ -964,6 +975,7 @@ namespace TheTerrariaSeedProject.UI
                 "Temple at height (%)",
                 "Temple at depth (%)",
                 "Pathlength to Temple Door",
+                "Pathlength to Temple Tile",
                 "Pathlength to Boots",
                 "Pathlength to Iron/Lead Bar",
                 "Pathlength to 10 Iron/Lead Bar Chest",
@@ -984,6 +996,9 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to Fish Pet",
                 "Pathlength to Seaweed Pet",
                 "Pathlength to Meteorite Bar",
+                "Pathlength to Obsidian Skin Potion",
+                "Pathlength to Battle Potion",
+                "Pathlength to Lifeforce Potion",
                 "Pathlength to Enchanted Sword",
                 "Pathlength to Altar",
                 "Pathlength to Bee Hive",
@@ -998,6 +1013,10 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to Detonator",
                 "Pathlength to Magic/Ice Mirror",
                 "Pathlength to Chest",
+                "Pathlength to 2nd Chest",
+                "Pathlength to 3rd Chest",
+                "Pathlength to 4th Chest",
+                "Pathlength to 5th Chest",
                 "Pathlength to Tree Chest",                
                 "Pathlength to free ShadowOrb/Heart",
                 "Pathlength into cavern layer",
@@ -1092,6 +1111,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Mushroom Biome above surface count", vNumTiles);
 
             Add("neg. Pathlength to Temple Door", vPathLengthNeg);
+            Add("neg. Pathlength to Temple Tile", vPathLengthNeg);
             Add("neg. Pathlength to Boots", vPathLengthNeg);
             Add("neg. Pathlength to Iron/Lead Bar", vPathLengthNeg);
             Add("neg. Pathlength to 10 Iron/Lead Bar Chest", vPathLengthNeg);
@@ -1112,6 +1132,10 @@ namespace TheTerrariaSeedProject.UI
             Add("neg. Pathlength to Fish Pet", vPathLengthNeg);
             Add("neg. Pathlength to Seaweed Pet", vPathLengthNeg);
             Add("neg. Pathlength to Meteorite Bar", vPathLengthNeg);
+            Add("neg. Pathlength to Obsidian Skin Potion", vPathLengthNeg);
+            Add("neg. Pathlength to Battle Potion", vPathLengthNeg);
+            Add("neg. Pathlength to Lifeforce Potion", vPathLengthNeg);
+
             Add("neg. Pathlength to Enchanted Sword", vPathLengthNeg);
             Add("neg. Pathlength to Altar", vPathLengthNeg);
             Add("neg. Pathlength to Bee Hive", vPathLengthNeg);
@@ -1127,6 +1151,12 @@ namespace TheTerrariaSeedProject.UI
             Add("neg. Pathlength to Detonator", vPathLengthNeg);
             Add("neg. Pathlength to Magic/Ice Mirror", vPathLengthNeg);
             Add("neg. Pathlength to Chest", vPathLengthNeg);
+            Add("neg. Pathlength to 2nd Chest", vPathLengthNeg);
+            Add("neg. Pathlength to 3rd Chest", vPathLengthNeg);
+            Add("neg. Pathlength to 4th Chest", vPathLengthNeg);
+            Add("neg. Pathlength to 5th Chest", vPathLengthNeg);
+
+            
             Add("neg. Pathlength to Tree Chest", vPathLengthNeg);
 
 
@@ -1166,6 +1196,9 @@ namespace TheTerrariaSeedProject.UI
             Add("Pathlength to Seaweed Pet", vPathLength);
 
             Add("Pathlength to Meteorite Bar", vPathLength);
+            Add("Pathlength to Obsidian Skin Potion", vPathLength);
+            Add("Pathlength to Battle Potion", vPathLength);
+            Add("Pathlength to Lifeforce Potion", vPathLength);
             Add("Pathlength to Enchanted Sword", vPathLength);
             Add("Pathlength to Altar", vPathLength);
             Add("Pathlength to Bee Hive", vPathLength);
@@ -1180,8 +1213,14 @@ namespace TheTerrariaSeedProject.UI
             Add("Pathlength to Detonator", vPathLength);
             Add("Pathlength to Magic/Ice Mirror", vPathLength);
             Add("Pathlength to Chest", vPathLength);
+            Add("Pathlength to 2nd Chest", vPathLength);
+            Add("Pathlength to 3rd Chest", vPathLength);
+            Add("Pathlength to 4th Chest", vPathLength);
+            Add("Pathlength to 5th Chest", vPathLength);
+
             Add("Pathlength to Tree Chest", vPathLength);
             Add("Pathlength to Temple Door", vPathLength);
+            Add("Pathlength to Temple Tile", vPathLength);
             Add("Pathlength to free ShadowOrb/Heart", vPathLength);  
             Add("Pathlength into cavern layer", vPathLength);  
             Add("Pathlength into 40% cavern layer", vPathLength);  
@@ -1421,7 +1460,7 @@ namespace TheTerrariaSeedProject.UI
                 " Bee Hives, Granite and Marble biomes. Some minor influence at lakes, dungeon position, sand generation and some more. This sand generation again has some influence at the value for " +
                 "option '"+Phase1.pyramidsPossible+ "' which has again some influence at the number of pyramids. \n" +
                 " Most times a higher values gives you a beter world. The seed need to have a higher (or equal) value than you selected here to pass that initial very fast test. Too high values can also have " +
-                "some negative effect. For more details left click at header '"+ Phase1.title +"'.\n" +
+                "some negative effect (e.g. chance for dungeon in ocean seems to be higher). For more details left click at header '"+ Phase1.title +"'.\n" +
                 " Or in short: you are doing good with value 60 or if you hunt for pyramids 70 for small worlds, 110 for medium, 150 for large");
 
 
@@ -1451,6 +1490,7 @@ namespace TheTerrariaSeedProject.UI
 
 
             HelpDict.Add("Dungeon below ground tree", "The dungeon can be located below surface. Sometimes a tree is above this and leads down to the dungeon. If that rare case happen this value will be 1.");
+            HelpDict.Add("Dungeon below ground", "The dungeon can be located below surface. This condition is true if dungeon has many tiles above it.");
 
             string dungeonChestText = "Sometimes another (micro-)biome overlapping the dungeon. If that case happen a dungeon chest can be nearby. It's called Risky if you need to enter the " +
                 "the dungeon to reach it(Auto-pause can be helpful). It's called Grab if you don't need to enter dungeon and can loot the chest without summon the dungeon guardian.";
@@ -1641,8 +1681,11 @@ namespace TheTerrariaSeedProject.UI
 
             HelpDict.Add("neg. Jungle biome distance to mid", "Negative amount of blocks until Jungle biome starts. The value is positive if Jungle biome overlap mid");
             HelpDict.Add("neg. Snow biome distance to mid", "Negative amount of blocks until Snow biome starts. The value is positive if Snow biome overlap mid");
-                    
 
+            HelpDict.Add("Jungle biome surface overlap mid", "Number of Jungle biome tiles which are at the wrong side of the world");
+            HelpDict.Add("Snow biome surface overlap mid", "Number of Snow biome tiles which are at the wrong side of the world");
+
+            HelpDict.Add("Pathlength to Temple Tile", "Smallest pathlength to a tile close to Jungle Temple");
 
         }
 
