@@ -892,6 +892,7 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Pathlength to 2nd Dynamite",
                 "neg. Pathlength to Gravitation Potion",
                 "neg. Pathlength to Crystal Heart",
+                "neg. Pathlength to 2nd Crystal Heart",
                 "neg. Pathlength to Jester's Arrow",
                 "neg. Pathlength to Suspicious Looking Eye",
                 "neg. Pathlength to Snowball Cannon",
@@ -918,6 +919,8 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Pathlength to 2 Herb Bag Chest",
                 "neg. Pathlength to Extractinator",
                 "neg. Pathlength to Detonator",
+                "neg. Pathlength to Explosives",
+                "neg. Pathlength to 2nd Explosives",
                 "neg. Pathlength to Magic/Ice Mirror",
                 "neg. Pathlength to Chest",                
                 "neg. Pathlength to 2nd Chest",
@@ -985,6 +988,7 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to 2nd Dynamite",
                 "Pathlength to Gravitation Potion",
                 "Pathlength to Crystal Heart",
+                "Pathlength to 2nd Crystal Heart",
                 "Pathlength to Jester's Arrow",
                 "Pathlength to Suspicious Looking Eye",
                 "Pathlength to Snowball Cannon",
@@ -1011,6 +1015,8 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to 2 Herb Bag Chest",
                 "Pathlength to Extractinator",
                 "Pathlength to Detonator",
+                "Pathlength to Explosives",
+                "Pathlength to 2nd Explosives",
                 "Pathlength to Magic/Ice Mirror",
                 "Pathlength to Chest",
                 "Pathlength to 2nd Chest",
@@ -1121,6 +1127,7 @@ namespace TheTerrariaSeedProject.UI
             Add("neg. Pathlength to 2nd Dynamite", vPathLengthNeg);
             Add("neg. Pathlength to Gravitation Potion", vPathLengthNeg);
             Add("neg. Pathlength to Crystal Heart", vPathLengthNeg);
+            Add("neg. Pathlength to 2nd Crystal Heart", vPathLengthNeg);
             Add("neg. Pathlength to Jester's Arrow", vPathLengthNeg);
             Add("neg. Pathlength to Suspicious Looking Eye", vPathLengthNeg);
             Add("neg. Pathlength to Snowball Cannon", vPathLengthNeg);
@@ -1149,6 +1156,9 @@ namespace TheTerrariaSeedProject.UI
             Add("neg. Pathlength to 2 Herb Bag Chest", vPathLengthNeg);
             Add("neg. Pathlength to Extractinator", vPathLengthNeg);
             Add("neg. Pathlength to Detonator", vPathLengthNeg);
+            Add("neg. Pathlength to Explosives", vPathLengthNeg);
+            Add("neg. Pathlength to 2nd Explosives", vPathLengthNeg);
+            
             Add("neg. Pathlength to Magic/Ice Mirror", vPathLengthNeg);
             Add("neg. Pathlength to Chest", vPathLengthNeg);
             Add("neg. Pathlength to 2nd Chest", vPathLengthNeg);
@@ -1184,6 +1194,8 @@ namespace TheTerrariaSeedProject.UI
             Add("Pathlength to 2nd Dynamite", vPathLength);
             Add("Pathlength to Gravitation Potion", vPathLength);
             Add("Pathlength to Crystal Heart", vPathLength);
+            Add("Pathlength to 2nd Crystal Heart", vPathLength);
+
             Add("Pathlength to Jester's Arrow", vPathLength);
             Add("Pathlength to Suspicious Looking Eye", vPathLength);
             Add("Pathlength to Snowball Cannon", vPathLength);
@@ -1211,6 +1223,8 @@ namespace TheTerrariaSeedProject.UI
             Add("Pathlength to 2 Herb Bag Chest", vPathLength);
             Add("Pathlength to Extractinator", vPathLength);
             Add("Pathlength to Detonator", vPathLength);
+            Add("Pathlength to Explosives", vPathLength);
+            Add("Pathlength to 2nd Explosives", vPathLength);
             Add("Pathlength to Magic/Ice Mirror", vPathLength);
             Add("Pathlength to Chest", vPathLength);
             Add("Pathlength to 2nd Chest", vPathLength);
@@ -1635,7 +1649,7 @@ namespace TheTerrariaSeedProject.UI
             HelpDict.Add(Phase3.openTemple, "If you can access the Jungle Temple without key. Current implementation does not take overlapping evil biome into account (but trees, pyramids, cabins,..)." +
                 " Often this feature is also not stable between multiple world generations and modded/vanilla Terraria.");
 
-            HelpDict.Add("Mushroom Biome above surface count", "Counts mushroom biome tiles in surface layer. May not exist in current vanilla version.");
+            HelpDict.Add("Mushroom Biome above surface count", "Counts mushroom biome tiles in surface layer.");
             
             HelpDict.Add(Phase3.pathlength, "Pathlength tries to calculate the amount of blocks you need to walk from spawn to reach the given point. It introduces some extra costs if you need to mine " +
                 "some tiles or pass webs, liquids, more dangerous areas and many more. Tiles you can't mine from start (evil biome, dungeon, temple, ..) count as impassable. It's not a perfect " +

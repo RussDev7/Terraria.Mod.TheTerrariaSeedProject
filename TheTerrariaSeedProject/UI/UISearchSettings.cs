@@ -867,10 +867,13 @@ namespace TheTerrariaSeedProject.UI
                     string size = currentConfig.FindConfigItemValue("World size", 0);
                     int numPyramid = size.Equals("Large") ? 6 : size.Equals("Medium") ? 5 : size.Equals("Small") ? 4 : 7;
                     int numPyramidChance = size.Equals("Large") ? 9 : size.Equals("Medium") ? 7 : size.Equals("Small") ? 6 : 10;
+                    int numPyramidBoost = size.Equals("Large") ? 150 : size.Equals("Medium") ? 110 : size.Equals("Small") ? 70 : 150;
 
 
-                    currentConfig.ChangeValueOfSelectableText(0, Configuration.ConfigItemType.InputField, OptionsDict.Configuration.searchSeedNum, "100000");
+
+                    currentConfig.ChangeValueOfSelectableText(0, Configuration.ConfigItemType.InputField, OptionsDict.Configuration.searchSeedNum, "1000000");
                     currentConfig.ChangeValueOfSelectableText(1, Configuration.ConfigItemType.Header, OptionsDict.Phase1.pyramidsPossible, (numPyramidChance).ToString());
+                    currentConfig.ChangeValueOfSelectableText(1, Configuration.ConfigItemType.Header, OptionsDict.Phase1.boost, (numPyramidBoost).ToString());
 
                     currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListPositive, "Snow biome surface overlap mid", "10");
                     currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListPositive, "Jungle biome surface overlap mid", "10");
@@ -878,8 +881,9 @@ namespace TheTerrariaSeedProject.UI
 
                     currentConfig.InsertPositiveList(2);
                     currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListPositive, "Number of Pyramids", numPyramid.ToString());
+                    
+                    
 
-   
                 }
                 else if (currentPositive == 3)
                 {
@@ -903,8 +907,8 @@ namespace TheTerrariaSeedProject.UI
 
 
                     currentConfig.InsertPositiveList(2);
-                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListPositive, "Snow biome surface overlap mid", "10");
-                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListPositive, "Jungle biome surface overlap mid", "10");
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListPositive, "Snow biome surface overlap mid", "1000");
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListPositive, "Jungle biome surface overlap mid", "500");
 
                     currentConfig.InsertPositiveList(2);
                     currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListPositive, "Evil only one side", "1");
@@ -950,8 +954,8 @@ namespace TheTerrariaSeedProject.UI
 
 
                     currentConfig.InsertPositiveList(2);
-                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListPositive, "Snow biome surface overlap mid", "10");
-                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListPositive, "Jungle biome surface overlap mid", "10");
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListPositive, "Snow biome surface overlap mid", "1000");
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListPositive, "Jungle biome surface overlap mid", "500");
 
                     currentConfig.InsertPositiveList(2);
                     currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListPositive, "Evil only one side", "1");
