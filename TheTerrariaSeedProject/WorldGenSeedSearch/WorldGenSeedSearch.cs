@@ -1880,6 +1880,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Pathlength to 2nd Dynamite", 1000000);
             hasOBjectOrParam.Add("Pathlength to Gravitation Potion", 1000000);
             hasOBjectOrParam.Add("Pathlength to Crystal Heart", 1000000);
+            hasOBjectOrParam.Add("Pathlength to 2nd Crystal Heart", 1000000);
             hasOBjectOrParam.Add("Pathlength to Jester's Arrow", 1000000);
 
             hasOBjectOrParam.Add("Pathlength to Boots", 1000000);
@@ -1901,6 +1902,8 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Pathlength to 2 Herb Bag Chest", 1000000);
             hasOBjectOrParam.Add("Pathlength to Extractinator", 1000000);
             hasOBjectOrParam.Add("Pathlength to Detonator", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Explosives", 1000000);
+            hasOBjectOrParam.Add("Pathlength to 2nd Explosives", 1000000);
             hasOBjectOrParam.Add("Pathlength to Magic/Ice Mirror", 1000000);
             hasOBjectOrParam.Add("Pathlength to Chest", 1000000);
             hasOBjectOrParam.Add("Pathlength to 2nd Chest", 1000000);
@@ -1946,6 +1949,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("neg. Pathlength to 2nd Dynamite", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Gravitation Potion", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Crystal Heart", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to 2nd Crystal Heart", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Jester's Arrow", -1000000);
 
             hasOBjectOrParam.Add("neg. Pathlength to Boots", -1000000);
@@ -1967,6 +1971,8 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("neg. Pathlength to 2 Herb Bag Chest", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Extractinator", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Detonator", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Explosives", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to 2nd Explosives", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Magic/Ice Mirror", 1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Chest", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to 2nd Chest", -1000000);
@@ -3513,10 +3519,11 @@ namespace TheTerrariaSeedProject
 
                                 //is it in Sand?
                                 bool inSand = CheckIfInSand(x + 1, y);
-
+                                bool counted = false;
                                 if (!inSand && checkIfNearSpawn(x, y, 350, 200) && pathl < 700)
                                 {
                                     hasOBjectOrParam["Near Enchanted Sword"] += 1;
+                                    counted = true;
                                 }
                                 if (checkIfNearTree(x, y, 80, 50) && tile.wall != 68)
                                 {
@@ -3525,6 +3532,7 @@ namespace TheTerrariaSeedProject
                                     if (!inSand && checkIfNearSpawn(x, y, 350, 2000) && pathl < 1050)
                                     {
                                         hasOBjectOrParam["Near Enchanted Sword near Tree"] += 1;
+                                        hasOBjectOrParam["Near Enchanted Sword"] += counted ? 0 : 1;
                                     }
                                 }
                                 if (checkIfNearPyramid(x, y, 100, 50) && tile.wall != 68)
@@ -3533,6 +3541,7 @@ namespace TheTerrariaSeedProject
                                     if (!inSand && checkIfNearSpawn(x, y, 400, 2000) && pathl < 1200)
                                     {
                                         hasOBjectOrParam["Near Enchanted Sword near Pyramid"] += 1;
+                                        hasOBjectOrParam["Near Enchanted Sword"] += counted ? 0 : 1;
                                     }
 
                                 }
@@ -3802,6 +3811,22 @@ namespace TheTerrariaSeedProject
                                     }
                                 }
 
+                            }else if(tile.type == TileID.Explosives)
+                            {
+                                int pathl = FindShortestPathInRange(ref pathLength, x, y, 2, 2, 2, 2);
+
+                                if (pathl < hasOBjectOrParam["Pathlength to Explosives"])
+                                {
+                                    hasOBjectOrParam["Pathlength to 2nd Explosives"] = hasOBjectOrParam["Pathlength to Explosives"];
+                                    hasOBjectOrParam["Pathlength to Explosives"] = pathl;
+                                }
+                                else if (pathl < hasOBjectOrParam["Pathlength to 2nd Explosives"])
+                                {
+                                    hasOBjectOrParam["Pathlength to 2nd Explosives"] = pathl;
+                                }
+
+
+
                             }
                             //Mushroom biome
                             else if (tile.type == TileID.MushroomGrass || tile.type == TileID.MushroomPlants || tile.type == TileID.MushroomTrees)
@@ -3879,7 +3904,7 @@ namespace TheTerrariaSeedProject
                                 {
                                     if(checkIfNearTiles(x, y, new List<ushort> {TileID.SnowBlock, TileID.IceBlock, TileID.FleshIce, TileID.CorruptIce, TileID.BreakableIce }))
                                     {
-                                        hasOBjectOrParam[OptionsDict.Phase3.frozenTemple] = 1;                                        
+                                        hasOBjectOrParam[OptionsDict.Phase3.frozenTemple]++;                                        
                                     }
                                     int bestPL = FindShortestPathInRange(ref pathLength, x, y, 1, 1, 1, 1);
                                     if (bestPL < hasOBjectOrParam["Pathlength to Temple Tile"])
@@ -3903,15 +3928,23 @@ namespace TheTerrariaSeedProject
                             }
                             else if(Main.tile[x, y].type == TileID.Heart && Main.tile[x, y].frameX == 0 && Main.tile[x, y].frameY == 0)
                             {
-                                int pathl = FindShortestPathInRange(ref pathLength, x, y, 2, 2, 3, 3);
+                                int pathl = FindShortestPathInRange(ref pathLength, x, y, 2, 3, 2, 3);
 
                                 if (pathl < hasOBjectOrParam["Pathlength to Crystal Heart"])
+                                {
+                                    hasOBjectOrParam["Pathlength to 2nd Crystal Heart"] = hasOBjectOrParam["Pathlength to Crystal Heart"];
                                     hasOBjectOrParam["Pathlength to Crystal Heart"] = pathl;
+                                }
+                                else if (pathl < hasOBjectOrParam["Pathlength to 2nd Crystal Heart"])
+                                {
+
+                                    hasOBjectOrParam["Pathlength to 2nd Crystal Heart"] = pathl;
+                                }
 
                             }
                             else if (Main.tile[x, y].active() && Main.tile[x, y].type == TileID.Ruby || (Main.tile[x, y].type == TileID.ExposedGems && Main.tile[x, y].frameX == 72))
                             {
-                                int pathl = FindShortestPathInRange(ref pathLength, x, y, 2, 2, 3, 3);
+                                int pathl = FindShortestPathInRange(ref pathLength, x, y, 2, 2, 2, 2);
 
                                 if (pathl < hasOBjectOrParam["Pathlength to Ruby"])
                                     hasOBjectOrParam["Pathlength to Ruby"] = pathl;
@@ -3919,7 +3952,7 @@ namespace TheTerrariaSeedProject
                             }
                             else if (Main.tile[x, y].type == TileID.Extractinator && Main.tile[x, y].frameX == 0 && Main.tile[x, y].frameY == 0)
                             {
-                                int pathl = FindShortestPathInRange(ref pathLength, x, y, 2, 2, 3, 3);
+                                int pathl = FindShortestPathInRange(ref pathLength, x, y, 2, 4, 2, 4);
 
                                 if (pathl < hasOBjectOrParam["Pathlength to Extractinator"])
                                 {
@@ -3974,6 +4007,8 @@ namespace TheTerrariaSeedProject
 
             score.activeTiles = activeTiles;
             score.evilTiles = evilTiles;
+
+            hasOBjectOrParam[OptionsDict.Phase3.frozenTemple] = hasOBjectOrParam[OptionsDict.Phase3.frozenTemple] > 25 ? 1 : 0;
 
             //pictures
             hasOBjectOrParam["Number different Paintings"] = paintingsCount.Count;
@@ -4547,7 +4582,7 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam.Add("Spawn in Evil biome", numE > 10 ? 1 : 0);
                 hasOBjectOrParam.Add("Spawn in Marble or Granite biome", numGM > 4 ? 1 : 0);
 
-                hasOBjectOrParam.Add("Mushroom Biome above surface", hasOBjectOrParam["Mushroom Biome above surface count"] > 0 ? 1 : 0); //todo higher value if exist
+                hasOBjectOrParam.Add("Mushroom Biome above surface", hasOBjectOrParam["Mushroom Biome above surface count"] > 50 ? 1 : 0); //todo higher value if exist
 
                 //set unset for score
                 hasOBjectOrParam.Add("Cloud Ballon", has(ref hasOBjectOrParam, ItemID.ShinyRedBalloon));
@@ -4580,7 +4615,7 @@ namespace TheTerrariaSeedProject
 
                 hasOBjectOrParam.Add("Enchanted Sword near Pyramid or Tree", hasOBjectOrParam["Enchanted Sword near Pyramid"] + hasOBjectOrParam["Enchanted Sword near Tree"]);
 
-                hasOBjectOrParam["Very Near Enchanted Sword"] += hasOBjectOrParam["Near Enchanted Sword near Pyramid"] + hasOBjectOrParam["Near Enchanted Sword near Tree"];
+                //hasOBjectOrParam["Very Near Enchanted Sword"] += hasOBjectOrParam["Near Enchanted Sword near Pyramid"] + hasOBjectOrParam["Near Enchanted Sword near Tree"];
 
 
 
@@ -4652,6 +4687,7 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["neg. Pathlength to 2nd Dynamite"] = -hasOBjectOrParam["Pathlength to 2nd Dynamite"];
                 hasOBjectOrParam["neg. Pathlength to Gravitation Potion"] = -hasOBjectOrParam["Pathlength to Gravitation Potion"];
                 hasOBjectOrParam["neg. Pathlength to Crystal Heart"] = -hasOBjectOrParam["Pathlength to Crystal Heart"];
+                hasOBjectOrParam["neg. Pathlength to 2nd Crystal Heart"] = -hasOBjectOrParam["Pathlength to 2nd Crystal Heart"];
                 hasOBjectOrParam["neg. Pathlength to Jester's Arrow"] = -hasOBjectOrParam["Pathlength to Jester's Arrow"];
 
                 hasOBjectOrParam["neg. Pathlength to Suspicious Looking Eye"] = -hasOBjectOrParam["Pathlength to Suspicious Looking Eye"];
@@ -4685,6 +4721,8 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["neg. Pathlength to 2 Herb Bag Chest"] = -hasOBjectOrParam["Pathlength to 2 Herb Bag Chest"];
                 hasOBjectOrParam["neg. Pathlength to Extractinator"] = -hasOBjectOrParam["Pathlength to Extractinator"];
                 hasOBjectOrParam["neg. Pathlength to Detonator"] = -hasOBjectOrParam["Pathlength to Detonator"];
+                hasOBjectOrParam["neg. Pathlength to Explosives"] = -hasOBjectOrParam["Pathlength to Explosives"];
+                hasOBjectOrParam["neg. Pathlength to 2nd Explosives"] = -hasOBjectOrParam["Pathlength to 2nd Explosives"];
                 hasOBjectOrParam["neg. Pathlength to Magic/Ice Mirror"] = -hasOBjectOrParam["Pathlength to Magic/Ice Mirror"];
                 hasOBjectOrParam["neg. Pathlength to Chest"] = -hasOBjectOrParam["Pathlength to Chest"];
                 hasOBjectOrParam["neg. Pathlength to 2nd Chest"] = -hasOBjectOrParam["Pathlength to 2nd Chest"];
@@ -6266,6 +6304,7 @@ namespace TheTerrariaSeedProject
 
             score += hasOBjectOrParam["Water Bolt before Skeletron"] > 0 ? 70 : -10;
             score += sumUp(hasOBjectOrParam["Water Bolt before Skeletron"], 20, 1.4);
+            score -= hasOBjectOrParam["Water Bolt"] == 0 ? -40 : 0;
 
             allScoreText += System.Environment.NewLine + "Score Water Bolt " + (int)score;
 
@@ -6377,10 +6416,12 @@ namespace TheTerrariaSeedProject
 
 
 
-
+            
 
             score += hasOBjectOrParam["Near Enchanted Sword"] > 0 ? sumUp(hasOBjectOrParam["Near Enchanted Sword"] - hasOBjectOrParam["Very Near Enchanted Sword"], 250, 1.0) : 0;
-            score += hasOBjectOrParam["Very Near Enchanted Sword"] > 0 ? sumUp(hasOBjectOrParam["Very Near Enchanted Sword"], 500, 1.0) : 0;
+            score += hasOBjectOrParam["Near Enchanted Sword near Pyramid"]+ hasOBjectOrParam["Near Enchanted Sword near Tree"] > hasOBjectOrParam["Near Enchanted Sword"] ?
+                sumUp(hasOBjectOrParam["Near Enchanted Sword near Pyramid"] + hasOBjectOrParam["Near Enchanted Sword near Tree"] - hasOBjectOrParam["Near Enchanted Sword"], 150, 1.0) : 0;
+            score += hasOBjectOrParam["Very Near Enchanted Sword"] > 0 ? (sumUp(hasOBjectOrParam["Very Near Enchanted Sword"], 820, 1.0)) + 3*Math.Max(330-hasOBjectOrParam["Pathlength to Enchanted Sword"],0) : 0 ;            
             score += hasOBjectOrParam["Enchanted Sword near Pyramid"] > 0 ? sumUp(hasOBjectOrParam["Enchanted Sword near Pyramid"] - hasOBjectOrParam["Near Enchanted Sword near Pyramid"], 50, 1.0) : 0;
             score += hasOBjectOrParam["Enchanted Sword near Tree"] > 0 ? sumUp(hasOBjectOrParam["Enchanted Sword near Tree"] - hasOBjectOrParam["Near Enchanted Sword near Tree"], 50, 1.0) : 0;
 
@@ -7028,10 +7069,11 @@ namespace TheTerrariaSeedProject
             if (hasOBjectOrParam["Chest duplication Glitch"] > 0) strares += "_" + "ChestDuplGlitch";
             if (hasOBjectOrParam["Near Enchanted Sword near Tree"] > 0) strares += "_" + "NearESnearTree";
             if (hasOBjectOrParam["Near Enchanted Sword near Pyramid"] > 0) strares += "_" + "NearESnearPyramid";
-            if (hasOBjectOrParam["Near Enchanted Sword"] - hasOBjectOrParam["Very Near Enchanted Sword"] > 0) strares += "_" + "NearEnchantedSword";
+            if (hasOBjectOrParam["Near Enchanted Sword"] - hasOBjectOrParam["Very Near Enchanted Sword"] > 0 
+                && hasOBjectOrParam["Near Enchanted Sword near Tree"] + hasOBjectOrParam["Near Enchanted Sword near Pyramid"] == 0) strares += "_" + "NearEnchantedSword";
             if (hasOBjectOrParam["Enchanted Sword near Tree"] - hasOBjectOrParam["Near Enchanted Sword near Tree"] > 0) strares += "_" + "ESnearTree";
             if (hasOBjectOrParam["Enchanted Sword near Pyramid"] - hasOBjectOrParam["Near Enchanted Sword near Pyramid"] > 0) strares += "_" + "ESnearPyramid";
-            if (hasOBjectOrParam["Very Near Enchanted Sword"] - hasOBjectOrParam["Near Enchanted Sword near Tree"] - hasOBjectOrParam["Near Enchanted Sword near Pyramid"] > 0) strares += "_" + "VeryNearES";
+            if (hasOBjectOrParam["Very Near Enchanted Sword"] > 0) strares += "_" + "VeryNearES";
             if (hasOBjectOrParam["Floating Island without chest"] > 0) strares += "_" + "CloudWithoutHouse";
             if (hasOBjectOrParam["Detonator at surface"] > 0) strares += "_" + "DetonatorSurface";
             if (hasOBjectOrParam[OptionsDict.Phase3.greenPyramid] > 0) strares += "_" + "GreenPyramid";
