@@ -89,7 +89,7 @@ namespace TheTerrariaSeedProject
         int condsTrue;
         int rareMax;
 
-        const int chanceSize = 20;
+        const int chanceSize = 22;
         int[] chanceCount;
         int[,] hasCount;
 
@@ -448,6 +448,7 @@ namespace TheTerrariaSeedProject
 
                             clearWorld(stage);
                             continue;
+                            
 
                         }
 
@@ -484,7 +485,7 @@ namespace TheTerrariaSeedProject
                                     dungColTrue = true;
 
                             }
-                                                        
+                            
 
                             //if(randVals.Item1 >95 && randVals.Item2 < 5 && randVals.Item3>90)
                             //if (randVals.Item1 < 2 && randVals.Item2 < 2)
@@ -1003,6 +1004,11 @@ namespace TheTerrariaSeedProject
             numSearched++;
             if (seed == Int32.MinValue) seed = 0; //else vanilla crashes here            
             if (seed < 0) seed = Int32.MaxValue + seed + 1;
+
+            if (randomInverse)
+            {
+                WorldGen.WorldGenParam_Evil = -1; //reset evil type
+            }
 
             Main.ActiveWorldFileData.SetSeed(seed.ToString());
         }
@@ -4008,7 +4014,7 @@ namespace TheTerrariaSeedProject
             score.activeTiles = activeTiles;
             score.evilTiles = evilTiles;
 
-            hasOBjectOrParam[OptionsDict.Phase3.frozenTemple] = hasOBjectOrParam[OptionsDict.Phase3.frozenTemple] > 25 ? 1 : 0;
+            hasOBjectOrParam[OptionsDict.Phase3.frozenTemple] = hasOBjectOrParam[OptionsDict.Phase3.frozenTemple] > 100 ? 1 : 0;
 
             //pictures
             hasOBjectOrParam["Number different Paintings"] = paintingsCount.Count;
@@ -7678,7 +7684,7 @@ namespace TheTerrariaSeedProject
                 pnEnd = false;
                 for (xAdd = 0; xAdd < pathSearchMax; xAdd++)
                 {                    
-                    pxp = px + xAdd;
+                    pxp = Math.Min(px + xAdd, Main.maxTilesX-1);
                     Tile tile = Main.tile[pxp, pyp];
                     if ((tile.active() && tile.type == TileID.SandstoneBrick) || (!tile.active() && tile.wall == WallID.SandstoneBrick))
                     {
@@ -7686,7 +7692,7 @@ namespace TheTerrariaSeedProject
                         pnEnd = true;
                         break;
                     }
-                    pxp = px - xAdd;
+                    pxp = Math.Max(px - xAdd,0);
                     tile = Main.tile[pxp, pyp];
                     if ((tile.active() && tile.type == TileID.SandstoneBrick) || (!tile.active() && tile.wall == WallID.SandstoneBrick))
                     {
