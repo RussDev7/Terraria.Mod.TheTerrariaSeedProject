@@ -360,7 +360,6 @@ namespace TheTerrariaSeedProject.UI
 
             addFreeLine();
             addDictToInfo(OptionsDict.Phase1.title).setCustomColor(Color.Orange);
-            addDictToInfo(OptionsDict.Phase1.pyramidsPossible).SetValue("0");
             addDictToInfo(OptionsDict.Phase1.copperTin).SetValue("Random");
             addDictToInfo(OptionsDict.Phase1.ironLead).SetValue("Random");
             addDictToInfo(OptionsDict.Phase1.silverTungsten).SetValue("Random");
@@ -370,7 +369,22 @@ namespace TheTerrariaSeedProject.UI
             addDictToInfo(OptionsDict.Phase1.dungeonWallColor).SetValue("Random");
             addDictToInfo(OptionsDict.Phase1.dungeonSide).SetValue("Random");
             addDictToInfo(OptionsDict.Phase1.boost).SetValue("10");
-
+            addDictToInfo(OptionsDict.Phase1.boostUGheightMin).SetValue("0");
+            addDictToInfo(OptionsDict.Phase1.boostUGheightMax).SetValue("1000");
+            addDictToInfo(OptionsDict.Phase1.boostHeightMin).SetValue("0");
+            addDictToInfo(OptionsDict.Phase1.boostHeightMax).SetValue("300");            
+            if (!WorldGenSeedSearch.isPubRel)
+            {
+                addDictToInfo(OptionsDict.Phase1.boostRockLayerOffset).SetValue("0");
+                addDictToInfo(OptionsDict.Phase1.boostSurfRockLayerOffset).SetValue("0");
+                addDictToInfo(OptionsDict.Phase1.boostSpawnRockSeedOffset).SetValue("-500");
+                addDictToInfo(OptionsDict.Phase1.boostES).SetValue("0");
+                addDictToInfo(OptionsDict.Phase1.boostESgran).SetValue("0");
+                addDictToInfo(OptionsDict.Phase1.boostMidTree).SetValue("0");
+                addDictToInfo(OptionsDict.Phase1.boostMidPyramid).SetValue("0");
+            }
+            addDictToInfo(OptionsDict.Phase1.pyramidsPossible).SetValue("0");
+            addDictToInfo(OptionsDict.Phase1.boostPyr).SetValue("0");
 
             addFreeLine();
             addDictToInfo(OptionsDict.Phase2.title).setCustomColor(Color.Orange);

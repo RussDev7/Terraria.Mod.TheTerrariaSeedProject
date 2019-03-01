@@ -51,6 +51,18 @@ namespace TheTerrariaSeedProject.UI
             public const string dungeonWallColor = "Dungeon wall color";
             public const string dungeonSide = "Dungeon side";
             public const string boost = "Boost (experimental) >=";
+            public const string boostPyr = "pred. Pyramid count >=";
+            public const string boostES = "Boost ES mid Tree (experimental) >="; //np
+            public const string boostESgran = "Boost ES mid Granite (experimental) >=";//np
+            public const string boostHeightMin = "pred. spawn height min  >=";
+            public const string boostHeightMax = "pred. spawn height max  <=";
+            public const string boostUGheightMin = "Underground layer height min >=";
+            public const string boostUGheightMax = "Underground layer height max >=";
+            public const string boostRockLayerOffset = "Boost rock layer offset >=";//np
+            public const string boostSurfRockLayerOffset = "Boost surfRock layer offset >=";//np
+            public const string boostSpawnRockSeedOffset = "Boost spawn rock layer offset >=";//np          
+            public const string boostMidTree = "Boost tree might be mid (exper.) >=";//np
+            public const string boostMidPyramid = "Boost pyramid might be mid (exper.) >=";//np
         }
 
         public static class Phase2
@@ -260,16 +272,16 @@ namespace TheTerrariaSeedProject.UI
         public static readonly List<string> vBeachPenalty = getPatern(100, 9, 100).Concat(getPatern(1000, 4, 250)).Concat(getPatern(2000, 16, 500)).Concat(getPatern(10000, 11, 1000)).ToList();
         public static readonly List<string> vEvilTiles = getPatern(0, 10, 10).Concat(getPatern(100, 9, 100)).Concat(getPatern(1000, 9, 1000)).Concat(getPatern(10000, 9, 5000)).ToList();
         public static readonly List<string> vEvilTilesNeg = getPatern(-50000, 8, 5000).Concat(getPatern(-10000, 9, 1000)).Concat(getPatern(-1000, 9, 100)).Concat(getPatern(-100, 11, 10)).ToList();
-        public static readonly List<string> vDistance = getPatern(5, 4, 5).Concat(getPatern(25, 7, 25).Concat(getPatern(200, 4, 50).Concat(getPatern(400, 6, 100).Concat(getPatern(1000, 5, 200)).Concat(getPatern(2000, 9, 250))))).ToList();
-        public static readonly List<string> vDistanceNeg = getPatern(-5, 4, -5).Concat(getPatern(-25, 7, -25).Concat(getPatern(-200, 4, -50).Concat(getPatern(-400, 6, -100).Concat(getPatern(-1000, 5, -200)).Concat(getPatern(-2000, 9, -250))))).ToList();
+        public static readonly List<string> vDistance = getPatern(0, 5, 5).Concat(getPatern(25, 7, 25).Concat(getPatern(200, 4, 50).Concat(getPatern(400, 6, 100).Concat(getPatern(1000, 5, 200)).Concat(getPatern(2000, 9, 250))))).ToList();
+        public static readonly List<string> vDistanceNeg = getPatern(0, 5, -5).Concat(getPatern(-25, 7, -25).Concat(getPatern(-200, 4, -50).Concat(getPatern(-400, 6, -100).Concat(getPatern(-1000, 5, -200)).Concat(getPatern(-2000, 9, -250))))).ToList();
         public static readonly List<string> vDistanceOverlap = getPatern(-1000, 9, 100).Concat(getPatern(-100, 3, 25).Concat(getPatern(-25, 10, 5).Concat(getPatern(25, 3, 25).Concat(getPatern(100, 9, 100).Concat(getPatern(1000, 5, 200)).Concat(getPatern(2000, 9, 250)))))).ToList();
         public static readonly List<string> vDistanceOverlapNeg = getPatern(1000, 9, -100).Concat(getPatern(100, 3, -25).Concat(getPatern(25, 10, -5).Concat(getPatern(-25, 3, -25).Concat(getPatern(-100, 9, -100).Concat(getPatern(-1000, 5, -200)).Concat(getPatern(-2000, 9, -250)))))).ToList();
-        public static readonly List<string> vDistanceShort = getPatern(25, 9, 25).Concat(getPatern(250, 4, 50)).Concat(getPatern(500, 16, 100)).ToList();
-        public static readonly List<string> vDistanceShortNeg = getPatern(-25, 9, -25).Concat(getPatern(-250, 4, -50)).Concat(getPatern(-500, 16, -100)).ToList();
+        public static readonly List<string> vDistanceShort = getPatern(0, 5, 5).Concat(getPatern(25, 9, 25).Concat(getPatern(250, 4, 50)).Concat(getPatern(500, 16, 100))).ToList();
+        public static readonly List<string> vDistanceShortNeg = getPatern(0, 5, -5).Concat(getPatern(-25, 9, -25).Concat(getPatern(-250, 4, -50)).Concat(getPatern(-500, 16, -100))).ToList();
         public static readonly List<string> vDistanceLong = getPatern(200, 8, 100).Concat(getPatern(1000, 17, 200)).ToList();
         public static readonly List<string> vDistanceLongNeg = getPatern(-200, 8, -100).Concat(getPatern(-1000, 17, -200)).ToList();
         public static readonly List<string> vNumTiles = getPatern(0, 10, 10).Concat(getPatern(100, 9, 100)).Concat(getPatern(1000, 9, 1000).Concat(getPatern(10000, 9, 5000))).ToList();
-        public static readonly List<string> vNumSearch = getPatern(1, 7).Concat(getPatern(10, 4, 5)).Concat(getPatern(50, 16, 0, 2, 5)).ToList();
+        public static readonly List<string> vNumSearch = getPatern(1, 7).Concat(getPatern(10, 4, 5)).Concat(getPatern(50, 16, 0, 2, 5)).Concat(new string[] {((int)2e9).ToString() }).ToList();
         public static readonly List<string> vStepSize = (new string[] { "1000000000", "100000000", "10000000", "1000000", "100000", "10000", "1000", "100", "25", "10", "5", "3", "2", "1", "0", "-1", "-2", "-3", "-5", "-10", "-25", "-100", "-1000", "-10000", "-100000", "-1000000", "-10000000","-100000000", "-1000000000" }).ToList();
         public static readonly List<string> vScore = getPatern(-1000, 61, 100);
         public static readonly List<string> vEmpty = new List<string>();
@@ -291,9 +303,13 @@ namespace TheTerrariaSeedProject.UI
         public static readonly List<string> vMaxDist = getPatern(0, 20, 10).Concat(getPatern(200, 17, 25)).ToList();
         public static readonly List<string> vMeanHeight = getPatern(0, 51, 5);
         public static readonly List<string> vTreePyrExistCavernDist = getPatern(-300, 61, 10);
-        public static readonly List<string> vUnderground = getPatern(0, 50).Concat(getPatern(50, 10, 5)).Concat(getPatern(100, 10, 20)).Concat(getPatern(300, 29, 25)).ToList();
+        public static readonly List<string> vUnderground = getPatern(0, 1,25).Concat(getPatern(25, 25).Concat(getPatern(50, 10, 5)).Concat(getPatern(100, 10, 20)).Concat(getPatern(300, 29, 25))).ToList();
+        public static readonly List<string> vUndergroundNeg = getPatern(0, 1, -25).Concat(getPatern(-25, 25, -1).Concat(getPatern(-50, 10, -5)).Concat(getPatern(-100, 10, -20)).Concat(getPatern(-300, 29, -25))).ToList();
+        public static readonly List<string> vHeight = getPatern(0, 100).Concat(getPatern(100, 41, 5)).ToList();
+        public static readonly List<string> vSpawnRockOff = getPatern(-500, 16, 25).Concat(getPatern(-100, 10, 5).Concat(getPatern(-50, 101, 1))).ToList();
 
         public static readonly List<string> vForUnknown = getPatern(0, 10).Concat(getPatern(10, 9, 10)).Concat(getPatern(100, 9, 100)).Concat(getPatern(1000, 9, 1000)).Concat(getPatern(10000, 10, 10000)).ToList();
+        
 
 
         public OptionsDict()
@@ -347,25 +363,32 @@ namespace TheTerrariaSeedProject.UI
                 "If you are looking for pyramids the option '"+Phase1.pyramidsPossible+"' is very important for speed up the search. The maximal number of possible pyramids is determined in this world " +
                 "gen step. The seed value need to be at least the value you selected to pass that phase. \n" +
                 "E.g. if you are looking for a seed with at least 2 pyramids but at the current world generation step "+
-                "it only computes a maximal number of 1, you don't need to generate further. This map seed can only have "+
+                " only computes a maximal number of 1, you don't need to generate further. This map seed can only have "+
                 "zero or one pyramid in later world generation steps. So you can skip other steps and continue with next seed.\n "+
-                "If a map seed has a higher value of maximal pyramid count, also the chance for pyramids it actually has increases. So you can tune your search here with a higher number than needed. E.g. If you enter 4 here, it will skip all seeds with a chance 3 or less. You might miss some worlds with 2 or 3 pyramids but will be faster in finding a seed which actually has 2 pyramids.\n "+
-                "Out of experiments it is recommended that this value should not be higher than 6 for small, 7/8 for medium and 8/9 for large maps or two higher than the number of pyramids you are looking for. Because a higher value is also rarer in most cases (0(1) also rarer than 1(2)).\n "+
-                "For a small map with value 6 you need to skip in mean close to 1000 seeds. At the right panel a distribution is shown. It shows a correlation between chance of a seed to have a number of Pyramids vs. how many it actually has. To save space it's written in a short form. " +
+                "If a map seed has a higher value of maximal pyramid count, also the chance for pyramids it actually has increase. So you can tune your search here with a higher number than needed. E.g. If you enter 4 here, it will skip all seeds with a chance 3 or less. You might miss some worlds with 2 or 3 pyramids but will be faster in finding a seed which actually has 2 pyramids.\n "+
+                "Out of experiments it is recommended that this value should not be higher than 5 for small, 6 for medium and 7 (above very rare). \n "+
+                " At the right panel a distribution is shown. It shows a correlation between chance of a seed to have a number of Pyramids vs. how many it actually has. To save space it's written in a short form. " +
                 "E.g. 23 means at least 3 with 2 zeros behind, so over 300. At the end of a search it stores a file names lastStats.txt with normal number distribution in Terraria \\ModLoader \\TheTerrariaSeedProject folder close to your world files. Also stored in seed's stats file if option '"+Configuration.storeStats +"' active."+
                 "\n\n So far small maps with 4 pyramids, medium with 5 and large with 6 are known.\n \n"+
                 "Challenge: Can you find more? Good luck!" +
-                "\n "+
-                "Other phase 1 options are checked before pyramid chance and so very fast. To enter Phase 2 all conditions (ores, moon, pyramid chance, dungeon) need to be true. \n" +
+                "\n " +
+                "For a more accurate counting you can use option '"+ Phase1.boostPyr +"' on top of it. It introduce an additional world gen. cycle limited to the crucial steps. It take some extra time (if not equal to 0) but delivers a closer value to the actual pyramid count. There is a " +
+                "rare chance it count too many pyramids. In tests so far depending on other settings the chance of having one additional pyramid is between less than 0.1% and 4%. Skipped world gen steps can overwrite those Pyramid places. So this value " +
+                "is still only an upper bound (in most cases). After successfully passing all other conditions of Phase 1 this value gets computed (if not 0). The seed will enter the next phase if it has at least the selected value. The selected value should not be higher than '" +
+                Phase1.pyramidsPossible + "'. Values higher than 4 for small, 5 for medium and 6 for large a very rare. It should be at least the amount of pyramids you are looking for, except you want to be sure to catch also those rare cases were the pyramid count was underestimated. In this case select one less. Higher values as " +
+                "the wished pyramid count are more rare but also higher the chance the seed actually get that many in later world gen. steps." +
+                "\n"+
+                "Other phase 1 options are checked before pyramid chance and so very fast. To enter Phase 2 all conditions (ores, moon, pyramid chance, dungeon, underground layer height, spawn height) need to be true. \n" +
                 "In current vanilla version the hallow biome spread after defeating Wall of Flesh is always at the left side for pink dungeons and at the right side for blue dungeons. So some combinations are " +
                 "impossible. \n \n" +
-                "For advanced users: If you want to tune it even more you can use the option '"+Phase1.boost+"'. With this you can higher the chance to get a high number of possible pyramid spots and so also higher the" +
-                "chance to get more pyramids. Furthermore the same value also has a direct impact at the number of living wood trees, Bee Hives, Granite and Marble biomes. It also has some minor influence " +
+                "For advanced users: If you want to tune it even more you can use the option '"+Phase1.boost+"' and '"+Phase1.boostPyr+"'. With first you can higher the chance to get a high number of possible pyramid spots and so also higher the" +
+                "chance to get more pyramids. The 2nd can be used for guessing the (max) amount of pyramids the seed actually has. \n " +
+                "Furthermore the (seed) value of '"+Phase1.boost+"' also has a direct impact at the number of living wood trees, Bee Hives, Granite and Marble biomes. It also has some minor influence " +
                 "at lakes, dungeon position, sand generation and some more. This sand generation higher the chance for possible pyramid spots and so also for pyramids. A higher value will result in a " +
                 "higher count of those mentioned above but too high value will limit the variation and can have negative impact as well. E.g. it seem to increase the chance of a dungeon placed in ocean (more testing needed). " +
                 "Depending at world size and condition you are looking for there is some maximal value. Going higher than this will have no influence in this count. It is the internal amount of " +
                 "possible values for that structure. For convenience it is multiplied by 10. E.g. a small world can have 0, 1 or 2 living trees, so 3 possibilities, times 10 = 30. If you select this value " +
-                "the mod will divide 10 by this value and subtract it from one: 1-(10:30) = ratio (about 0.6667). For each seed with a value higher (or equal) than this ratio it is guaranteed that the small world which is" +
+                "the mod will divide 10 by this value and subtract it from one, e.g.: 1-(10:30) = ratio (about 0.6667). For each seed with a value higher (or equal) than this ratio it is guaranteed that the small world which is" +
                 "generates has two living trees. Or to be correct, at least world gen tries it. Sometimes it can't find a valid place. If you are also OK with one living tree, so you are OK with 2 out of those " +
                 "3 possibilities divide 30 by this (30:2=15, ratio would be about 0.333). Each seed with" +
                 "a value higher (or equal) than this will generate a small world with 1 or 2 living trees (or at least tries). \n" +
@@ -526,6 +549,18 @@ namespace TheTerrariaSeedProject.UI
             Add(Phase1.dungeonWallColor, new List<string> { "Random", "Blue", "Green", "Pink"});
             Add(Phase1.dungeonSide, new List<string> { "Random", "Left", "Right"});
             Add(Phase1.boost, vboost);
+            Add(Phase1.boostPyr, v0to10);
+            Add(Phase1.boostES, v0to10);
+            Add(Phase1.boostESgran, v0to10);
+            Add(Phase1.boostUGheightMin, vUnderground);
+            Add(Phase1.boostUGheightMax, vUnderground);
+            Add(Phase1.boostHeightMax, vHeight);
+            Add(Phase1.boostHeightMin, vHeight);
+            Add(Phase1.boostRockLayerOffset, v0to300_5);
+            Add(Phase1.boostSurfRockLayerOffset, v0to300_5);
+            Add(Phase1.boostSpawnRockSeedOffset, vSpawnRockOff);
+            Add(Phase1.boostMidTree, v0to1);
+            Add(Phase1.boostMidPyramid, v0to1);
 
             //phase 2 content
             Add(Phase2.positive, new List<string> {
@@ -587,7 +622,9 @@ namespace TheTerrariaSeedProject.UI
                 "Beach penalty mean",
                 "Beach penalty max",
                 "Nearest Evil left Ocean",
-                "Nearest Evil right Ocean",                
+                "Nearest Evil right Ocean",
+                "Nearest Evil Dungeon Ocean",
+                "Nearest Evil Jungle Ocean",
                 "Evil only one side",                               
                 "Evil Tiles for Jungle Grass",
                 "Evil Tiles for Sand",
@@ -597,11 +634,17 @@ namespace TheTerrariaSeedProject.UI
                 "Jungle biome surface overlap mid",
                 "Jungle biome distance to mid",
                 "Snow biome distance to mid",
-                "Evil biome distance to mid",
+                "MarbleGranite at surf dist. to mid",
+                "Top MarbleGranite dist. to spawn (guess)",
+                "UG MarbleGranite dist. to spawn (guess)",
+                "Evil biome distance to mid",                
                 "Surface average height (aprox.)",
                 "Surface height (sqrt) variance",
                 "Surface max-min height",
                 "Underground layer height",
+                "Underground Distance to spawn (guess)",
+                "neg. Underground Distance to spawn (guess)",
+                "neg. Underground layer height",
                 "neg. Distance Tree to mid", 
                 "neg. Distance Tree Chest to mid",
                 "neg. Distance Cloud to mid", 
@@ -611,18 +654,30 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Distance Lake to mid (guess)",
                 "neg. Jungle biome distance to mid",
                 "neg. Snow biome distance to mid",
+                "neg. MarbleGranite at surf dist. to mid",
+                "neg. Top MarbleGranite dist. to spawn (guess)",
+                "neg. UG MarbleGranite dist. to spawn (guess)",
                 "neg. Evil biome distance to mid",
                 "neg. Evil Tiles for Jungle Grass",
                 "neg. Evil Tiles for Sand",
                 "neg. Evil Tiles for Ice",
                 "Ice surface more than half not evil",
+                "Enchanted Sword mid may possible (guess)",
+                "Enchanted Sword mid granite may possible (guess)",
+                "Enchanted Sword mid good may possible (guess)",
                 OptionsDict.Tools.conditionConnector,
                 OptionsDict.Tools.dummyPlus
                 });
             //legacy
             //"Green Dungeon Walls",
-             //   "Blue Dungeon Walls",
-             //   "Pink Dungeon Walls",
+            //   "Blue Dungeon Walls",
+            //   "Pink Dungeon Walls",
+            if (WorldGenSeedSearch.isPubRel)
+            {
+                this[Phase2.positive].Remove("Enchanted Sword mid may possible (guess)");
+                this[Phase2.positive].Remove("Enchanted Sword mid granite may possible (guess)");
+                this[Phase2.positive].Remove("Enchanted Sword mid good may possible (guess)");
+            }
 
 
             Add(Phase2.negative, new List<string> {                     
@@ -652,6 +707,9 @@ namespace TheTerrariaSeedProject.UI
                 "Jungle biome surface overlap mid",
                 "Jungle biome distance to mid",
                 "Snow biome distance to mid",
+                "MarbleGranite at surf dist. to mid",
+                "Top MarbleGranite dist. to spawn (guess)",
+                "UG MarbleGranite dist. to spawn (guess)",
                 "Evil biome distance to mid",
                 "Surface average height (aprox.)",
                 "Surface height (sqrt) variance",
@@ -661,6 +719,9 @@ namespace TheTerrariaSeedProject.UI
                 Phase2.maxTreeExitCavDist,
                 Phase2.maxPyrExitCavDist,
                 "Underground layer height",                
+                "neg. Underground layer height",
+                "Underground Distance to spawn (guess)",                
+                "neg. Underground Distance to spawn (guess)",                
                 OptionsDict.Tools.conditionConnector1,
                 OptionsDict.Tools.conditionConnector2,
                 OptionsDict.Tools.conditionConnector3,
@@ -730,15 +791,23 @@ namespace TheTerrariaSeedProject.UI
             Add("All Dungeon Items", v0to1);            
             Add("Nearest Evil left Ocean", vNearEvilOcean);
             Add("Nearest Evil right Ocean", vNearEvilOcean);
+            Add("Nearest Evil Dungeon Ocean", vNearEvilOcean);
+            Add("Nearest Evil Jungle Ocean", vNearEvilOcean);
             Add("Evil only one side", v0to1);
             Add("Snow biome surface overlap mid", vNumTiles);
             Add("Jungle biome surface overlap mid", vNumTiles);
             Add("Jungle biome distance to mid", vDistanceOverlap);
             Add("Snow biome distance to mid", vDistanceOverlap);
+            Add("MarbleGranite at surf dist. to mid", vDistance);
+            Add("Top MarbleGranite dist. to spawn (guess)", vDistance);
+            Add("UG MarbleGranite dist. to spawn (guess)", vDistance);
             Add("Evil biome distance to mid", vDistance);
             Add("Surface average height (aprox.)", vMeanHeight);
             Add("Surface height (sqrt) variance", v0to120);
             Add("Surface max-min height", vMaxDist);
+            Add("Enchanted Sword mid may possible (guess)", v0to5);
+            Add("Enchanted Sword mid granite may possible (guess)", v0to5);
+            Add("Enchanted Sword mid good may possible (guess)", v0to5);
 
 
 
@@ -769,6 +838,9 @@ namespace TheTerrariaSeedProject.UI
 
             Add("neg. Jungle biome distance to mid", vDistanceOverlapNeg);
             Add("neg. Snow biome distance to mid", vDistanceOverlapNeg);
+            Add("neg. MarbleGranite at surf dist. to mid", vDistanceNeg);
+            Add("neg. Top MarbleGranite dist. to spawn (guess)", vDistanceNeg);
+            Add("neg. UG MarbleGranite dist. to spawn (guess)", vDistanceNeg);
             Add("neg. Evil biome distance to mid", vDistanceNeg);
 
 
@@ -781,6 +853,9 @@ namespace TheTerrariaSeedProject.UI
             Add("Has evil Dungeon Ocean", v0to1);
             Add("Has evil Jungle Ocean", v0to1);
             Add("Underground layer height", vUnderground);
+            Add("neg. Underground layer height", vUndergroundNeg);
+            Add("Underground Distance to spawn (guess)", vUnderground);
+            Add("neg. Underground Distance to spawn (guess)", vUndergroundNeg);
 
 
             Add(OptionsDict.Tools.dummyPlus, vdummy);
@@ -929,6 +1004,7 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Pathlength to 5th Chest",
                 "neg. Pathlength to Tree Chest",
                 "neg. Pathlength to free ShadowOrb/Heart",
+                "neg. Pathlength to underground MarbleGranite",
                 "neg. Pathlength into cavern layer",
                 "neg. Pathlength into 40% cavern layer",
                 "neg. Pathlength to 40% cavern entrance",
@@ -1025,6 +1101,7 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to 5th Chest",
                 "Pathlength to Tree Chest",                
                 "Pathlength to free ShadowOrb/Heart",
+                "Pathlength to underground MarbleGranite",
                 "Pathlength into cavern layer",
                 "Pathlength into 40% cavern layer",
                 "Pathlength to 40% cavern entrance",
@@ -1171,6 +1248,7 @@ namespace TheTerrariaSeedProject.UI
 
 
             Add("neg. Pathlength to free ShadowOrb/Heart", vPathLengthNeg);
+            Add("neg. Pathlength to underground MarbleGranite", vPathLengthNeg);
             Add("neg. Pathlength into cavern layer", vPathLengthNeg);
             Add("neg. Pathlength into 40% cavern layer", vPathLengthNeg);
             Add("neg. Pathlength to 40% cavern entrance", vPathLengthNeg);
@@ -1236,6 +1314,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Pathlength to Temple Door", vPathLength);
             Add("Pathlength to Temple Tile", vPathLength);
             Add("Pathlength to free ShadowOrb/Heart", vPathLength);  
+            Add("Pathlength to underground MarbleGranite", vPathLength);  
             Add("Pathlength into cavern layer", vPathLength);  
             Add("Pathlength into 40% cavern layer", vPathLength);  
             Add("Pathlength to 40% cavern entrance", vPathLength);  
@@ -1314,10 +1393,11 @@ namespace TheTerrariaSeedProject.UI
                 "\n \nIf you found a nice seed you would like to share try to create it with the vanilla version as well. More notes about this in Phase 3 description. \n \n" +
                 
                 
-                "Don't be too harsh with the conditions you set. E.g. looking alone for a small map with 4 pyramids can take a day. And even if you only combine many common stuff all together can "+
-                "become rare again. To speed up you can boost it in Phase 1 ('" + Phase1.pyramidsPossible + "' and '" + Phase1.boost + "') or " +
+                "Don't be too harsh with the conditions you set. E.g. looking alone for a small world with 4 pyramids can take a day. And even if you only combine many common stuff all together can "+
+                "become rare again. To speed up you can boost it in Phase 1 ('" + Phase1.pyramidsPossible + "' , '" + Phase1.boost + "' and '" + Phase1.boostPyr + "') or " +
                 "if you have a newer PC with multiple CPU cores you can run Terraria multiple times. But don't run too many. It can slow down search again. And don't forget to start the search " +
-                "at a different seed in each. At this time the numbers you can select do not change with map size in nearly all cases. So be careful to not select impossible values e.g a Small world " +
+                "at a different seed in each. \n Mod need some additional memory especially for large worlds (careful with other mods active). If your PC is too old it may not worth waiting. \n \n" +
+                "At this time the numbers you can select do not change with map size in nearly all cases. So be careful to not select impossible values e.g a Small world " +
                 "can never have 3 or more Living Trees. \n \n" +
 
                 "If you found some good world seeds it would be nice if you share them in Terraria forum, e.g. at the linked mod page or the SHARE YOUR MAP SEED thread in PC General Talk section or " +
@@ -1462,12 +1542,14 @@ namespace TheTerrariaSeedProject.UI
 
 
            //phase 1
-           HelpDict.Add(Phase1.pyramidsPossible, "At begin of world gen some possible pyramids spots are set up. Only those have the chance to get a pyramid in later world gen steps. " +
+           HelpDict.Add(Phase1.pyramidsPossible, "In early world gen. some possible pyramids spots are set up. Only those have the chance to get a pyramid in later world gen steps. " +
                "E.g. a world with only 2 possible pyramid spots can never have 3 or more pyramids. If you select a value here only those seeds which have the chance to get that many " +
                "or more pyramids will pass that phase. If you are looking for pyramids in phase 2 then this value should be at least the amount you are looking for. You can higher the value " +
-               "to increase the chance getting many pyramids in later world gen. But be careful, high value also become more rare. Values not higher than 6 for small, " +
-               "7/8 for medium, 8/9 for large, or 2 higher than wished pyramid count is suggested for most cases. But feel free to try around yourself. Some stats distribution is displayed at " +
-               "the right side of the GUI during search or in a seeds stats file if active. To higher the chances getting many possible pyramid spots you can use option '"+ Phase1.boost+ "'");
+               "to increase the chance getting many pyramids in later world gen. But be careful, high value also become more rare. Values higher than 5 for small, " +
+               "6 for medium, 7 for large are not recommended for most cases. But feel free to try around yourself. Some stats distribution is displayed at " +
+               "the right side of the GUI during search or in a seeds stats file if active. It won't get computed if other conditions evaluated before are not true. " +
+               "To higher the chances getting many possible pyramid spots you can use option '"+ Phase1.boost+ "'. "+
+               "For a more accurate but also much slower prediction you can use " + Phase1.boostPyr + " as well");
 
 
             HelpDict.Add(Phase1.boost, "An advanced feature which gives you some control about a very important value during world gen. This has (known) direct impact at the number of living trees," +
@@ -1477,6 +1559,31 @@ namespace TheTerrariaSeedProject.UI
                 "some negative effect (e.g. chance for dungeon in ocean seems to be higher). For more details left click at header '"+ Phase1.title +"'.\n" +
                 " Or in short: you are doing good with value 60 or if you hunt for pyramids 70 for small worlds, 110 for medium, 150 for large");
 
+            HelpDict.Add(Phase1.boostPyr, "This condition is only needed if you are" +
+                " looking for pyramids. If a value other than 0 is selected it introduces an additional world generation cycle which is limited to the crucial steps for guessing an upper bound" +
+                " of the number of pyramids. This extra step only applies if other conditions of phase 1 are true. It's more reliable than '" + Phase1.pyramidsPossible + "' for predicting the actual" +
+                " pyramid count but in rare cases also a higher number of pyramids is possible. Also it " +
+                "takes some additional time for computing (if not set to 0). " +
+                "Suggested value is the amount of pyramids " +
+                "you are looking for (or 1 less to get them all). This is the max number of pyramids this world can have (or 1 less sometimes). Skipped world gen. steps may overwrite those and reduce the " +
+                "count. This value should not be higher than '"+ Phase1.pyramidsPossible +"'. Values higher than 4 for small worlds, 5 for medium, 6 for large are very rare." );
+
+
+            HelpDict.Add(Phase1.boostHeightMin, "In early world gen. it tries to predict the amount of blocks between (unknown) character spawn location and (known) start of underground layer. " +
+                " World gen. only contine if height is between "+ Phase1.boostHeightMin + " and " + Phase1.boostHeightMax);
+            HelpDict.Add(Phase1.boostHeightMax, "In early world gen. it tries to predict the amount of blocks between (unknown) character spawn location and (known) start of underground layer. " +
+                " World gen. only contine if height is between " + Phase1.boostHeightMin + " and " + Phase1.boostHeightMax);
+
+            
+
+            HelpDict.Add("Underground Distance to spawn (guess)", "Amount of blocks between (unknown) character spawn location and (known) start of underground layer. ");
+            
+
+            HelpDict.Add(Phase1.boostUGheightMin, "Early world gen. steps can check the height of underground layer. " +
+                " World gen. only contine if height is between " + Phase1.boostUGheightMin + " and " + Phase1.boostHeightMax);
+
+            HelpDict.Add(Phase1.boostUGheightMax, "Early world gen. steps can check the height of underground layer. " +
+               " World gen. only contine if height is between " + Phase1.boostUGheightMin + " and " + Phase1.boostHeightMax);
 
             string wtext = "Be careful setting dungeon side together with dungeon color and hardmode evil spread side. In current version hardmode evil spread is always at the left side on worlds with blue dungeons and always to the right on worlds with pink dungeon";
             HelpDict.Add(Phase1.dungeonSide, wtext);
@@ -1577,7 +1684,33 @@ namespace TheTerrariaSeedProject.UI
             HelpDict.Add("Ice surface more than half evil", "True if more than half of the ice tiles above surface are evil ice tiles or can get converted to.");
             HelpDict.Add("Ice surface more than half not evil", "Opposite of 'Ice surface more than half evil'");
 
+            HelpDict.Add("neg. Jungle biome distance to mid", "Negative amount of blocks until Jungle biome starts. The value is positive if Jungle biome overlap mid");
+            HelpDict.Add("neg. Snow biome distance to mid", "Negative amount of blocks until Snow biome starts. The value is positive if Snow biome overlap mid");
 
+            HelpDict.Add("MarbleGranite at surf dist. to mid", "Amount of blocks until a Marble or Granite biome located in surface layer (or slightly below) starts. " +
+                "Can be used to detect Marble and Granite biome close to spawn location.");
+
+
+            HelpDict.Add("UG MarbleGranite dist. to spawn (guess)", "Amount of blocks until a Marble or Granite biome background wall located in underground or below from an " +
+                "approximated spawn location (top of blocks in mid). " +
+                "Can be used to detect Marble and Granite biome which offeres underground treasures close to spawn location.");
+
+            HelpDict.Add("Top MarbleGranite dist. to spawn (guess)", "Amount of blocks until a Marble or Granite biome background wall with biome tile on top located above " +
+                "the approximated spawn location (top of blocks in mid, slightly (4) below also counts ). " +
+                "Can be used to detect Marble and Granite biome close to spawn location.");
+
+
+
+            HelpDict.Add("Jungle biome surface overlap mid", "Number of Jungle biome tiles which are at the wrong side of the world");
+            HelpDict.Add("Snow biome surface overlap mid", "Number of Snow biome tiles which are at the wrong side of the world");
+
+
+            HelpDict.Add("Surface average height (aprox.)", "Computes the average amount of blocks between start of undergeround layer and surface.");
+            HelpDict.Add("Surface height (sqrt) variance", "The square root of the variance (or standard deviation) from computing the values for 'Surface average height (aprox.)'");
+            HelpDict.Add("Surface max-min height", "Difference between max an min value from computing the values for 'Surface average height (aprox.)'. So the amount of blocks of the" +
+                "deepest hole to the biggest mountain.");
+
+            
 
 
             //phase 3
@@ -1688,18 +1821,15 @@ namespace TheTerrariaSeedProject.UI
                 "computation is viewed at the bottom of the right GUI and also in the stats file if stored. It's not perfect in all cases. Only the chance of getting a nice world is " +
                 "higher with a higher score.");
 
-            HelpDict.Add("Underground Distance to spawn", "How many tiles downwards until end of world");
+            HelpDict.Add("Underground Distance to spawn", "How many tiles downwards until underground layer");
             HelpDict.Add("Cavern Distance to spawn", "How many tiles downwards until start of cavern layer");
 
 
 
-            HelpDict.Add("neg. Jungle biome distance to mid", "Negative amount of blocks until Jungle biome starts. The value is positive if Jungle biome overlap mid");
-            HelpDict.Add("neg. Snow biome distance to mid", "Negative amount of blocks until Snow biome starts. The value is positive if Snow biome overlap mid");
-
-            HelpDict.Add("Jungle biome surface overlap mid", "Number of Jungle biome tiles which are at the wrong side of the world");
-            HelpDict.Add("Snow biome surface overlap mid", "Number of Snow biome tiles which are at the wrong side of the world");
+         
 
             HelpDict.Add("Pathlength to Temple Tile", "Smallest pathlength to a tile close to Jungle Temple");
+            HelpDict.Add("Pathlength to underground MarbleGranite", "Smallest pathlength to a granite or marble biome wall located in underground or below.");
 
         }
 
