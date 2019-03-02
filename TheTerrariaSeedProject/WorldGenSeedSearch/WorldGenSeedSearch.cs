@@ -5494,7 +5494,7 @@ namespace TheTerrariaSeedProject
                 if (hasOBjectOrParam["Cloud Chest"] + 1 + ((Main.maxTilesX > 6000) ? 1 : 0) + ((Main.maxTilesX > 8000) ? 1 : 0) < hasOBjectOrParam["Number of Clouds"])
                     hasOBjectOrParam["Floating Island without chest"] = 1;
 
-
+                hasOBjectOrParam["Pathlength to Detonator"] /= pathNormFac;
                 hasOBjectOrParam["Pathlength to underground MarbleGranite"] /= pathNormFac;
                 hasOBjectOrParam["Pathlength to Minecart Track"] /= pathNormFac;
 
