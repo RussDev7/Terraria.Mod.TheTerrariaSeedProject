@@ -880,7 +880,7 @@ namespace TheTerrariaSeedProject.UI
 
                     string size = currentConfig.FindConfigItemValue("World size", 0);
                     int numPyramid = size.Equals("Large") ? 6 : size.Equals("Medium") ? 5 : size.Equals("Small") ? 4 : 7;
-                    int numPyramidChance = size.Equals("Large") ? 9 : size.Equals("Medium") ? 7 : size.Equals("Small") ? 6 : 10;
+                    int numPyramidChance = size.Equals("Large") ? 7 : size.Equals("Medium") ? 6 : size.Equals("Small") ? 5 : 10;
                     int numPyramidBoost = size.Equals("Large") ? 150 : size.Equals("Medium") ? 110 : size.Equals("Small") ? 70 : 150;
 
 

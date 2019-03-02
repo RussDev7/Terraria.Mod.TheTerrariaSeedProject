@@ -526,6 +526,7 @@ namespace TheTerrariaSeedProject.UI
                 "Omit Shadow Chest item in normal chest",
                 "Omit Mushroom Biome above surface",
                 "Omit Spawn in Marble or Granite biome",
+                "Omit Minecart Track close to spawn",
                 "Omit "+ Phase3.frozenTemple,
                 "Omit All Paintings",
                 "Omit "+ Phase3.allChestItemsNoCraftFish,
@@ -1003,6 +1004,7 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Pathlength to 4th Chest",
                 "neg. Pathlength to 5th Chest",
                 "neg. Pathlength to Tree Chest",
+                "neg. Pathlength to Minecart Track",
                 "neg. Pathlength to free ShadowOrb/Heart",
                 "neg. Pathlength to underground MarbleGranite",
                 "neg. Pathlength into cavern layer",
@@ -1099,7 +1101,8 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to 3rd Chest",
                 "Pathlength to 4th Chest",
                 "Pathlength to 5th Chest",
-                "Pathlength to Tree Chest",                
+                "Pathlength to Tree Chest",
+                "Pathlength to Minecart Track",
                 "Pathlength to free ShadowOrb/Heart",
                 "Pathlength to underground MarbleGranite",
                 "Pathlength into cavern layer",
@@ -1243,8 +1246,9 @@ namespace TheTerrariaSeedProject.UI
             Add("neg. Pathlength to 4th Chest", vPathLengthNeg);
             Add("neg. Pathlength to 5th Chest", vPathLengthNeg);
 
-            
             Add("neg. Pathlength to Tree Chest", vPathLengthNeg);
+            Add("neg. Pathlength to Minecart Track", vPathLengthNeg);
+            
 
 
             Add("neg. Pathlength to free ShadowOrb/Heart", vPathLengthNeg);
@@ -1310,7 +1314,9 @@ namespace TheTerrariaSeedProject.UI
             Add("Pathlength to 4th Chest", vPathLength);
             Add("Pathlength to 5th Chest", vPathLength);
 
+            
             Add("Pathlength to Tree Chest", vPathLength);
+            Add("Pathlength to Minecart Track", vPathLength);
             Add("Pathlength to Temple Door", vPathLength);
             Add("Pathlength to Temple Tile", vPathLength);
             Add("Pathlength to free ShadowOrb/Heart", vPathLength);  
