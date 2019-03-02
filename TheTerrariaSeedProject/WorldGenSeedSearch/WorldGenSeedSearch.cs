@@ -6350,6 +6350,7 @@ namespace TheTerrariaSeedProject
                 || type == TileID.PressurePlates
                 || type == TileID.Stalactite
                 || type == TileID.Explosives
+                || type == TileID.Detonator
                 || type == TileID.FleshWeeds
                 || type == TileID.CrimsonVines
                 || type == TileID.DyePlants
