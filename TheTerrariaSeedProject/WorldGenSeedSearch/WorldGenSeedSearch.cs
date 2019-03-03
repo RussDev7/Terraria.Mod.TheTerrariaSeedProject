@@ -2090,6 +2090,7 @@ namespace TheTerrariaSeedProject
                 }
             }
             isSky = true;
+            if(stage!=1)
             while (isSky && ++y < Main.worldSurface)
             {                
                 for (int x = from; x < to; ++x)
