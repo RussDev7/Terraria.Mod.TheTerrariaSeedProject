@@ -1335,11 +1335,15 @@ namespace TheTerrariaSeedProject
                     uiss.SetCountText(hasCount, chanceCount);
 
                     //debug
-                    Main.worldName = "failed " +seed;
+                    if (!isPubRel)
+                    {
+                        //debug
+                        Main.worldName = "failed " + seed;
 
-                    Main.ActiveWorldFileData = WorldFile.CreateMetadata(Main.worldName, false, Main.expertMode);
-                    Main.ActiveWorldFileData.SetSeed(seed.ToString());
-                    StoreMapAsPNG(stage>2);
+                        Main.ActiveWorldFileData = WorldFile.CreateMetadata(Main.worldName, false, Main.expertMode);
+                        Main.ActiveWorldFileData.SetSeed(seed.ToString());
+                        StoreMapAsPNG(stage > 2);
+                    }
 
                     //debug end
 
