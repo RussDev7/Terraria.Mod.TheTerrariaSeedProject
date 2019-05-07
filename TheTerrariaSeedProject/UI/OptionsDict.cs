@@ -51,18 +51,25 @@ namespace TheTerrariaSeedProject.UI
             public const string dungeonWallColor = "Dungeon wall color";
             public const string dungeonSide = "Dungeon side";
             public const string boost = "Boost (experimental) >=";
-            public const string boostPyr = "pred. Pyramid count >=";
+            public const string boostPyr = "pred. Pyramid count >=";            
             public const string boostES = "Boost ES mid Tree (experimental) >="; //np
             public const string boostESgran = "Boost ES mid Granite (experimental) >=";//np
-            public const string boostHeightMin = "pred. spawn height min  >=";
-            public const string boostHeightMax = "pred. spawn height max  <=";
+            public const string boostHeightMin = "pred. spawn height min >=";
+            public const string boostHeightMax = "pred. spawn height max <=";
             public const string boostUGheightMin = "Underground layer height min >=";
-            public const string boostUGheightMax = "Underground layer height max >=";
+            public const string boostUGheightMax = "Underground layer height max >=";            
             public const string boostRockLayerOffset = "Boost rock layer offset >=";//np
+            public const string boostCavernLayeroffsetMin = "Boost cavern layer offset min(%) >=";
+            public const string boostCavernLayeroffsetMax = "Boost cavern layer offset max(%) <=";//np
             public const string boostSurfRockLayerOffset = "Boost surfRock layer offset >=";//np
-            public const string boostSpawnRockSeedOffset = "Boost spawn rock layer offset >=";//np          
+            public const string boostSpawnRockSeedOffsetMin = "Boost spawn rock layer offset min >=";//np          
+            public const string boostSpawnRockSeedOffsetMax = "Boost spawn rock layer offset max <=";//np          
             public const string boostMidTree = "Boost tree might be mid (exper.) >=";//np
             public const string boostMidPyramid = "Boost pyramid might be mid (exper.) >=";//np
+            public const string boostMidCloud = "pred. Clouds in mid dist <="; //np
+            public const string boostMidCloudInner2 = "pred. Clouds in mid mean dist inner 2 <="; //np
+            public const string boostMidCloudNum = "pred. Clouds in mid num >="; //np
+            public const string boostMidCloud1stLake = "pred. Clouds in mid contain 1st lake right ="; //np
         }
 
         public static class Phase2
@@ -263,12 +270,14 @@ namespace TheTerrariaSeedProject.UI
         public static readonly List<string> v0to500_5_700_10 = getPatern(0, 100, 5).Concat(getPatern(500, 21, 10)).ToList();
         public static readonly List<string> v0to200_2 = getPatern(0, 101, 2);        
         public static readonly List<string> v0to5 = getPatern(0, 6);
+        public static readonly List<string> v0to4 = getPatern(0, 5);
         public static readonly List<string> v0to1 = getPatern(0, 2);
         public static readonly List<string> v0to2 = getPatern(0, 3);
         public static readonly List<string> vboost = getPatern(10, 40).Concat(getPatern(50, 11, 5).Concat(new string[] {"110","134","150","190","200","300","400" }.ToList())).ToList();
         public static readonly List<string> vDungeonWalls = getPatern(10000, 19, 5000);
         public static readonly List<string> vDungeonALLWalls = getPatern(0, 3, 50, 1 , 2).Concat(getPatern(250, 3, 250).Concat(getPatern(1000, 9, 1000)).Concat(getPatern(10000, 21, 2000))).ToList();
-        public static readonly List<string> vNearEvilOcean = getPatern(0, 8, 25).Concat(getPatern(400, 5, 100)).Concat(getPatern(1000, 10, 200)).ToList();
+        public static readonly List<string> vNearEvilOcean = getPatern(0, 8, 25).Concat(getPatern(400, 5, 100)).Concat(getPatern(1000, 10, 200).Concat(getPatern(3000, 22, 250))).ToList();
+        public static readonly List<string> vNearEvilOceanNeg = getPatern(0, 8, -25).Concat(getPatern(-400, 5, -100)).Concat(getPatern(-1000, 10, -200).Concat(getPatern(-3000, 22, -250))).ToList();
         public static readonly List<string> vBeachPenalty = getPatern(100, 9, 100).Concat(getPatern(1000, 4, 250)).Concat(getPatern(2000, 16, 500)).Concat(getPatern(10000, 11, 1000)).ToList();
         public static readonly List<string> vEvilTiles = getPatern(0, 10, 10).Concat(getPatern(100, 9, 100)).Concat(getPatern(1000, 9, 1000)).Concat(getPatern(10000, 9, 5000)).ToList();
         public static readonly List<string> vEvilTilesNeg = getPatern(-50000, 8, 5000).Concat(getPatern(-10000, 9, 1000)).Concat(getPatern(-1000, 9, 100)).Concat(getPatern(-100, 11, 10)).ToList();
@@ -278,6 +287,8 @@ namespace TheTerrariaSeedProject.UI
         public static readonly List<string> vDistanceOverlapNeg = getPatern(1000, 9, -100).Concat(getPatern(100, 3, -25).Concat(getPatern(25, 10, -5).Concat(getPatern(-25, 3, -25).Concat(getPatern(-100, 9, -100).Concat(getPatern(-1000, 5, -200)).Concat(getPatern(-2000, 9, -250)))))).ToList();
         public static readonly List<string> vDistanceShort = getPatern(0, 5, 5).Concat(getPatern(25, 9, 25).Concat(getPatern(250, 4, 50)).Concat(getPatern(500, 16, 100))).ToList();
         public static readonly List<string> vDistanceShortNeg = getPatern(0, 5, -5).Concat(getPatern(-25, 9, -25).Concat(getPatern(-250, 4, -50)).Concat(getPatern(-500, 16, -100))).ToList();
+                
+        public static readonly List<string> vDistanceShortNegTree = getPatern(100, 6, -5).Concat(getPatern(-130, 2, -10).Concat(getPatern(-150, 3, -25).Concat(getPatern(-250, 4, -50)).Concat(getPatern(-500, 16, -100)))).ToList();
         public static readonly List<string> vDistanceLong = getPatern(200, 8, 100).Concat(getPatern(1000, 17, 200)).ToList();
         public static readonly List<string> vDistanceLongNeg = getPatern(-200, 8, -100).Concat(getPatern(-1000, 17, -200)).ToList();
         public static readonly List<string> vNumTiles = getPatern(0, 10, 10).Concat(getPatern(100, 9, 100)).Concat(getPatern(1000, 9, 1000).Concat(getPatern(10000, 9, 5000))).ToList();
@@ -305,12 +316,16 @@ namespace TheTerrariaSeedProject.UI
         public static readonly List<string> vTreePyrExistCavernDist = getPatern(-300, 61, 10);
         public static readonly List<string> vUnderground = getPatern(0, 1,25).Concat(getPatern(25, 25).Concat(getPatern(50, 10, 5)).Concat(getPatern(100, 10, 20)).Concat(getPatern(300, 29, 25))).ToList();
         public static readonly List<string> vUndergroundNeg = getPatern(0, 1, -25).Concat(getPatern(-25, 25, -1).Concat(getPatern(-50, 10, -5)).Concat(getPatern(-100, 10, -20)).Concat(getPatern(-300, 29, -25))).ToList();
+        public static readonly List<string> vUndergroundDist = getPatern(0, 25, 1).Concat(getPatern(25, 25).Concat(getPatern(50, 10, 5)).Concat(getPatern(100, 10, 20)).Concat(getPatern(300, 29, 25))).ToList();
+        public static readonly List<string> vUndergroundDistNeg = getPatern(0, 25, -1).Concat(getPatern(-25, 25, -1).Concat(getPatern(-50, 10, -5)).Concat(getPatern(-100, 10, -20)).Concat(getPatern(-300, 29, -25))).ToList();
         public static readonly List<string> vHeight = getPatern(0, 100).Concat(getPatern(100, 41, 5)).ToList();
-        public static readonly List<string> vSpawnRockOff = getPatern(-500, 16, 25).Concat(getPatern(-100, 10, 5).Concat(getPatern(-50, 101, 1))).ToList();
+        public static readonly List<string> vCavernOff = getPatern(0, 300);
+        public static readonly List<string> vSpawnRockOff = getPatern(-1000, 5, 100).Concat(getPatern(-500, 16, 25).Concat(getPatern(-100, 10, 5).Concat(getPatern(-50, 151, 1)))).ToList();
+        public static readonly List<string> vSpawnRockOffNeg = getPatern(1000, 5, -100).Concat(getPatern(500, 16, -25).Concat(getPatern(100, 10, -5).Concat(getPatern(50, 151, -1)))).ToList();
 
         public static readonly List<string> vForUnknown = getPatern(0, 10).Concat(getPatern(10, 9, 10)).Concat(getPatern(100, 9, 100)).Concat(getPatern(1000, 9, 1000)).Concat(getPatern(10000, 10, 10000)).ToList();
-        
 
+        public static readonly List<string> vCloudsMidDist = (new string[] { "-1" }).Concat(getPatern(85, 48, 5).Concat(getPatern(275, 45, 5).Concat(getPatern(500, 20, 25).Concat(getPatern(1000, 20, 50).Concat(getPatern(2000, 13, 250)))))).ToList();
 
         public OptionsDict()
         {
@@ -369,7 +384,7 @@ namespace TheTerrariaSeedProject.UI
                 "Out of experiments it is recommended that this value should not be higher than 5 for small, 6 for medium and 7 (above very rare). \n "+
                 " At the right panel a distribution is shown. It shows a correlation between chance of a seed to have a number of Pyramids vs. how many it actually has. To save space it's written in a short form. " +
                 "E.g. 23 means at least 3 with 2 zeros behind, so over 300. At the end of a search it stores a file names lastStats.txt with normal number distribution in Terraria \\ModLoader \\TheTerrariaSeedProject folder close to your world files. Also stored in seed's stats file if option '"+Configuration.storeStats +"' active."+
-                "\n\n So far small maps with 4 pyramids, medium with 5 and large with 6 are known.\n \n"+
+                "\n\n So far small maps with 5 pyramids, medium with 6 and large with 7 are known but they are very very very very rare.\n \n"+
                 "Challenge: Can you find more? Good luck!" +
                 "\n " +
                 "For a more accurate counting you can use option '"+ Phase1.boostPyr +"' on top of it. It introduce an additional world gen. cycle limited to the crucial steps. It take some extra time (if not equal to 0) but delivers a closer value to the actual pyramid count. There is a " +
@@ -383,9 +398,10 @@ namespace TheTerrariaSeedProject.UI
                 "impossible. \n \n" +
                 "For advanced users: If you want to tune it even more you can use the option '"+Phase1.boost+"' and '"+Phase1.boostPyr+"'. With first you can higher the chance to get a high number of possible pyramid spots and so also higher the" +
                 "chance to get more pyramids. The 2nd can be used for guessing the (max) amount of pyramids the seed actually has. \n " +
-                "Furthermore the (seed) value of '"+Phase1.boost+"' also has a direct impact at the number of living wood trees, Bee Hives, Granite and Marble biomes. It also has some minor influence " +
+                "Furthermore the (seed) value of '"+Phase1.boost+"' also has a direct impact at the number of living wood trees, Bee Hives, Granite and Marble biomes, 1st sky lake (except its mid). It also has some minor influence " +
                 "at lakes, dungeon position, sand generation and some more. This sand generation higher the chance for possible pyramid spots and so also for pyramids. A higher value will result in a " +
                 "higher count of those mentioned above but too high value will limit the variation and can have negative impact as well. E.g. it seem to increase the chance of a dungeon placed in ocean (more testing needed). " +
+                "Also the first sky lake is placed very far in east, far away from spawn for high values (seed value of about 20 would be mid, in that case it gets a new location)." +
                 "Depending at world size and condition you are looking for there is some maximal value. Going higher than this will have no influence in this count. It is the internal amount of " +
                 "possible values for that structure. For convenience it is multiplied by 10. E.g. a small world can have 0, 1 or 2 living trees, so 3 possibilities, times 10 = 30. If you select this value " +
                 "the mod will divide 10 by this value and subtract it from one, e.g.: 1-(10:30) = ratio (about 0.6667). For each seed with a value higher (or equal) than this ratio it is guaranteed that the small world which is" +
@@ -527,6 +543,7 @@ namespace TheTerrariaSeedProject.UI
                 "Omit Mushroom Biome above surface",
                 "Omit Spawn in Marble or Granite biome",
                 "Omit Minecart Track close to spawn",
+                "Omit ExplosiveDetonator close to spawn",
                 "Omit "+ Phase3.frozenTemple,
                 "Omit All Paintings",
                 "Omit "+ Phase3.allChestItemsNoCraftFish,
@@ -550,18 +567,26 @@ namespace TheTerrariaSeedProject.UI
             Add(Phase1.dungeonWallColor, new List<string> { "Random", "Blue", "Green", "Pink"});
             Add(Phase1.dungeonSide, new List<string> { "Random", "Left", "Right"});
             Add(Phase1.boost, vboost);
-            Add(Phase1.boostPyr, v0to10);
+            Add(Phase1.boostPyr, v0to10);            
             Add(Phase1.boostES, v0to10);
             Add(Phase1.boostESgran, v0to10);
             Add(Phase1.boostUGheightMin, vUnderground);
             Add(Phase1.boostUGheightMax, vUnderground);
             Add(Phase1.boostHeightMax, vHeight);
             Add(Phase1.boostHeightMin, vHeight);
+            Add(Phase1.boostCavernLayeroffsetMin, vCavernOff);
+            Add(Phase1.boostCavernLayeroffsetMax, vCavernOff);
             Add(Phase1.boostRockLayerOffset, v0to300_5);
             Add(Phase1.boostSurfRockLayerOffset, v0to300_5);
-            Add(Phase1.boostSpawnRockSeedOffset, vSpawnRockOff);
+            Add(Phase1.boostSpawnRockSeedOffsetMin, vSpawnRockOff);
+            Add(Phase1.boostSpawnRockSeedOffsetMax, vSpawnRockOff);
             Add(Phase1.boostMidTree, v0to1);
             Add(Phase1.boostMidPyramid, v0to1);
+            Add(Phase1.boostMidCloud, vCloudsMidDist);
+            Add(Phase1.boostMidCloudInner2, vCloudsMidDist);
+            Add(Phase1.boostMidCloudNum, v0to9);
+            Add(Phase1.boostMidCloud1stLake, v0to2);
+
 
             //phase 2 content
             Add(Phase2.positive, new List<string> {
@@ -581,6 +606,7 @@ namespace TheTerrariaSeedProject.UI
                 "Tree Chest Loom",
                 "Trees near mid",
                 "Tree chests near mid",
+                "Tree near mid open to mid",
                 "Tree to cavern layer",
                 "Tree to cavern layer near mid",
                 "Tree close to cavern layer",
@@ -603,6 +629,7 @@ namespace TheTerrariaSeedProject.UI
                 "Pre Skeletron Muramasa good positon",
                 "Pre Skeletron Muramasa Chest reachable",                
                 "Pre Skeletron Cobalt Shield Chest reachable",
+                "Pre Skeletron Handgun Chest reachable",
                 "Pre Skeletron Shadow Key Chest reachable",
                 "Pre Skeletron Golden Key Grab",
                 "Pre Skeletron Golden Key Risky",
@@ -622,10 +649,12 @@ namespace TheTerrariaSeedProject.UI
                 "All Dungeon Items",                
                 "Beach penalty mean",
                 "Beach penalty max",
-                "Nearest Evil left Ocean",
-                "Nearest Evil right Ocean",
+                //"Nearest Evil left Ocean",
+                //"Nearest Evil right Ocean",
                 "Nearest Evil Dungeon Ocean",
+                "neg. Nearest Evil Dungeon Ocean",
                 "Nearest Evil Jungle Ocean",
+                "neg. Nearest Evil Jungle Ocean",
                 "Evil only one side",                               
                 "Evil Tiles for Jungle Grass",
                 "Evil Tiles for Sand",
@@ -644,15 +673,17 @@ namespace TheTerrariaSeedProject.UI
                 "Surface max-min height",
                 "Underground layer height",
                 "Underground Distance to spawn (guess)",
-                "neg. Underground Distance to spawn (guess)",
+                "Spawn rock layer offset (guess)",
                 "neg. Underground layer height",
+                "neg. Underground Distance to spawn (guess)",                
+                "neg. Spawn rock layer offset (guess)",
                 "neg. Distance Tree to mid", 
                 "neg. Distance Tree Chest to mid",
                 "neg. Distance Cloud to mid", 
                 "neg. Distance Pyramid to mid", 
                 "neg. Distance Dungeon to mid", 
                 "neg. Distance ShadowOrb/Heart to mid",
-                "neg. Distance Lake to mid (guess)",
+                "neg. Distance Lake to mid (guess)",                
                 "neg. Jungle biome distance to mid",
                 "neg. Snow biome distance to mid",
                 "neg. MarbleGranite at surf dist. to mid",
@@ -677,7 +708,7 @@ namespace TheTerrariaSeedProject.UI
             {
                 this[Phase2.positive].Remove("Enchanted Sword mid may possible (guess)");
                 this[Phase2.positive].Remove("Enchanted Sword mid granite may possible (guess)");
-                this[Phase2.positive].Remove("Enchanted Sword mid good may possible (guess)");
+                this[Phase2.positive].Remove("Enchanted Sword mid good may possible (guess)");                
             }
 
 
@@ -722,7 +753,9 @@ namespace TheTerrariaSeedProject.UI
                 "Underground layer height",                
                 "neg. Underground layer height",
                 "Underground Distance to spawn (guess)",                
-                "neg. Underground Distance to spawn (guess)",                
+                "neg. Underground Distance to spawn (guess)",
+                "Spawn rock layer offset (guess)",
+                "neg. Spawn rock layer offset (guess)",
                 OptionsDict.Tools.conditionConnector1,
                 OptionsDict.Tools.conditionConnector2,
                 OptionsDict.Tools.conditionConnector3,
@@ -746,8 +779,9 @@ namespace TheTerrariaSeedProject.UI
             Add("Ocean Pyramid", v0to2);
             Add("Tree Chest", v0to5);
             Add("Tree Chest Loom", v0to5);
-            Add("Trees near mid", v0to5);
-            Add("Tree chests near mid", v0to5);
+            Add("Trees near mid", v0to4);
+            Add("Tree near mid open to mid", v0to4);
+            Add("Tree chests near mid", v0to5);            
             Add("Tree to cavern layer", v0to5);
             Add("Tree to cavern layer near mid", v0to5);
             Add("Tree close to cavern layer", v0to5);
@@ -770,6 +804,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Pre Skeletron Muramasa good positon", v0to5);
             Add("Pre Skeletron Muramasa Chest reachable", v0to5);      
             Add("Pre Skeletron Cobalt Shield Chest reachable", v0to5);
+            Add("Pre Skeletron Handgun Chest reachable", v0to5);
             Add("Pre Skeletron Shadow Key Chest reachable", v0to5);
             Add("Pre Skeletron Golden Key Grab", v0to5);
             Add("Pre Skeletron Golden Key Risky", v0to5);
@@ -790,10 +825,12 @@ namespace TheTerrariaSeedProject.UI
             Add("Dungeon farm spot 3Wall inters.", v0to10);
             Add("Dungeon farm spot 3Wall in line", v0to10);
             Add("All Dungeon Items", v0to1);            
-            Add("Nearest Evil left Ocean", vNearEvilOcean);
-            Add("Nearest Evil right Ocean", vNearEvilOcean);
+            //Add("Nearest Evil left Ocean", vNearEvilOcean);
+            //Add("Nearest Evil right Ocean", vNearEvilOcean);
             Add("Nearest Evil Dungeon Ocean", vNearEvilOcean);
+            Add("neg. Nearest Evil Dungeon Ocean", vNearEvilOceanNeg);
             Add("Nearest Evil Jungle Ocean", vNearEvilOcean);
+            Add("neg. Nearest Evil Jungle Ocean", vNearEvilOceanNeg);
             Add("Evil only one side", v0to1);
             Add("Snow biome surface overlap mid", vNumTiles);
             Add("Jungle biome surface overlap mid", vNumTiles);
@@ -829,7 +866,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Distance ShadowOrb/Heart to mid", vDistance);
             Add("Distance Lake to mid (guess)", vDistance);
 
-            Add("neg. Distance Tree to mid", vDistanceShortNeg);
+            Add("neg. Distance Tree to mid", vDistanceShortNegTree);
             Add("neg. Distance Tree Chest to mid", vDistanceShortNeg);
             Add("neg. Distance Cloud to mid", vDistanceShortNeg);
             Add("neg. Distance Pyramid to mid", vDistanceShortNeg);
@@ -855,8 +892,11 @@ namespace TheTerrariaSeedProject.UI
             Add("Has evil Jungle Ocean", v0to1);
             Add("Underground layer height", vUnderground);
             Add("neg. Underground layer height", vUndergroundNeg);
-            Add("Underground Distance to spawn (guess)", vUnderground);
-            Add("neg. Underground Distance to spawn (guess)", vUndergroundNeg);
+            Add("Underground Distance to spawn (guess)", vUndergroundDist);
+            Add("neg. Underground Distance to spawn (guess)", vUndergroundDistNeg);
+            
+            Add("Spawn rock layer offset (guess)", vSpawnRockOff);
+            Add("neg. Spawn rock layer offset (guess)", vSpawnRockOffNeg);
 
 
             Add(OptionsDict.Tools.dummyPlus, vdummy);
@@ -883,7 +923,7 @@ namespace TheTerrariaSeedProject.UI
                 "Near Mushroom Biome count",
                 "Near Chest",
                 "Near Tree",
-                "Near Tree Chest",
+                "Near Tree Chest",                
                 "Near Cloud",
                 "Cloud Chest",
                 "Cloud Ballon",
@@ -987,6 +1027,7 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Pathlength to Altar",
                 "neg. Pathlength to Bee Hive",
                 "neg. Pathlength to Boomstick",
+                "neg. Pathlength to Flower Boots",
                 "neg. Pathlength to Slime Staute",
                 "neg. Pathlength to Shark Staute",
                 "neg. Pathlength to Anvil",
@@ -1003,7 +1044,14 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Pathlength to 3rd Chest",
                 "neg. Pathlength to 4th Chest",
                 "neg. Pathlength to 5th Chest",
+                "neg. Pathlength to underground Chest",
+                "neg. Pathlength to 2nd underground Chest",
+                "neg. Pathlength to 3rd underground Chest",
+                "neg. Pathlength to 4th underground Chest",
+                "neg. Pathlength to 5th underground Chest",
                 "neg. Pathlength to Tree Chest",
+                "neg. Pathlength to Pyramid Chest",
+                "neg. Pathlength to cabin",
                 "neg. Pathlength to Minecart Track",
                 "neg. Pathlength to free ShadowOrb/Heart",
                 "neg. Pathlength to underground MarbleGranite",
@@ -1085,6 +1133,7 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to Altar",
                 "Pathlength to Bee Hive",
                 "Pathlength to Boomstick",
+                "Pathlength to Flower Boots",
                 "Pathlength to Slime Staute",
                 "Pathlength to Shark Staute",
                 "Pathlength to Anvil",
@@ -1101,7 +1150,14 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to 3rd Chest",
                 "Pathlength to 4th Chest",
                 "Pathlength to 5th Chest",
+                "Pathlength to underground Chest",
+                "Pathlength to 2nd underground Chest",
+                "Pathlength to 3rd underground Chest",
+                "Pathlength to 4th underground Chest",
+                "Pathlength to 5th underground Chest",
                 "Pathlength to Tree Chest",
+                "Pathlength to Pyramid Chest",
+                "Pathlength to cabin",
                 "Pathlength to Minecart Track",
                 "Pathlength to free ShadowOrb/Heart",
                 "Pathlength to underground MarbleGranite",
@@ -1131,7 +1187,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Near Mushroom Biome count", vNumTiles);            
             Add("Near Chest", v0to20);
             Add("Near Tree", v0to5);
-            Add("Near Tree Chest", v0to5);
+            Add("Near Tree Chest", v0to5);            
             Add("Near Cloud", v0to5);
             Add("Bee Hives", v0to20);
             Add("High Hive", v0to10);
@@ -1186,7 +1242,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Number noncraf. Statues", vStatuesTotal);
             Add("Floating Island without chest", v0to1);
             Add("Near Sunflower", v0to20);
-            Add("Nearest Teleportation Potion count", v0to5);            
+            Add("Nearest Teleportation Potion count", v0to2);            
             Add("Free ShadowOrb/Heart", v0to5);
             Add("Free cavern to mid Jungle", v0to1);
             Add("Free cavern to deep Jungle", v0to1);
@@ -1227,6 +1283,7 @@ namespace TheTerrariaSeedProject.UI
             Add("neg. Pathlength to Altar", vPathLengthNeg);
             Add("neg. Pathlength to Bee Hive", vPathLengthNeg);
             Add("neg. Pathlength to Boomstick", vPathLengthNeg);
+            Add("neg. Pathlength to Flower Boots", vPathLengthNeg);
 
             Add("neg. Pathlength to Slime Staute", vPathLengthNeg);
             Add("neg. Pathlength to Shark Staute", vPathLengthNeg);
@@ -1246,7 +1303,17 @@ namespace TheTerrariaSeedProject.UI
             Add("neg. Pathlength to 4th Chest", vPathLengthNeg);
             Add("neg. Pathlength to 5th Chest", vPathLengthNeg);
 
+
+            Add("neg. Pathlength to underground Chest", vPathLengthNeg);
+            Add("neg. Pathlength to 2nd underground Chest", vPathLengthNeg);
+            Add("neg. Pathlength to 3rd underground Chest", vPathLengthNeg);
+            Add("neg. Pathlength to 4th underground Chest", vPathLengthNeg);
+            Add("neg. Pathlength to 5th underground Chest", vPathLengthNeg);
+            
+
             Add("neg. Pathlength to Tree Chest", vPathLengthNeg);
+            Add("neg. Pathlength to Pyramid Chest", vPathLengthNeg);
+            Add("neg. Pathlength to cabin", vPathLengthNeg);
             Add("neg. Pathlength to Minecart Track", vPathLengthNeg);
             
 
@@ -1297,6 +1364,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Pathlength to Altar", vPathLength);
             Add("Pathlength to Bee Hive", vPathLength);
             Add("Pathlength to Boomstick", vPathLength);
+            Add("Pathlength to Flower Boots", vPathLength);
             Add("Pathlength to Slime Staute", vPathLength);
             Add("Pathlength to Shark Staute", vPathLength);
             Add("Pathlength to Anvil", vPathLength);
@@ -1314,8 +1382,16 @@ namespace TheTerrariaSeedProject.UI
             Add("Pathlength to 4th Chest", vPathLength);
             Add("Pathlength to 5th Chest", vPathLength);
 
-            
+            Add("Pathlength to underground Chest", vPathLengthNeg);
+            Add("Pathlength to 2nd underground Chest", vPathLengthNeg);
+            Add("Pathlength to 3rd underground Chest", vPathLengthNeg);
+            Add("Pathlength to 4th underground Chest", vPathLengthNeg);
+            Add("Pathlength to 5th underground Chest", vPathLengthNeg);
+
+
             Add("Pathlength to Tree Chest", vPathLength);
+            Add("Pathlength to Pyramid Chest", vPathLength);
+            Add("Pathlength to cabin", vPathLength);
             Add("Pathlength to Minecart Track", vPathLength);
             Add("Pathlength to Temple Door", vPathLength);
             Add("Pathlength to Temple Tile", vPathLength);
@@ -1382,7 +1458,8 @@ namespace TheTerrariaSeedProject.UI
                 UISearchSettings.IconNames.stop + " Stops after finishing the current world gen step and exit the mod. \n \n \n" +
                 "You can left click at colored (sub) section headers or hover your mouse over many other for more information. Here only some general information. \n \n" +
                 "This mod was made for vanilla Terraria. Seeds you found here will work there too *(more details later). However also most mods tested can be used with this. Some " +
-                "exception is 'WorldGen Previewer' and for some user also 'Overhaul' don't work. Best results if you disable all other and restart Terraria. \n \n" +
+                "exception is 'WorldGen Previewer' and for some user also 'Overhaul' don't work. Mod's which add some world gen cycles can make some trouble (e.g. 'ThoriumMod') " +
+                "Best results if you disable all other and restart Terraria. \n \n" +
                 "How the search works: \n" +
                 "During world generation this mod checks if the world fulfills the conditions you set up. If not it takes the next seed and tries that. \n" +
                 "Some conditions can already be checked before the full world is generated. With this you can save much search time. \n" +
@@ -1471,7 +1548,7 @@ namespace TheTerrariaSeedProject.UI
             HelpDict.Add("Store stats for each seed", "Stores a text file which contains nearly all information you can ask for in that mod. It also stores information about the configuration you searched for" +
                 " and some statistics about your current search. \n The file is stored at your normal world folder. This file can be used for record (what I have searched for this seed?) and to figure out" +
                 " good values for future searches. E.g. you found a world you like, just look up the values in that text file and add them to your search conditions. Storing that stats file is suggested." +
-                " \n Some advanced experimental feature (beta): You can analzse an already existing world (with some content you like). For this enter the full world file name including '.wld' as world name " +
+                " \n Some advanced experimental feature (beta): You can analyzse an already existing world (with some content you like). For this enter the full world file name including '.wld' as world name " +
                 "(outside mod) and a seed starting with '?'. It will generate the stats file and a minimap image.");
             
 
@@ -1559,11 +1636,11 @@ namespace TheTerrariaSeedProject.UI
 
 
             HelpDict.Add(Phase1.boost, "An advanced feature which gives you some control about a very important value during world gen. This has (known) direct impact at the number of living trees," +
-                " Bee Hives, Granite and Marble biomes. Some minor influence at lakes, dungeon position, sand generation and some more. This sand generation again has some influence at the value for " +
+                " Bee Hives, Granite, Marble biomes, sky lake position. Some minor influence at lakes, dungeon position, sand generation and some more. This sand generation again has some influence at the value for " +
                 "option '"+Phase1.pyramidsPossible+ "' which has again some influence at the number of pyramids. \n" +
                 " Most times a higher values gives you a beter world. The seed need to have a higher (or equal) value than you selected here to pass that initial very fast test. Too high values can also have " +
-                "some negative effect (e.g. chance for dungeon in ocean seems to be higher). For more details left click at header '"+ Phase1.title +"'.\n" +
-                " Or in short: you are doing good with value 60 or if you hunt for pyramids 70 for small worlds, 110 for medium, 150 for large");
+                "some negative effect (e.g. chance for dungeon in ocean seems to be higher, 1st sky lake cloud very far to the right). For more details left click at header '"+ Phase1.title +"'.\n" +
+                " Or in short: you are doing good in most cases with value 60 or if you hunt for pyramids 70 for small worlds, 110 for medium, 150 for large");
 
             HelpDict.Add(Phase1.boostPyr, "This condition is only needed if you are" +
                 " looking for pyramids. If a value other than 0 is selected it introduces an additional world generation cycle which is limited to the crucial steps for guessing an upper bound" +
@@ -1574,6 +1651,12 @@ namespace TheTerrariaSeedProject.UI
                 "you are looking for (or 1 less to get them all). This is the max number of pyramids this world can have (or 1 less sometimes). Skipped world gen. steps may overwrite those and reduce the " +
                 "count. This value should not be higher than '"+ Phase1.pyramidsPossible +"'. Values higher than 4 for small worlds, 5 for medium, 6 for large are very rare." );
 
+
+            HelpDict.Add(Phase1.boostMidTree, "This slightly increases the chance of having a living tree very close to mid (~105 blocks). It is neigther correct all the time nor finding all seeds which have such " +
+                "a living tree. It can only check the first generated tree. Later world gen can overwrite it (quite often), so another check in phase 2 is needed. Speed up about 3 times.");
+
+            HelpDict.Add(Phase1.boostMidPyramid, "This increases the chance of having a pyramid very close to mid. It is neigther correct all the time nor finding all seeds which have such a pyramid. " +
+                "Later world gen can overwrite it, so another check in phase 2 is needed.");
 
             HelpDict.Add(Phase1.boostHeightMin, "In early world gen. it tries to predict the amount of blocks between (unknown) character spawn location and (known) start of underground layer. " +
                 " World gen. only contine if height is between "+ Phase1.boostHeightMin + " and " + Phase1.boostHeightMax);
@@ -1586,10 +1669,20 @@ namespace TheTerrariaSeedProject.UI
             
 
             HelpDict.Add(Phase1.boostUGheightMin, "Early world gen. steps can check the height of underground layer. " +
-                " World gen. only contine if height is between " + Phase1.boostUGheightMin + " and " + Phase1.boostHeightMax);
+                " World gen. only contine if height is between " + Phase1.boostUGheightMin + " and " + Phase1.boostUGheightMax + "");
 
             HelpDict.Add(Phase1.boostUGheightMax, "Early world gen. steps can check the height of underground layer. " +
-               " World gen. only contine if height is between " + Phase1.boostUGheightMin + " and " + Phase1.boostHeightMax);
+               " World gen. only contine if height is between " + Phase1.boostUGheightMin + " and " + Phase1.boostUGheightMax+"");
+
+            string bcavltex = "An advanced feature which gives you control about the placement of typically cavern layer elements, like marble and granite biomes, detonators. " +
+                "Also has an impact at the depth of standard ores, like gold or demonite. The selected value is related to other layers depth." +
+                " 0 is same depth as the start of cavern layer. 100 same depth as the start of underground layer. 200 the same depth as predicted spawn height. >200 higher than " +
+                "predicted spawn height. 300 would be underground layer height above predicted spawn height. 0 is min value and common, >200 is very rare";
+            HelpDict.Add(Phase1.boostCavernLayeroffsetMin, bcavltex);
+            HelpDict.Add(Phase1.boostCavernLayeroffsetMax, bcavltex);
+
+            
+
 
             string wtext = "Be careful setting dungeon side together with dungeon color and hardmode evil spread side. In current version hardmode evil spread is always at the left side on worlds with blue dungeons and always to the right on worlds with pink dungeon";
             HelpDict.Add(Phase1.dungeonSide, wtext);
@@ -1632,6 +1725,7 @@ namespace TheTerrariaSeedProject.UI
                 "which also have a golden key in a chest you can reach will pass the phase.";
             HelpDict.Add("Pre Skeletron Muramasa Chest reachable", dungeonChestTextReach);
             HelpDict.Add("Pre Skeletron Cobalt Shield Chest reachable", dungeonChestTextReach);
+            HelpDict.Add("Pre Skeletron Handgun Chest reachable", dungeonChestTextReach);
             HelpDict.Add("Pre Skeletron Shadow Key Chest reachable", dungeonChestTextReach);
             HelpDict.Add("Pre Skeletron Muramasa good positon", "If you can grab a Muramasa chest without entering the dungeon or a golden key which you can get without entering the dungeon is nearby (<150 blocks distance). For 2nd case " +
                 "you might summon dungeon guardian.");
@@ -1784,6 +1878,10 @@ namespace TheTerrariaSeedProject.UI
 
             HelpDict.Add("Temple at depth (%)", "Location of the jungle temple regarding to the cavern layer. 100% means the mid of jungle temple is at the same depth as the entrance to the " +
                "underworld. 0% at the same depth as the entrance to the cavern layer. Other way around is option 'Temple at height (%)'");
+
+             HelpDict.Add("Pathlength to cabin", "(beta) Why build a flat if there is one close to spawn. Sometimes with treasures in it.");
+
+
 
             HelpDict.Add(Phase3.openTemple, "If you can access the Jungle Temple without key. Current implementation does not take overlapping evil biome into account (but trees, pyramids, cabins,..)." +
                 " Often this feature is also not stable between multiple world generations and modded/vanilla Terraria.");

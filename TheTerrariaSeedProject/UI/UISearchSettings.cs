@@ -372,17 +372,28 @@ namespace TheTerrariaSeedProject.UI
             addDictToInfo(OptionsDict.Phase1.boostUGheightMin).SetValue("0");
             addDictToInfo(OptionsDict.Phase1.boostUGheightMax).SetValue("1000");
             addDictToInfo(OptionsDict.Phase1.boostHeightMin).SetValue("0");
-            addDictToInfo(OptionsDict.Phase1.boostHeightMax).SetValue("300");            
+            addDictToInfo(OptionsDict.Phase1.boostHeightMax).SetValue("300");
+            addDictToInfo(OptionsDict.Phase1.boostCavernLayeroffsetMin).SetValue("0");
+            addDictToInfo(OptionsDict.Phase1.boostCavernLayeroffsetMax).SetValue("300");
+            addDictToInfo(OptionsDict.Phase1.boostMidPyramid).SetValue("0");
             if (!WorldGenSeedSearch.isPubRel)
             {
-                addDictToInfo(OptionsDict.Phase1.boostRockLayerOffset).SetValue("0");
-                addDictToInfo(OptionsDict.Phase1.boostSurfRockLayerOffset).SetValue("0");
-                addDictToInfo(OptionsDict.Phase1.boostSpawnRockSeedOffset).SetValue("-500");
+                //addDictToInfo(OptionsDict.Phase1.boostRockLayerOffset).SetValue("0");
+                //addDictToInfo(OptionsDict.Phase1.boostSurfRockLayerOffset).SetValue("0");
+                //addDictToInfo(OptionsDict.Phase1.boostSpawnRockSeedOffsetMin).SetValue("-1000");
+                //addDictToInfo(OptionsDict.Phase1.boostSpawnRockSeedOffsetMax).SetValue("100");
+
+
                 addDictToInfo(OptionsDict.Phase1.boostES).SetValue("0");
                 addDictToInfo(OptionsDict.Phase1.boostESgran).SetValue("0");
-                addDictToInfo(OptionsDict.Phase1.boostMidTree).SetValue("0");
-                addDictToInfo(OptionsDict.Phase1.boostMidPyramid).SetValue("0");
+                
+                
+                addDictToInfo(OptionsDict.Phase1.boostMidCloud).SetValue("-1");
+                addDictToInfo(OptionsDict.Phase1.boostMidCloudInner2).SetValue("-1");
+                addDictToInfo(OptionsDict.Phase1.boostMidCloudNum).SetValue("0");
+                addDictToInfo(OptionsDict.Phase1.boostMidCloud1stLake).SetValue("0");
             }
+            addDictToInfo(OptionsDict.Phase1.boostMidTree).SetValue("0");
             addDictToInfo(OptionsDict.Phase1.pyramidsPossible).SetValue("0");
             addDictToInfo(OptionsDict.Phase1.boostPyr).SetValue("0");
 
