@@ -78,6 +78,7 @@ namespace TheTerrariaSeedProject
         public bool didNotfinishLast = false;
         int numPyramidChanceTrue, numPyramidChanceTrueComputed;
         bool pyramidPruning; //beta, predict max amount of placed pyramids
+        bool cloudPruning; //beta, predict max amount of placed pyramids
         int[] passedStage;
         int[] couldNotGenerateStage;
         int rareGenOnly;
@@ -131,6 +132,10 @@ namespace TheTerrariaSeedProject
         double boostValue = 0;
         double boostValueSeed = 0;        
         int boostPyramidValue = 0;
+        int boostCloudValue = 0;
+        int boostCloudInner2Value = 0;
+        int boostCloudNumValue = 0;
+        int boostCloudNum1stLakeValue = 0;
         int boostPyramidValueSeed = 0;
         int boostESValue = 0;
         int boostESGraniteValue = 0;
@@ -145,17 +150,22 @@ namespace TheTerrariaSeedProject
         int boostUGHeightValueMin = 0;
         int boostUGHeightValueMax = 1000;
         int boostUGHeightValueSeed = 0;
+        int boostCavernLayeroffsetMin = 0;
+        int boostCavernLayeroffsetMax = 300;
+        int boostCavernLayeroffsetSeed = 0;
         int boostHeightValueSeed = 0;
         int boostRockLayerOffset = 0;
         int boostRockLayerOffsetSeed = 0;
         int boostSurfRockLayerOffset = 0;
         int boostSurfRockLayerOffsetSeed = 0;
-        int boostSpawnRockSeedOffset = -500;
+        int boostSpawnRockSeedOffsetMin = -1000;
+        int boostSpawnRockSeedOffsetMax =  100;
         int boostSpawnRockSeedOffsetSeed = 0;
         int boostMidTreeValue = 0;
         int boostMidTreeValueSeed = 0;
         int boostPyramidMidValue = 0;       
         bool doApproxRun = false;
+        bool inApproxRun = false;
 
         bool search4MoonOres = false;
         
@@ -174,6 +184,8 @@ namespace TheTerrariaSeedProject
         int  useOtherStackFrame = 0;
 
         List<int> itemIDdoNotWant = null;
+
+        bool loadWorld = false;
 
         public override void Initialize()
         {
@@ -319,7 +331,7 @@ namespace TheTerrariaSeedProject
                
 
 
-                bool loadWorld = false;
+                loadWorld = false;
                 
                 if (worldName.Length > 4 )
                 {
@@ -339,10 +351,11 @@ namespace TheTerrariaSeedProject
                     for (int l = 0; l < lines.Length; l++)
                     {
                         string path = Main.WorldPath + '\\' + lines[l];
-
-                        writeDebugFile(path);
+                        
                         if (System.IO.File.Exists(path))
                         {
+                            writeDebugFile(path);
+                            //writeDebugFile(path);
                             loadWorld = true;
 
                             Main.worldName = lines[l].Length>4 ?lines[l].Substring(0, lines[l].Length - 4) : lines[l]; 
@@ -351,14 +364,28 @@ namespace TheTerrariaSeedProject
                             Main.ActiveWorldFileData = new WorldFileData(path, false);
 
                             WorldFile.loadWorld(false);
+                            seed = lastSeed = Main.ActiveWorldFileData.Seed;
+                            
                             stage = 42;
+                            lastStage = 42;
                             ended = false;
                             gotToMain = false;
                             numPyrChance = -1;
                             currentConfiguration = uiss.currentConfig;
                             PostWorldGen();
+                            setHights(true);
+                            checkAndSetIfESmidPossible(false);
+                            checkAndSetIfESmidPossible(true);                            
                             analyzeWorld(score, genInfo);
                             computeScore(score);
+                            var name = createMapName(score, true, currentConfiguration, worldName);
+
+                            worldName = name.worldNameByUser + "_" + name.content + "_" + name.sscore + "_" + name.strares;
+                            Main.worldName = worldName;
+
+                            Main.ActiveWorldFileData = WorldFile.CreateMetadata(Main.worldName, false, Main.expertMode);
+                            Main.ActiveWorldFileData.SetSeed(name.cseed);
+                            
                             StoreMapAsPNG(true);
                             StoreLastStats(true);
                             stage = 0;
@@ -472,6 +499,28 @@ namespace TheTerrariaSeedProject
                             if (boostPyramidString.Length > 0)
                                 if (!Int32.TryParse(boostPyramidString, out boostPyramidValue)) boostPyramidValue = 0;
 
+                            boostCloudValue = -1;
+                            string boostCloudString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boostMidCloud, 1);
+                            if (boostCloudString.Length > 0)
+                                if (!Int32.TryParse(boostCloudString, out boostCloudValue)) boostCloudValue = -1;
+
+                            boostCloudInner2Value = -1;
+                            boostCloudString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boostMidCloudInner2, 1);
+                            if (boostCloudString.Length > 0)
+                                if (!Int32.TryParse(boostCloudString, out boostCloudInner2Value)) boostCloudInner2Value = -1;
+
+                            boostCloudNumValue = 0;
+                            boostCloudString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boostMidCloudNum, 1);
+                            if (boostCloudString.Length > 0)
+                                if (!Int32.TryParse(boostCloudString, out boostCloudNumValue)) boostCloudNumValue = 0;
+
+                            boostCloudNum1stLakeValue = 0;
+                            boostCloudString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boostMidCloud1stLake, 1);
+                            if (boostCloudString.Length > 0)
+                                if (!Int32.TryParse(boostCloudString, out boostCloudNum1stLakeValue)) boostCloudNum1stLakeValue = 0;
+
+
+
                             boostESValue = 0;
                             string boostESString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boostES, 1);
                             if (boostESString.Length > 0)
@@ -501,6 +550,15 @@ namespace TheTerrariaSeedProject
                             if (boostUGHeightString.Length > 0)
                                 if (!Int32.TryParse(boostUGHeightString, out boostUGHeightValueMax)) boostUGHeightValueMax = 1000;
 
+                            boostCavernLayeroffsetMin = 0;
+                            string boostCavernLayeroffsetString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boostCavernLayeroffsetMin, 1);
+                            if (boostCavernLayeroffsetString.Length > 0)
+                                if (!Int32.TryParse(boostCavernLayeroffsetString, out boostCavernLayeroffsetMin)) boostCavernLayeroffsetMin = 0;
+
+                            boostCavernLayeroffsetMax = 300;
+                            boostCavernLayeroffsetString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boostCavernLayeroffsetMax, 1);
+                            if (boostCavernLayeroffsetString.Length > 0)
+                                if (!Int32.TryParse(boostCavernLayeroffsetString, out boostCavernLayeroffsetMax)) boostCavernLayeroffsetMax = 300;
 
                             boostRockLayerOffset = 0;
                             string boostRockLayerOffsetString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boostRockLayerOffset, 1);
@@ -512,13 +570,19 @@ namespace TheTerrariaSeedProject
                             if (boostSurfRockLayerOffsetString.Length > 0)
                                 if (!Int32.TryParse(boostSurfRockLayerOffsetString, out boostSurfRockLayerOffset)) boostSurfRockLayerOffset = 0;
 
-                            boostSpawnRockSeedOffset = -500;
-                            string boostSpawnRockSeedOffsetString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boostSpawnRockSeedOffset, 1);
+                            boostSpawnRockSeedOffsetMin = -1000;
+                            string boostSpawnRockSeedOffsetString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boostSpawnRockSeedOffsetMin, 1);
                             if (boostSpawnRockSeedOffsetString.Length > 0)
-                                if (!Int32.TryParse(boostSpawnRockSeedOffsetString, out boostSpawnRockSeedOffset)) boostSpawnRockSeedOffset = -500;
+                                if (!Int32.TryParse(boostSpawnRockSeedOffsetString, out boostSpawnRockSeedOffsetMin)) boostSpawnRockSeedOffsetMin = -1000;
+
+                            boostSpawnRockSeedOffsetMax = 100;
+                             boostSpawnRockSeedOffsetString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boostSpawnRockSeedOffsetMax, 1);
+                            if (boostSpawnRockSeedOffsetString.Length > 0)
+                                if (!Int32.TryParse(boostSpawnRockSeedOffsetString, out boostSpawnRockSeedOffsetMax)) boostSpawnRockSeedOffsetMax = -1000;
+
 
                             doApproxRun = false;
-                            if (boostPyramidValue > 0 )
+                            if (boostPyramidValue > 0 || boostCloudValue > 0 || boostCloudInner2Value > 0 )
                                 doApproxRun = true;
 
                             boostMidTreeValue = 0;
@@ -561,6 +625,7 @@ namespace TheTerrariaSeedProject
 
                             clearWorld(stage);
                             pyramidPruning = false;
+                            cloudPruning = false;
                             continue;
                             
 
@@ -592,6 +657,7 @@ namespace TheTerrariaSeedProject
                             boostHeightValueSeed = -1;
                             boostUGHeightValueSeed = -1;
                             pyramidPruning = false;
+                            cloudPruning = false;
                             midESspots = null;
                             midESspotsGood = null;
                             midGraniteESspots = null;
@@ -599,8 +665,7 @@ namespace TheTerrariaSeedProject
                             double ratio = numPyramidChanceTrue == 0 ? 0 : ((float)numSearched) / ((float)numPyramidChanceTrue);
 
                             
-                            Tuple<double,double,double> randVals = setDirectComputeValues(); //### boost values and set dungeon color and hallow side
-                            boostValueSeed = randVals.Item1;
+                            Tuple<double,double,double, double> randVals = setDirectComputeValues(); //### boost values and set dungeon color and hallow side
                             
 
                             bool look4dungCol = false;
@@ -617,14 +682,14 @@ namespace TheTerrariaSeedProject
 
                             bool midtree = true;
                             const int treeDist = 105;
-                            boostMidTreeValueSeed = 300 + (int)(randVals.Item2 * (Main.maxTilesX - 600));
+                            
                             if (boostMidTreeValue > 0)
                             {
-                                midtree = false;                                
-                                
-                                if (boostMidTreeValueSeed <= Main.maxTilesX / 2 - 100 || boostMidTreeValueSeed >= Main.maxTilesX / 2 + 100)
+                                midtree = false;
+                                if (boostValueSeed > 1.0 / (3 * (Main.maxTilesX / 4200)))
                                     if (boostMidTreeValueSeed > Main.maxTilesX / 2 - treeDist && boostMidTreeValueSeed < Main.maxTilesX / 2 + treeDist)
-                                        midtree = true;
+                                        if (boostMidTreeValueSeed <= Main.maxTilesX / 2 - 100 || boostMidTreeValueSeed >= Main.maxTilesX / 2 + 100)                                    
+                                            midtree = true;
 
                             }
 
@@ -637,6 +702,10 @@ namespace TheTerrariaSeedProject
                             //if (randVals.Item1 < 13 && randVals.Item2 > 80 && randVals.Item3 < 20)
                             //if (randVals.Item1 > 1e9-50)    
                             bool doit = false;
+
+
+
+
                             if (boostValueSeed >= boostValue && midtree) //the inverted boostValue can be a little smaller than original value >= --> > ?
                                 if (!look4dungCol || dungColTrue)
                                 {
@@ -644,10 +713,14 @@ namespace TheTerrariaSeedProject
                                     if (boostESValue != 0 || boostESGraniteValue != 0)
                                     {
                                         var res = checkAndSetIfESmidPossible(stage != 1);
-                                        //writeDebugFile("" + seed + " " + res.Item1 + " " + res.Item2);
+                                        //writeDebugFile("" + seed + " " + res.Item1 + " " + res.Item2 +" " + res.Item4);
                                         if (boostESValue != 0 && res.Item1 < boostESValue ||
                                             boostESGraniteValue != 0 && res.Item2 < boostESGraniteValue)
                                             doit = false;
+
+                                        //writeDebugFile(""+res.Item4);
+                                        //if(res.Item4<8)
+                                        //    doit = false;
                                     }
 
                                 }
@@ -668,9 +741,9 @@ namespace TheTerrariaSeedProject
 
                                 //Main.surface = WorldGen.worldSurfaceHigh +25;
                                 //marble granite : small spawn high , high main.surf-wg.rock value
-                                if ( (Main.worldSurface - WorldGen.rockLayer - boostHeightValueSeed > 30) && !isPubRel && seedFile == null)
-                                    writeDebugFile($"{seed} (m:wlh) {(int)Main.worldSurface}: {(int)WorldGen.worldSurface}|{(int)WorldGen.worldSurfaceLow}|{(int)WorldGen.worldSurfaceHigh} # " +
-                                        $"{(int)Main.rockLayer}: {(int)WorldGen.rockLayer}|{(int)WorldGen.rockLayerLow}|{(int)WorldGen.rockLayerHigh} # {boostHeightValueSeed} # {Main.maxTilesY}");
+                                //if ( (Main.worldSurface - WorldGen.rockLayer - boostHeightValueSeed > 30) && !isPubRel && seedFile == null )
+                                //    writeDebugFile($"{seed} (m:wlh) {(int)Main.worldSurface}: {(int)WorldGen.worldSurface}|{(int)WorldGen.worldSurfaceLow}|{(int)WorldGen.worldSurfaceHigh} # " +
+                                //        $"{(int)Main.rockLayer}: {(int)WorldGen.rockLayer}|{(int)WorldGen.rockLayerLow}|{(int)WorldGen.rockLayerHigh} # {boostHeightValueSeed} # {Main.maxTilesY}");
                             }
 
 
@@ -684,109 +757,13 @@ namespace TheTerrariaSeedProject
                                 genInfo.numPyrChance = localnumPyr;
                                 numPyrChance = localnumPyr;
                                 legacyPyrNum = localnumPyr;
-                                                                                                
-                                //more accurate pyramid number
-                                List<int> pyrPosX = new List<int>();
-                                if (localPyrX != null)
-                                {
-                                    for (int p = 0; p < localPyrX.Length; p++)
-                                    {
-                                        if (localPyrX[p] != 0 && localPyrX[p] > 300 && localPyrX[p] < Main.maxTilesX - 300
-                                            && ((localDungeonSide < 0 && localPyrX[p] > 240 + (double)Main.maxTilesX * 0.15)
-                                            || (localDungeonSide > 0 && localPyrX[p] < Main.maxTilesX - 240 - (double)Main.maxTilesX * 0.15))
-                                            )
-                                            pyrPosX.Add(localPyrX[p]);
-                                        //writeDebugFile("seed " + seed + " might have pyramid at " + localPyrX[p] + "," + localPyrY[p]);
-                                    }
-                                }
-                                numPyramidChanceAdv = pyrPosX.Count;
-                                
-                                //even more accurate pyramid number
-                                pyrPosX.Sort();
-                                int lastx = -133700;
-                                List<int> conflict = new List<int>();
-                                int subp = 0;
-                                int minDist = Main.maxTilesX;
-                                for (int pi = 0; pi < pyrPosX.Count; pi++)
-                                {
-                                    minDist = Math.Min(minDist, Math.Abs(pyrPosX[pi] - Main.maxTilesX / 2));
 
-                                    if (pyrPosX[pi] - lastx < 250)
-                                    {
-                                        if (conflict.Count == 0)
-                                        {
-                                            conflict.Add(lastx);
-                                        }
-                                        conflict.Add(pyrPosX[pi]);
-                                    }
-                                    else
-                                    {
-                                        if (conflict.Count > 0)
-                                        {
-                                            if (conflict.Count == 2) subp++; //reduce count by one
-                                            else
-                                            {
-                                                int fx = conflict[0];
-                                                int lx = conflict[0];
-                                                int maxp = (lx - fx) / 250 + 1;
-
-                                                if (maxp == 1)
-                                                {
-                                                    subp += conflict.Count - 1;
-                                                }
-                                                else
-                                                {
-                                                    int l = conflict.Count;
-                                                    bool[] used = new bool[l];
-                                                    const int maxVal = 8; // else too long
-
-                                                    int remove = l - maxp;
-                                                    for (; remove < maxVal; remove++)
-                                                    {
-                                                        int[] which = new int[remove];
-                                                        for (int i = 0; i < remove; i++) which[i] = i;
-                                                        bool works = false;
-
-                                                        while (!works)
-                                                        {
-                                                            for (int i = 0; i < l; i++) used[i] = true;
-                                                            for (int i = 0; i < remove; i++) used[which[i]] = false;
-
-                                                            works = true;
-                                                            for (int i = 0; i < l && works; i++)
-                                                                for (int j = i + 1; j < l && works; j++)
-                                                                    if (used[i] && used[j])
-                                                                        if (conflict[j] - conflict[i] < 250) works = false;
-
-                                                            which[0]++;
-                                                            for (int i = 0; i < remove - 1; i++) if (which[i] == l) { which[i] = 0; which[i + 1]++; }
-                                                            if (which[remove - 1] == l)
-                                                                break;
-                                                        }
-                                                        if (works)
-                                                        {
-                                                            subp += remove;
-                                                            break;
-                                                        }
-
-                                                    }
-                                                    if (remove == maxVal)
-                                                    {
-                                                        subp += remove;
-                                                    }
+                                var red= removeInvalidPyrPos();
+                                numPyramidChanceAdv = red.Item1;
+                                numPyramidChanceAdvUber = red.Item2;
+                                int minDist = red.Item3;
 
 
-
-                                                }
-
-                                            }
-                                            conflict.Clear();
-                                        }
-                                    }
-                                    lastx = pyrPosX[pi];
-                                }
-                                numPyramidChanceAdvUber = numPyramidChanceAdv - subp;
-                                
                                 localnumPyr = numPyramidChanceAdvUber;
                                 genInfo.numPyrChance = numPyramidChanceAdvUber;
                                 numPyrChance = numPyramidChanceAdvUber;
@@ -808,28 +785,21 @@ namespace TheTerrariaSeedProject
 
                                 if (boostMidTreeValue > 0)
                                 {
-                                    midtree = false;
-                                    if (condsTrue > 0)
+                                    midtree = false;   
+                                    if (condsTrue > 0 )
+                                    if (boostMidTreeValueSeed > Main.maxTilesX / 2 - treeDist && boostMidTreeValueSeed < Main.maxTilesX / 2 + treeDist)
                                         if (boostMidTreeValueSeed <= Main.maxTilesX / 2 - 100 || boostMidTreeValueSeed >= Main.maxTilesX / 2 + 100)
-                                            if (boostMidTreeValueSeed > Main.maxTilesX / 2 - treeDist && boostMidTreeValueSeed < Main.maxTilesX / 2 + treeDist)
-                                            {
-                                                int y = 0;
-                                                while (!Main.tile[boostMidTreeValueSeed, y].active() && (double)y < Main.worldSurface)
-                                                {
-                                                    y++;
-                                                }
-                                                if (Main.tile[boostMidTreeValueSeed, y].type == 0)
-                                                {
-                                                    y--;
-                                                    if (y > 150)
-                                                        midtree = true;
-
-                                                }
-                                            }
+                                        {
+                                            int y = 151;
+                                            midtree = true;
+                                            while (!Main.tile[boostMidTreeValueSeed, y].active() && y > 0) y--;                                                
+                                            if (y > 0) midtree = false;
+                                                
+                                        }
                                     condsTrue = midtree ? condsTrue : 0;
                                 }
                                                                 
-                                if (boostPyramidMidValue!=0 && minDist > 0.1 * Main.maxTilesX)
+                                if (boostPyramidMidValue!=0 && minDist > 0.1 * Main.maxTilesX+1)
                                     condsTrue = 0;                                                               
 
                             }
@@ -849,35 +819,15 @@ namespace TheTerrariaSeedProject
                             if (condsTrue > 0 && doApproxRun && !ended && searchForSeed && !gotoCreation)
                             {
                                 //pyramid apporx
-                                pyramidPruning = true;
+                                inApproxRun = true;
+                                if ( boostPyramidValue > 0) pyramidPruning = true;
+                                if (boostCloudValue > 0 || boostCloudInner2Value > 0) cloudPruning = true;
                                 if (!TryToGenerate()) continue; // -- > boostHeightValueSeed
                                 pyramidPruning = false;
-                                if (boostPyramidValue > 0)
-                                {
-                                    int pyrPlaced = 0;
-                                    for (int i = 0; i < Main.maxChests; i++)
-                                    {
-                                        if (Main.chest[i] != null)
-                                        {
-                                            Chest chest = Main.chest[i];
-                                            //check if doubl chest
-                                            int cx = chest.x;
-                                            int cy = chest.y;
-                                            int iid = chest.item[0].type;
-                                            if (iid == ItemID.PharaohsMask || iid == ItemID.PharaohsRobe || iid == ItemID.FlyingCarpet || iid == ItemID.SandstorminaBottle)
-                                                pyrPlaced++;
-
-                                        }
-                                    }
-                                    
-                                    if (pyrPlaced < boostPyramidValue)
-                                        condsTrue = 0;
-
-                                    boostPyramidValueSeed = pyrPlaced;
-                                }
-
+                                cloudPruning = false;
+                                inApproxRun = false;
                                 //writeDebugFile("seed " + seed + " has pyspot " + legacyPyrNum + " adv " + numPyramidChanceAdv + " uber " + numPyramidChanceAdvUber + " placed " + boostPyramidValueSeed);
-                                                               
+
 
                             }
                             if (condsTrue > 0 && !ended && searchForSeed && !gotoCreation)
@@ -1334,7 +1284,6 @@ namespace TheTerrariaSeedProject
 
                     uiss.SetCountText(hasCount, chanceCount);
 
-                    //debug
                     if (!isPubRel)
                     {
                         //debug
@@ -1617,6 +1566,7 @@ namespace TheTerrariaSeedProject
                 
                 //thanks to jopojelly again
                 PassLegacy passLegacy = tasks[passid] as PassLegacy;
+                
                 if (passLegacy != null)
                 {
                     //private WorldGenLegacyMethod _method;
@@ -1630,11 +1580,12 @@ namespace TheTerrariaSeedProject
         List<Tuple<int, int>> midESspots = null;
         List<Tuple<int, int>> midGraniteESspots = null;
         List<Tuple<int, int>> midESspotsGood = null;
-        public Tuple<int,int, int> checkAndSetIfESmidPossible(bool checkIfValid = false)
+        //highly experimental, low chance of prediction is true
+        public Tuple<int,int, int, int> checkAndSetIfESmidPossible(bool checkIfValid = false)
         {
             //TODO depend on stage better structure, not vaild for stage 3,42
             int inStage = checkIfValid?2:1 ;
-            if (checkIfValid && stage == 2)
+            if (checkIfValid )
             {
                 midESspots = new List<Tuple<int, int>>();
                 midESspotsGood = new List<Tuple<int, int>>();
@@ -1732,12 +1683,22 @@ namespace TheTerrariaSeedProject
             int ces = 0;
             int cesGood = 0;
             int cges = 0;
-           
+
+            Func<Tile, bool> isActiveAndNoDeco = (Tile tile) => {
+                return (tile.active() && tile.type != TileID.Containers
+                        && tile.type != TileID.Pots && tile.type != TileID.SmallPiles && tile.type != TileID.LargePiles && tile.type != TileID.LargePiles2);
+            };
+
+
             Func<int, bool> isActive = (int xo) =>
             {
+                if (!checkIfValid)
+                    return false;
+
+                return isActiveAndNoDeco( Main.tile[25 + (int)(vals[(li + 6 - xo) % 6] * (Main.maxTilesX - 50)),
+                    (int)(Main.worldSurface + (vals[(li + 6 - xo +1) % 6] * (Main.maxTilesY - 300 - Main.worldSurface)))]);
+
                 
-                return (checkIfValid
-                && Main.tile[25 + (int)(vals[(li + 6 - xo) % 6] * (Main.maxTilesX - 50)), (int)(Main.worldSurface + (vals[(li + 6 - xo +1) % 6] * (Main.maxTilesY - 300 - Main.worldSurface)))].active());
 
             };
 
@@ -1851,6 +1812,7 @@ namespace TheTerrariaSeedProject
             double xgoff = (double)xoff / (Main.maxTilesX - 50);
             double ygmax = (double)ygmaxi / ((double)Main.maxTilesY - 300.0 - (inStage <= 1 ? (double)Main.maxTilesY * 0.17 - 25 : Main.worldSurface));
 
+            int mbes = 0; //mid top, maybe explosive? if together with high wg rocklayer over surf
             while (ex++ < exMax)
             {
                 li = (++li) % 6;
@@ -1908,7 +1870,7 @@ namespace TheTerrariaSeedProject
                             (25 + (int)(vals[(li + 6 - 5) % 6] * (Main.maxTilesX - 50)))  + "." + (int)(Main.worldSurface + (vals[(li + 6 - 5 + 1) % 6] * (Main.maxTilesY - 300 - Main.worldSurface))) +
                             " isac " + isActive(3) +"."+ isActive(4)+ "." + isActive(5) );*/
 
-                        if (stage == 2)
+                        if (inStage == 2)
                             for (int i = 3; i < 6; i++)
                             {
                                 if (i == 3 && xo3 || i == 4 && xo4 || i == 5 && xo5)
@@ -1943,18 +1905,19 @@ namespace TheTerrariaSeedProject
                             int x = (25 + (int)(vals[(li + 6 - xo) % 6] * (Main.maxTilesX - 50)));
                             int y = ((int)(Main.worldSurface + (vals[(li + 6 - xo + 1) % 6] * (Main.maxTilesY - 300 - Main.worldSurface))));
                                                 
-                            while (!Main.tile[x, y + 1].active() && y < Main.rockLayer+15)
+                            while (!isActiveAndNoDeco(Main.tile[x, y + 1]) && y < Main.rockLayer+18)
                             {
                                 y++; 
                             }
-                            if (y < Main.rockLayer+18 && Main.tile[x, y + 1].active())
+                            if (y < Main.rockLayer+18 && isActiveAndNoDeco(Main.tile[x, y + 1]))
                             {
+                               
                                 bool good = true;
                                 for (int xi = x - 1; xi < x + 2; xi++)
                                 {
                                     for (int yi = y; yi < y + 1; yi++)
                                     {
-                                        if (Main.tile[xi, yi]!=null && Main.tile[xi, yi].active()) 
+                                        if (Main.tile[xi, yi]!=null && isActiveAndNoDeco(Main.tile[xi, yi])) 
                                             good = false;
                                     }
                                     if (!WorldGen.SolidTile2(xi, y + 1))
@@ -1965,7 +1928,7 @@ namespace TheTerrariaSeedProject
 
                                 if (good)
                                 {
-                                    if (Main.tile[x, y + 1].active() && (Main.tile[x, y + 1].type == TileID.LivingWood                                      
+                                    if (isActiveAndNoDeco(Main.tile[x, y + 1]) && (Main.tile[x, y + 1].type == TileID.LivingWood                                      
                                         || Main.tile[x, y + 1].type == TileID.Granite
                                         || Main.tile[x, y + 1].type == TileID.Marble
                                         || Main.tile[x, y + 1].type == TileID.MarbleBlock
@@ -1973,7 +1936,7 @@ namespace TheTerrariaSeedProject
                                         ))
                                     {
                                         //writeDebugFile("seed " + seed + " cesm hit at " + x + "." + y + "  ("+xo+") 2ndlv "  + vals[(li + 6 - 1) % 6] );
-                                        if(stage == 2)
+                                        if(inStage == 2)
                                             midESspotsGood.Add(new Tuple<int, int>(x,y));
                                         cesGood++;
                                     }
@@ -1984,7 +1947,9 @@ namespace TheTerrariaSeedProject
 
                 }
 
-
+                if ((int)(vals[li] * (Main.maxTilesY - 200) * 0.5) < 5 &&
+                       (int)(vals[(li+6-1)%6] * (Main.maxTilesX - 100) * 0.5) < 15)
+                    mbes++;
 
             }
 
@@ -1999,27 +1964,26 @@ namespace TheTerrariaSeedProject
             if (ces > 10 && !isPubRel)
                 writeDebugFile("chance for " + seed + " :" + ces);
 
-            if (stage == 1)
+            if (inStage == 1)
             {
                 boostESValueSeed = ces;
                 boostESGraniteValueSeed = cges;
             }
-            if (stage == 2)
+            if (inStage == 2)
             {
                 boostESValueSeedP2 = ces;
                 boostESGraniteValueSeedP2 = cges;
-                if(checkIfValid)
-                    boostESValueSeedP2good = cesGood;
+                boostESValueSeedP2good = cesGood;
             }
             //writeDebugFile($"{xoff} and {ygmaxi}");
             //StoreMapAsPNG(false);
 
-            return new Tuple<int, int, int>(ces, cges, cesGood);
+            return new Tuple<int, int, int, int>(ces, cges, cesGood, mbes);
         }
 
 
 
-        public Tuple<double, double, double> setDirectComputeValues()
+        public Tuple<double, double, double, double > setDirectComputeValues()
         {
             //check hardmode evil biome side and dungeon wall color
             //that might not work in later terraria versions!!!! !!!!!!!
@@ -2035,6 +1999,7 @@ namespace TheTerrariaSeedProject
             //+thin ice biome 3 (..)
             //+marble count 5
             //+granite count 6
+            //position of first floating istland lake, except if it is mid
 
             //maybe
             //dungeon distance something (only inital)
@@ -2063,15 +2028,16 @@ namespace TheTerrariaSeedProject
             dungeonColor = (int)(randVar * (double)3); // 0: blue, 1:green, 2: pink ===> evil hm side and dcolor correlated 
 
 
+            boostValueSeed = sandSpotDensity;
+            boostMidTreeValueSeed = 300 + (int)(a * (Main.maxTilesX - 600));
 
 
 
-            
 
-            return new Tuple<double, double, double>(sandSpotDensity, a, randVar);
+            return new Tuple<double, double, double, double >(sandSpotDensity, a, randVar, dummy.NextDouble());
         }
 
-        public int guessSpawnHight()
+        public int guessSpawnHight(bool reduce)
         {
 
             //height approx
@@ -2079,7 +2045,7 @@ namespace TheTerrariaSeedProject
             const int csi = 15;
             int from = Main.maxTilesX / 2 - csi;
             int to = Main.maxTilesX / 2 + csi + 1;
-            int y = (int)Main.worldSurface - 5;
+            int y = (int)Main.worldSurface - 1;
             while (!isSky && --y > 200)
             {
                 isSky = true;
@@ -2094,7 +2060,7 @@ namespace TheTerrariaSeedProject
                 }
             }
             isSky = true;
-           if(stage!=1)
+            if(reduce)
             while (isSky && ++y < Main.worldSurface)
             {                
                 for (int x = from; x < to; ++x)
@@ -2118,14 +2084,34 @@ namespace TheTerrariaSeedProject
 
 
             int height = (int)Main.worldSurface - y;
-            if(Main.tile[(int)Main.worldSurface/2, y-1].wall == WallID.None)
+            if(reduce && Main.tile[(int)Main.worldSurface/2, y-1].wall == WallID.None)
                 height++;
             return height;
 
         }
 
+        public void setHights(bool reduce)
+        {
+            boostHeightValueSeed = guessSpawnHight(reduce);
+            boostUGHeightValueSeed = (int)(Main.rockLayer - Main.worldSurface);
+
+            boostRockLayerOffsetSeed = (int)(Main.rockLayer - WorldGen.rockLayer);
+            boostSurfRockLayerOffsetSeed = loadWorld ? -100000 :(int)(Main.worldSurface - WorldGen.rockLayer);
+
+            boostSpawnRockSeedOffsetSeed = boostSurfRockLayerOffsetSeed - boostHeightValueSeed;
+
+            //writeDebugFile(" seed " + seed + "  " + WorldGen.rockLayerLow+ "  " + WorldGen.rockLayerHigh + "  " + WorldGen.rockLayer + "  " + WorldGen.worldSurface +"  " + WorldGen.worldSurfaceHigh+ "  " + WorldGen.worldSurfaceLow);
+
+
+            boostCavernLayeroffsetSeed = 0;
+            if (boostRockLayerOffsetSeed < boostUGHeightValueSeed) boostCavernLayeroffsetSeed = (int)(((float)boostRockLayerOffsetSeed) /((float)boostUGHeightValueSeed)*100);
+            else if (boostRockLayerOffsetSeed < boostUGHeightValueSeed+ boostHeightValueSeed) boostCavernLayeroffsetSeed = 100+(int)(((float)(boostRockLayerOffsetSeed- boostUGHeightValueSeed)) / ((float)boostHeightValueSeed) * 100);
+            else boostCavernLayeroffsetSeed = 200 + (int)(((float)(boostRockLayerOffsetSeed - boostUGHeightValueSeed- boostHeightValueSeed)) / ((float)boostHeightValueSeed) * 100);
+
+        }
 
         private int startIndex = 0;
+        
         public override void ModifyWorldGenTasks(List<GenPass> tasks, ref float totalWeight)
         {
             //writeDebugFile(" save lokck is " + WorldGen.saveLock + " gtm " + gotToMain + " ended " + ended + " stage " + stage + " seed " + seed);
@@ -2204,14 +2190,14 @@ namespace TheTerrariaSeedProject
                     }));
 
 
-                    if (stage == 1 && !pyramidPruning)
+                    if (stage == 1 && !inApproxRun)
                     {
                         //other tasks not needed now
                         int sandIndex = tasks.FindIndex(genpass => genpass.Name.Equals("Sand"));
                         if (sandIndex != -1)
                             tasks.RemoveRange(sandIndex + 1, tasks.Count - sandIndex - 1);
                     }
-                    else if (tasks.Count > 0 && !pyramidPruning)
+                    else if (tasks.Count > 0 && !inApproxRun)
                     {
                         tasks.Add(new PassLegacy("Analyze World", delegate (GenerationProgress progress)
                         {
@@ -2233,8 +2219,53 @@ namespace TheTerrariaSeedProject
 
                     }
 
+                    
+                    int terrind = tasks.FindIndex(genpass => genpass.Name.Equals("Terrain"));
+                    if (terrind != -1)
+                    {
+                        tasks.Insert(terrind + 1, new PassLegacy("Check height ", delegate (GenerationProgress progress)
+                        {
+                            progress.Message = "Estimate spawn height above surface layer " + seed;
 
-                    if (stage == 1 && !pyramidPruning)
+                            setHights(false);
+
+                        }));
+
+                        tasks.Insert(terrind + 2, new PassLegacy("Continue or not ", delegate (GenerationProgress progress)
+                        {
+                            if ((boostHeightValueMax != 300 && boostHeightValueSeed > boostHeightValueMax) ||
+                                (boostHeightValueMin != 0 && boostHeightValueSeed < boostHeightValueMin) ||
+                                (boostUGHeightValueMax != 1000 && boostUGHeightValueSeed > boostUGHeightValueMax) ||
+                                (boostUGHeightValueMin != 0 && boostUGHeightValueSeed < boostUGHeightValueMin) ||
+                                (boostCavernLayeroffsetMin != 0 && boostCavernLayeroffsetSeed < boostCavernLayeroffsetMin) ||
+                                (boostCavernLayeroffsetMax != 300 && boostCavernLayeroffsetSeed > boostCavernLayeroffsetMax) ||
+                                (boostRockLayerOffset != 0 && boostRockLayerOffsetSeed < boostRockLayerOffset) ||
+                                (boostSurfRockLayerOffset != 0 && boostSurfRockLayerOffsetSeed < boostSurfRockLayerOffset) ||
+                                (boostSpawnRockSeedOffsetMin != -1000 && boostSpawnRockSeedOffsetSeed < boostSpawnRockSeedOffsetMin) ||
+                                (boostSpawnRockSeedOffsetMax != 100 && boostSpawnRockSeedOffsetSeed > boostSpawnRockSeedOffsetMax)
+                                )
+                            {
+                                condsTrue = 0;
+                                ClearPasses(tasks, terrind + 3);
+                            }
+
+                        }));
+                    }
+
+                    if (stage > 1)
+                    {
+
+                        int sandIndex = tasks.FindIndex(genpass => genpass.Name.Equals("Wood Tree Walls"));
+                        if (sandIndex != -1)
+                            tasks.Insert(sandIndex, new PassLegacy("Check near ES", delegate (GenerationProgress progress)
+                            {
+                                checkAndSetIfESmidPossible(true);
+
+
+                            }));
+                    }
+
+                    if (stage == 1 && !inApproxRun)
                     {
                         //other tasks not needed now
 
@@ -2309,41 +2340,7 @@ namespace TheTerrariaSeedProject
 
                         }));
 
-                        int terrind = tasks.FindIndex(genpass => genpass.Name.Equals("Terrain"));
-                        if (terrind != -1)
-                        {
-                            tasks.Insert(terrind + 1, new PassLegacy("Check height ", delegate (GenerationProgress progress)
-                            {
-                                progress.Message = "Estimate spawn height above surface layer " + seed;
-
-                                boostHeightValueSeed = guessSpawnHight();
-                                boostUGHeightValueSeed = (int)(Main.rockLayer - Main.worldSurface);
-
-                                boostRockLayerOffsetSeed = (int)(Main.rockLayer - WorldGen.rockLayer);
-                                boostSurfRockLayerOffsetSeed = (int)(Main.worldSurface - WorldGen.rockLayer);
-
-                                boostSpawnRockSeedOffsetSeed = boostSurfRockLayerOffsetSeed - boostHeightValueSeed;
-
-                            }));
-
-                            tasks.Insert(terrind + 2, new PassLegacy("Continue or not ", delegate (GenerationProgress progress)
-                            {
-                                if ((boostHeightValueMax != 300 && boostHeightValueSeed > boostHeightValueMax) ||
-                                    (boostHeightValueMin != 0 && boostHeightValueSeed < boostHeightValueMin) ||
-                                    (boostUGHeightValueMax != 1000 && boostUGHeightValueSeed > boostUGHeightValueMax) ||
-                                    (boostUGHeightValueMin != 0 && boostUGHeightValueSeed < boostUGHeightValueMin) ||
-                                    (boostRockLayerOffset != 0 && boostRockLayerOffsetSeed < boostRockLayerOffset) ||
-                                    (boostSurfRockLayerOffset != 0 && boostSurfRockLayerOffsetSeed < boostSurfRockLayerOffset) ||
-                                    (boostSpawnRockSeedOffset != -500 && boostSpawnRockSeedOffsetSeed < boostSpawnRockSeedOffset) 
-                                    )
-                                {
-                                    condsTrue = 0;
-                                    ClearPasses(tasks, terrind + 3);
-                                }
-
-                            }));
-                        }
-
+                        
                         int sandIndex = tasks.FindIndex(genpass => genpass.Name.Equals("Sand"));
                         
                         if (sandIndex != -1)
@@ -2365,20 +2362,21 @@ namespace TheTerrariaSeedProject
                        
 
                     }
-                    else if (stage == 1 && pyramidPruning)
+                    else if (stage == 1 && inApproxRun)
                     {
                         //only do reset, terrain , sand, full dester dungeon, Gravitating Sand and pyramids
 
 
 
                         int skipind = tasks.FindIndex(genpass => genpass.Name.Equals("Pyramids"));
+                        
                         if (skipind != -1)
                         {
                             tasks.Insert(skipind - 1, new PassLegacy("Approximate Pyramid count ", delegate (GenerationProgress progress)
                             {
                                 int y = (int)(Main.rockLayer + 0.5 * (Main.maxTilesY - Main.rockLayer - 200));
                                 progress.Message = "Approximate Pyramid count " + seed;
-
+                                
                                 for (int x = 0; x < Main.maxTilesX; x++)
                                 {
                                     //Main.tile[x, y].type = TileID.LihzahrdBrick;
@@ -2388,6 +2386,197 @@ namespace TheTerrariaSeedProject
                             }));
                             if (tasks.Count > skipind + 2)
                                 ClearPasses(tasks, skipind + 2);
+                            tasks.Add( new PassLegacy("Checkout Pyramid count ", delegate (GenerationProgress progress)
+                            {
+                                
+                                if (boostPyramidValue > 0)
+                                {
+                                    
+                                    progress.Message = "Checkout Pyramid count " + seed;
+                                    int pyrPlaced = 0;
+                                    for (int i = 0; i < Main.maxChests; i++)
+                                    {
+                                        if (Main.chest[i] != null)
+                                        {
+                                            Chest chest = Main.chest[i];
+                                            //check if doubl chest
+                                            int cx = chest.x;
+                                            int cy = chest.y;
+                                            int iid = chest.item[0].type;
+                                            if (iid == ItemID.PharaohsMask || iid == ItemID.PharaohsRobe || iid == ItemID.FlyingCarpet || iid == ItemID.SandstorminaBottle)
+                                                pyrPlaced++;
+
+                                        }
+                                    }
+
+                                    if (pyrPlaced < boostPyramidValue)
+                                        condsTrue = 0;
+
+                                    boostPyramidValueSeed = pyrPlaced;
+                                    
+                                }
+
+                            }));
+
+                            int cloudindex = tasks.FindIndex(genpass => genpass.Name.Equals("Floating Islands"));
+                            if (cloudindex > 0)
+                            {
+                                tasks.Insert(cloudindex - 1, new PassLegacy("search for good clouds ", delegate (GenerationProgress progress)
+                                {
+                                    if (condsTrue == 0 || (boostCloudValue <= 0 && boostCloudInner2Value <= 0))
+                                    {
+                                        ClearPasses(tasks, cloudindex + 1, cloudindex + 2);
+                                    }
+
+                                }));
+
+
+                                tasks.Insert(cloudindex + 2, new PassLegacy("search for good clouds ", delegate (GenerationProgress progress)
+                                {
+                                    if ( (boostCloudValue > 0 || boostCloudInner2Value > 0))
+                                    {
+                                        int turn = -1;
+
+
+                                        int index = cloudindex;
+
+                                        while (true)
+                                        {
+
+                                            turn++;
+                                            var cloudPos = new HashSet<int>(); //change to list
+
+                                        //todo: no border
+                                        for (int x = 0; x < Main.maxTilesX; x++)
+                                            {
+                                                for (int y = 0; y < Main.worldSurface - 50; y++) // changed to rocklayer
+                                            {
+                                                    var tile = Main.tile[x, y];
+
+                                                    if (tile.active())
+                                                    {
+                                                    //Clouds
+                                                    if (tile.type == TileID.Cloud)
+                                                        {
+
+                                                            int area = 120;
+                                                            bool found = false;
+                                                            for (int i = -area; i < area; i++)
+                                                            {
+                                                                if (cloudPos.Contains(x + i))
+                                                                {
+                                                                    found = true;
+                                                                    if (Math.Abs(i) > 50)
+                                                                    {
+                                                                        cloudPos.Remove(x + i);
+                                                                        int newPos = x + i - Math.Sign(i);
+                                                                        cloudPos.Add(newPos);
+
+                                                                    }
+                                                                    break;
+                                                                }
+                                                            }
+                                                            if (!found) cloudPos.Add(x);
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+                                            int closeToMid = 0;
+                                            int maxc = 0;
+                                            int minL = Main.maxTilesX;
+                                            int minR = Main.maxTilesX;
+                                            foreach (var cloudX in cloudPos)
+                                            {
+                                                int midDist = Math.Abs(Main.maxTilesX / 2 - cloudX);
+                                                if (midDist < boostCloudValue)
+                                                    closeToMid++;
+                                                if (cloudX < Main.maxTilesX / 2)
+                                                    minL = Math.Min(minL, midDist);
+                                                else
+                                                    minR = Math.Min(minR, midDist);
+                                                if (midDist > maxc)
+                                                {
+                                                    maxc = midDist;
+                                                }
+                                            }
+                                            int distInner2 = (minL + minR) / 2;
+                                            string pm = "Seed " + seed + " has " + cloudPos.Count + " clouds out of those in mid " + closeToMid;
+                                            progress.Message = pm;
+                                        //writeDebugFile("Checked clouds for seed " + seed + " :" + closeToMid + " of " + cloudPos.Count);
+                                        if ((boostCloudNumValue > 0 && closeToMid < boostCloudNumValue) || (boostCloudInner2Value > 0 && distInner2 > boostCloudInner2Value))
+                                            {
+                                                for (int x = 0; x < Main.maxTilesX; x++)
+                                                {
+                                                    for (int y = 0; y < Main.worldSurface - 50; y++)
+                                                    {
+                                                        Main.tile[x, y].ClearEverything();
+                                                    }
+                                                }
+
+                                                bool good = false;
+                                                int normFac = Main.maxTilesX;
+                                                if (boostCloudValue > 0 && boostCloudNum1stLakeValue == 1) normFac = boostCloudValue;
+                                                else if (boostCloudInner2Value > 0 && (boostCloudNum1stLakeValue == 2 || (boostCloudValue <= 0 && boostCloudNum1stLakeValue == 1))) normFac = boostCloudInner2Value * 2 - 80;//inner can be shifted
+
+                                            while (!good)
+                                                {
+                                                    double val = (new UnifiedRandom(++seed)).NextDouble();
+                                                    if (boostCloudNum1stLakeValue == 0 || (val - 0.5 > (80.0) / (0.8 * Main.maxTilesX) && (val - 0.5) <= ((double)normFac) / (0.8 * Main.maxTilesX)))  //small also works but less pyramids Math.Abs(val-0.5)
+                                                    good = true;
+                                                }
+
+                                                Main.ActiveWorldFileData.SetSeed((seed).ToString());
+                                                seed = Main.ActiveWorldFileData.Seed;
+                                                WorldGen._lastSeed = seed;
+                                                Main.rand = new UnifiedRandom(seed);
+
+
+                                                index = tasks.FindIndex(genpass => genpass.Name.Equals("Floating Islands"));
+                                                if (index > 0)
+                                                {
+                                                    tasks[index].Apply(progress);
+
+                                                }
+
+
+
+                                            }
+                                            else if (turn != 0)
+                                            {
+                                                Main.ActiveWorldFileData.SetSeed((seed - stepsize).ToString()); // TODO may be error if overflow
+                                                seed = Main.ActiveWorldFileData.Seed;
+                                                stage = 1;
+                                                ClearPasses(tasks, cloudindex + 2);
+                                                condsTrue = 0;
+                                                break;
+                                            }
+                                            else
+                                            {
+                                                if (boostCloudValue > maxc && !isPubRel)
+                                                {
+                                                    writeDebugFile("min cloud dist " + maxc + " from seed " + seed);
+                                                }
+                                                break;
+                                            }
+                                            if (stage > 0 && !ended && !gotToMain && !loadWorld && !gotoCreation)
+                                            { }
+                                            else
+                                            {
+                                                ClearPasses(tasks, cloudindex + 2);
+                                                stage = 1;
+                                                condsTrue = 0;
+                                                break;
+                                            }
+
+                                        }
+                                    }
+                                }));
+
+                            }
+
+
+
                         }
 
 
@@ -2410,7 +2599,7 @@ namespace TheTerrariaSeedProject
                         ind = tasks.FindIndex(genpass => genpass.Name.Equals("Marble")); if (ind != -1)  ClearPasses(tasks, ind, ind + 1);
                         ind = tasks.FindIndex(genpass => genpass.Name.Equals("Granite")); if (ind != -1)  ClearPasses(tasks, ind, ind + 1);
                         ind = tasks.FindIndex(genpass => genpass.Name.Equals("Mud Caves To Grass")); if (ind != -1)  ClearPasses(tasks, ind, ind + 1);
-                        ind = tasks.FindIndex(genpass => genpass.Name.Equals("Floating Islands")); if (ind != -1)  ClearPasses(tasks, ind, ind + 1);
+                        //ind = tasks.FindIndex(genpass => genpass.Name.Equals("Floating Islands")); if (ind != -1)  ClearPasses(tasks, ind, ind + 1);
                         ind = tasks.FindIndex(genpass => genpass.Name.Equals("Mushroom Patches")); if (ind != -1)  ClearPasses(tasks, ind, ind + 1);
                         ind = tasks.FindIndex(genpass => genpass.Name.Equals("Mud To Dirt")); if (ind != -1)  ClearPasses(tasks, ind, ind + 1);
                         ind = tasks.FindIndex(genpass => genpass.Name.Equals("Silt")); if (ind != -1)  ClearPasses(tasks, ind, ind + 1);
@@ -2429,7 +2618,7 @@ namespace TheTerrariaSeedProject
                     }
                     else if (stage == 2) ////////// or only else
                     {
-                        int woodIndex = tasks.FindIndex(genpass => genpass.Name.Equals("Wood Tree Walls"));
+                        int woodIndex = tasks.FindIndex(genpass => genpass.Name.Equals("Check near ES"));//==Wood Tree Walls +1
                         if (woodIndex != -1)
                         {
                             tasks.Insert(woodIndex + 1, new PassLegacy("Analyze World basic", delegate (GenerationProgress progress)
@@ -2438,8 +2627,8 @@ namespace TheTerrariaSeedProject
                                 PostWorldGen(); //--> geninfo
 
                                 analyzeWorld(score, genInfo, false);
-
                                 
+
 
                                 condsTrue = acond.checkConditions(score, currentConfiguration, stage);  //-near tree, -cloud, -pyramid, +capet & sandbottle or +3Py C | SB
                                 rareMax = score.rare;
@@ -2505,6 +2694,11 @@ namespace TheTerrariaSeedProject
 
                             }));
                         }
+
+
+
+                       
+                        
 
 
                     }
@@ -2602,6 +2796,7 @@ namespace TheTerrariaSeedProject
                 if (stage > 0)
                 {
                     if(stage==1) genInfo = new generatorInfo();
+                    
                     genInfo.copperOrTin = WorldGen.CopperTierOre == 7 ? "Copper" : "Tin";
                     genInfo.ironOrLead = WorldGen.IronTierOre == 6 ? "Iron" : "Lead";
                     genInfo.silverOrTung = WorldGen.SilverTierOre == 9 ? "Silver" : "Tungsten";
@@ -2788,8 +2983,7 @@ namespace TheTerrariaSeedProject
             //TODo better inclusion
             localDungeonSide = Main.dungeonX < Main.maxTilesX / 2 ? -1 : 1; // changed from spawnx
             setDirectComputeValues();
-            var espos = stage == 2? checkAndSetIfESmidPossible(true): new Tuple<int, int, int> (boostESValueSeedP2, boostESGraniteValueSeedP2, boostESValueSeedP2good );
-
+            
             const int oceanBiomeSizeX = 380; //from vanilla
 
             hasOBjectOrParam.Add("Max open air pyramid surface", 0);
@@ -2818,6 +3012,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Cloud Chest", 0);
             hasOBjectOrParam.Add("Tree", 0);
             hasOBjectOrParam.Add("Tree Chest", 0);
+            hasOBjectOrParam.Add("Tree near mid open to mid", 0);
             hasOBjectOrParam.Add("Max Living Tree Size", 0);
             hasOBjectOrParam.Add("Min Living Tree Size", 0);
             hasOBjectOrParam.Add("Max Living Tree root Size", 0);
@@ -2829,9 +3024,9 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Tree close to cavern layer near mid", 0);
 
             hasOBjectOrParam.Add("Trees near mid", 0);
-            hasOBjectOrParam.Add("Tree chests near mid", 0);
+            hasOBjectOrParam.Add("Tree chests near mid", 0);            
             hasOBjectOrParam.Add("Near Tree", 0);
-            hasOBjectOrParam.Add("Near Tree Chest", 0);
+            hasOBjectOrParam.Add("Near Tree Chest", 0);            
             hasOBjectOrParam.Add("Distance Tree Chest to mid", 100000);
 
             hasOBjectOrParam.Add("Lake near mid (guess)", 0);
@@ -2899,6 +3094,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Pathlength to Temple Tile", 1000000);
             hasOBjectOrParam.Add("Pathlength to free ShadowOrb/Heart", 1000000);
             hasOBjectOrParam.Add("Pathlength to Boomstick", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Flower Boots", 1000000);
             hasOBjectOrParam.Add("Pathlength to Suspicious Looking Eye", 1000000);
             hasOBjectOrParam.Add("Pathlength to Snowball Cannon", 1000000);
 
@@ -2918,7 +3114,18 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Pathlength to 3rd Chest", 1000000);
             hasOBjectOrParam.Add("Pathlength to 4th Chest", 1000000);
             hasOBjectOrParam.Add("Pathlength to 5th Chest", 1000000);
+            hasOBjectOrParam.Add("Pathlength to underground Chest", 1000000);
+            hasOBjectOrParam.Add("Pathlength to 2nd underground Chest", 1000000);
+            hasOBjectOrParam.Add("Pathlength to 3rd underground Chest", 1000000);
+            hasOBjectOrParam.Add("Pathlength to 4th underground Chest", 1000000);
+            hasOBjectOrParam.Add("Pathlength to 5th underground Chest", 1000000);
+
+
+
+
             hasOBjectOrParam.Add("Pathlength to Tree Chest", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Pyramid Chest", 1000000);
+            hasOBjectOrParam.Add("Pathlength to cabin", 1000000);
             hasOBjectOrParam.Add("Pathlength to Minecart Track", 1000000);
 
             hasOBjectOrParam.Add("Pathlength to underground MarbleGranite", 1000000);
@@ -2970,6 +3177,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("neg. Pathlength to Temple Tile", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to free ShadowOrb/Heart", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Boomstick", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Flower Boots", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Suspicious Looking Eye", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Snowball Cannon", -1000000);
 
@@ -2989,7 +3197,18 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("neg. Pathlength to 3rd Chest", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to 4th Chest", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to 5th Chest", -1000000);
+
+            hasOBjectOrParam.Add("neg. Pathlength to underground Chest", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to 2nd underground Chest", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to 3rd underground Chest", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to 4th underground Chest", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to 5th underground Chest", -1000000);
+
+
+
             hasOBjectOrParam.Add("neg. Pathlength to Tree Chest", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Pyramid Chest", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to cabin", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Minecart Track", -1000000);
 
             hasOBjectOrParam.Add("neg. Pathlength to underground MarbleGranite", -1000000);
@@ -3091,7 +3310,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Underground layer height", (int)Math.Abs(Main.rockLayer - Main.worldSurface));
             hasOBjectOrParam.Add("neg. Underground layer height", (int)-Math.Abs(Main.rockLayer - Main.worldSurface ));
 
-            int spawnHightGuess = guessSpawnHight();
+            int spawnHightGuess = guessSpawnHight(true);
             hasOBjectOrParam.Add("Underground Distance to spawn (guess)", spawnHightGuess);
             hasOBjectOrParam.Add("neg. Underground Distance to spawn (guess)", -spawnHightGuess);
 
@@ -3122,6 +3341,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Pre Skeletron Muramasa good positon", 0);
             hasOBjectOrParam.Add("Pre Skeletron Muramasa Chest reachable", 0);
             hasOBjectOrParam.Add("Pre Skeletron Cobalt Shield Chest reachable", 0);
+            hasOBjectOrParam.Add("Pre Skeletron Handgun Chest reachable", 0);
             hasOBjectOrParam.Add("Pre Skeletron Shadow Key Chest reachable", 0);
 
 
@@ -3181,13 +3401,14 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Lihzahrd Chest", 0);
             hasOBjectOrParam.Add("Living Wood Chest", 0);
 
+            checkAndSetIfESmidPossible(false);// already compuited in some cases
+            hasOBjectOrParam.Add("Boost ES Tree mid value seed", boostESValueSeed);
+            hasOBjectOrParam.Add("Enchanted Sword mid may possible (guess)", boostESValueSeedP2);
+            hasOBjectOrParam.Add("Boost ES granite mid value seed", boostESGraniteValueSeed);
+            hasOBjectOrParam.Add("Enchanted Sword mid granite may possible (guess)", boostESGraniteValueSeedP2);
+            hasOBjectOrParam.Add("Enchanted Sword mid good may possible (guess)", boostESValueSeedP2good);
 
             
-            hasOBjectOrParam.Add("Enchanted Sword mid may possible (guess)", espos.Item1);
-            hasOBjectOrParam.Add("Enchanted Sword mid granite may possible (guess)", espos.Item2);
-            hasOBjectOrParam.Add("Enchanted Sword mid good may possible (guess)", espos.Item3);
-
-            hasOBjectOrParam.Add("Boost ES mid value seed", boostESValueSeed);
 
             if (!isPubRel)
             {
@@ -3225,8 +3446,10 @@ namespace TheTerrariaSeedProject
 
             hasOBjectOrParam.Add("Boost height value seed", boostHeightValueSeed);
             hasOBjectOrParam.Add("Boost rock layer offset", boostRockLayerOffsetSeed);
+            hasOBjectOrParam.Add("Boost cavern layer offset (%)", boostCavernLayeroffsetSeed);
             hasOBjectOrParam.Add("Boost surfRock layer offset", boostSurfRockLayerOffsetSeed);
-            hasOBjectOrParam.Add("Boost spawn rock layer offset", boostSpawnRockSeedOffsetSeed);
+            hasOBjectOrParam.Add("Spawn rock layer offset (guess)", boostSpawnRockSeedOffsetSeed);
+            hasOBjectOrParam.Add("neg. Spawn rock layer offset (guess)", boostSpawnRockSeedOffsetSeed);
 
             hasOBjectOrParam.Add("random value seed *10000", (int)(10000.0 * boostValueSeed));
             hasOBjectOrParam.Add("Boost random value seed", (int)(10.0/(1.0-boostValueSeed)));
@@ -3444,6 +3667,8 @@ namespace TheTerrariaSeedProject
                                 hasOBjectOrParam["Pre Skeletron Muramasa Chest reachable"] += 1;
                             else if (chest.item[0].type == ItemID.CobaltShield)
                                 hasOBjectOrParam["Pre Skeletron Cobalt Shield Chest reachable"] += 1;
+                            else if (chest.item[0].type == ItemID.Handgun)
+                                hasOBjectOrParam["Pre Skeletron Handgun Chest reachable"] += 1;
                             else if (chest.item[0].type == ItemID.ShadowKey)
                                 hasOBjectOrParam["Pre Skeletron Shadow Key Chest reachable"] += 1;
                         }
@@ -3453,7 +3678,7 @@ namespace TheTerrariaSeedProject
 
                     int pathl = doFull ? FindShortestPathInRange(ref pathLength, cx, cy) : 1000000;
 
-                    if (chest.item[0] != null)                        
+                    if (chest.item[0] != null && doFull)                        
                     {                        
                         if (pathl < hasOBjectOrParam["Pathlength to 5th Chest"])                        
                         {
@@ -3472,7 +3697,35 @@ namespace TheTerrariaSeedProject
                             hasOBjectOrParam["Pathlength to 4th Chest"] = pl[3];
                             hasOBjectOrParam["Pathlength to 5th Chest"] = pl[4];
                         }
-                        
+
+                        if (cy > Main.worldSurface-1 && pathl < hasOBjectOrParam["Pathlength to 5th underground Chest"])
+                        {
+                            List<int> pl = new List<int>
+                            {
+                                hasOBjectOrParam["Pathlength to underground Chest"],
+                                hasOBjectOrParam["Pathlength to 2nd underground Chest"],
+                                hasOBjectOrParam["Pathlength to 3rd underground Chest"],
+                                hasOBjectOrParam["Pathlength to 4th underground Chest"],
+                                pathl
+                            };
+                            pl.Sort();
+                            hasOBjectOrParam["Pathlength to underground Chest"] = pl[0];
+                            hasOBjectOrParam["Pathlength to 2nd underground Chest"] = pl[1];
+                            hasOBjectOrParam["Pathlength to 3rd underground Chest"] = pl[2];
+                            hasOBjectOrParam["Pathlength to 4th underground Chest"] = pl[3];
+                            hasOBjectOrParam["Pathlength to 5th underground Chest"] = pl[4];
+                        }
+
+
+
+                        int iid = chest.item[0].type;
+                        if (iid == ItemID.PharaohsMask || iid == ItemID.PharaohsRobe || iid == ItemID.FlyingCarpet || iid == ItemID.SandstorminaBottle)
+                        {
+                            if(pathl < hasOBjectOrParam["Pathlength to Pyramid Chest"])
+                            {
+                                hasOBjectOrParam["Pathlength to Pyramid Chest"] = pathl;
+                            }
+                        }
                     }
 
                     if (doFull && chest.item[0] != null && Main.tile[cx, cy].frameY == 0)
@@ -3644,7 +3897,7 @@ namespace TheTerrariaSeedProject
 
                                     hasOBjectOrParam["Pathlength to 2 Teleport Potion Chest"] = pathl;
 
-                                    if (pathl < hasOBjectOrParam["Pathlength to 2nd Teleport Potion"]) hasOBjectOrParam["Pathlength to 2nd Teleport Potion"] = pathl;
+                                    if (pathl <= hasOBjectOrParam["Pathlength to 2nd Teleport Potion"]) hasOBjectOrParam["Pathlength to 2nd Teleport Potion"] = pathl;
 
                                     if (score.itemLocation.ContainsKey(ItemID.ChaosFish))
                                         score.itemLocation[ItemID.ChaosFish] = new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) };
@@ -3654,7 +3907,7 @@ namespace TheTerrariaSeedProject
 
                                 if (pathl < hasOBjectOrParam["Pathlength to Teleport Potion"])
                                 {
-                                    hasOBjectOrParam["Pathlength to 2nd Teleport Potion"] = hasOBjectOrParam["Pathlength to Teleport Potion"];
+                                    hasOBjectOrParam["Pathlength to 2nd Teleport Potion"] = item.stack > 1? pathl: hasOBjectOrParam["Pathlength to Teleport Potion"];
                                     hasOBjectOrParam["Pathlength to Teleport Potion"] = pathl;
 
                                     if (score.itemLocation.ContainsKey(item.type))
@@ -3672,9 +3925,10 @@ namespace TheTerrariaSeedProject
                                     hasOBjectOrParam["Pathlength to 2nd Teleport Potion"] = pathl;
                                     score.itemLocation[item.type] = new List<Tuple<int, int>> { new Tuple<int, int>(score.itemLocation[item.type].ElementAt(0).Item1, score.itemLocation[item.type].ElementAt(0).Item2), new Tuple<int, int>(cx, cy) };
                                 }
-
-
-
+                                if (hasOBjectOrParam["Pathlength to Teleport Potion"] < hasOBjectOrParam["Pathlength to 2 Teleport Potion Chest"])
+                                    hasOBjectOrParam["Nearest Teleportation Potion count"] = 1;
+                                else
+                                    hasOBjectOrParam["Nearest Teleportation Potion count"] = 2;
 
                             }
                             else if ((item.type == ItemID.IronBar || item.type == ItemID.LeadBar))
@@ -3737,6 +3991,19 @@ namespace TheTerrariaSeedProject
                                 if (pathl < hasOBjectOrParam["Pathlength to Boomstick"])
                                 {
                                     hasOBjectOrParam["Pathlength to Boomstick"] = pathl;
+                                    if (score.itemLocation.ContainsKey(item.type))
+                                        score.itemLocation[item.type] = new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) };
+                                    else
+                                        score.itemLocation.Add(item.type, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
+                                }
+
+
+                            }
+                            else if (item.type == ItemID.FlowerBoots)
+                            {
+                                if (pathl < hasOBjectOrParam["Pathlength to Flower Boots"])
+                                {
+                                    hasOBjectOrParam["Pathlength to Flower Boots"] = pathl;
                                     if (score.itemLocation.ContainsKey(item.type))
                                         score.itemLocation[item.type] = new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) };
                                     else
@@ -4092,12 +4359,41 @@ namespace TheTerrariaSeedProject
                                 hasOBjectOrParam["Top MarbleGranite dist. to spawn (guess)"] = Math.Min(distSq, hasOBjectOrParam["Top MarbleGranite dist. to spawn (guess)"]);
 
                         }
-                        
-
-
+               
                     }
 
+                    if(tile!=null)
+                    {
+                        if (tile.wall == WallID.LivingWood && (!tile.active() || tile.type!= TileID.LivingWood) )
+                        {              
+                            if (y < Main.worldSurface && Main.tile[x, y - 1].wall == WallID.LivingWood
+                                && Math.Abs(Main.maxTilesX / 2 - x) < 275)
+                            {
+                                int off = -1;
+                                if (x < Main.maxTilesX / 2)
+                                    off = +1;
+                                
 
+                                bool opening = true;
+                                //opening
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    if ((Main.tile[x + off, y + i].active() && Main.tile[x + off, y + i].type == TileID.LivingWood) || Main.tile[x + off, y + i].wall == WallID.LivingWood)
+                                    {
+                                        opening = false;
+
+                                    }
+                                }
+                                if (opening)
+                                {
+                                    hasOBjectOrParam["Tree near mid open to mid"] += 1;
+                                    //Main.tile[x , y ].wall = WallID.AmberGemspark;
+                                }
+
+
+                            }
+                        }
+                    }
 
                     if (!tile.active())
                     {
@@ -4108,9 +4404,10 @@ namespace TheTerrariaSeedProject
 
                         
 
-                        if (tile.wall == WallID.LivingWood && !treeToUGDung && checkIfNearDungeon(x,y,60,40))
+                        if (tile.wall == WallID.LivingWood)
                         {
-                            treeToUGDung = true;
+                            if (!treeToUGDung && checkIfNearDungeon(x, y, 60, 40))
+                                treeToUGDung = true;
 
                         }
 
@@ -4694,7 +4991,24 @@ namespace TheTerrariaSeedProject
 
 
                             }
-                            //todo sort by frequenzy
+
+                            //cabin finder
+                            if ( (tile.type == TileID.ClosedDoor && tile.frameY != 612) ||
+                                (tile.type == TileID.Platforms && Main.tile[x, y].frameY != 414) ||
+                                (tile.type == TileID.Torches) ||
+                                (tile.type == TileID.Chandeliers) ||
+                                (tile.type == TileID.Chairs) ||
+                                (tile.type == TileID.Tables)
+                                )
+                            {
+                                int pathl = FindShortestPathInRange(ref pathLength, x, y, 2, 2, 2, 2);
+                                if (pathl < hasOBjectOrParam["Pathlength to cabin"])
+                                    hasOBjectOrParam["Pathlength to cabin"] = pathl;
+
+                            }
+
+
+                            //todo sort by frequenzy or switch
 
                             //Temple Door
                             if (tile.type == TileID.ClosedDoor && tile.frameY == 612)
@@ -4927,6 +5241,7 @@ namespace TheTerrariaSeedProject
                                     int numfreeL = 0;
                                     int numfreeR = 0;
                                     int total = 0;
+                                    int liquid = 0;
                                     for (int xi=x-10; xi<x+12; xi++)
                                     {
                                         for (int yi = y - 9; yi < y + 2; yi++)
@@ -4940,10 +5255,12 @@ namespace TheTerrariaSeedProject
                                                 else if (xi > x)
                                                     numfreeR++;
                                             }
-
+                                            if (Main.tile[xi, yi].liquid == 255)
+                                                liquid++;
                                         }
                                     }
-                                    if( ((float)numfree)/ total > 0.55 || ((float)numfreeL)/ total > 0.45 || ((float)numfreeR) / total > 0.45)
+                                    
+                                    if( (((float)numfree)/ total > 0.55 || ((float)numfreeL)/ total > 0.45 || ((float)numfreeR) / total > 0.45) && ((float)liquid)/total <0.65)
                                     {
                                         hasOBjectOrParam["Detonator at surface"]++;
                                     
@@ -5489,6 +5806,9 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam["neg. Evil Tiles for Jungle Grass"] = -hasOBjectOrParam["Evil Tiles for Jungle Grass"];
             hasOBjectOrParam["neg. Evil Tiles for Sand"] = -hasOBjectOrParam["Evil Tiles for Sand"];
             hasOBjectOrParam["neg. Evil Tiles for Ice"] = -hasOBjectOrParam["Evil Tiles for Ice"];
+
+            hasOBjectOrParam["neg. Nearest Evil Dungeon Ocean"] = -hasOBjectOrParam["Nearest Evil Dungeon Ocean"];
+            hasOBjectOrParam["neg. Nearest Evil Jungle Ocean"] = -hasOBjectOrParam["Nearest Evil Jungle Ocean"];
             
 
 
@@ -5504,7 +5824,9 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["Pathlength to Minecart Track"] /= pathNormFac;
 
                 hasOBjectOrParam["Minecart Track close to spawn"] = hasOBjectOrParam["Pathlength to Minecart Track"] < 150 ? 1 : 0;
-
+                hasOBjectOrParam["ExplosiveDetonator close to spawn"] = (hasOBjectOrParam["Pathlength to Detonator"] < 20 && hasOBjectOrParam["Pathlength to Explosives"] < 35)
+                                                                     || (hasOBjectOrParam["Pathlength to Explosives"] < 20 && hasOBjectOrParam["Pathlength to Detonator"] < 35) ? 1 : 0;
+                
 
                 //find path
                 Stopwatch stopWatchway = new Stopwatch();
@@ -5880,6 +6202,7 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["neg. Pathlength to Altar"] = -hasOBjectOrParam["Pathlength to Altar"];
                 hasOBjectOrParam["neg. Pathlength to Bee Hive"] = -hasOBjectOrParam["Pathlength to Bee Hive"];
                 hasOBjectOrParam["neg. Pathlength to Boomstick"] = -hasOBjectOrParam["Pathlength to Boomstick"];
+                hasOBjectOrParam["neg. Pathlength to Flower Boots"] = -hasOBjectOrParam["Pathlength to Flower Boots"];
 
                 hasOBjectOrParam["neg. Pathlength to Slime Staute"] = -hasOBjectOrParam["Pathlength to Slime Staute"];
                 hasOBjectOrParam["neg. Pathlength to Shark Staute"] = -hasOBjectOrParam["Pathlength to Shark Staute"];
@@ -5897,7 +6220,16 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["neg. Pathlength to 3rd Chest"] = -hasOBjectOrParam["Pathlength to 3rd Chest"];
                 hasOBjectOrParam["neg. Pathlength to 4th Chest"] = -hasOBjectOrParam["Pathlength to 4th Chest"];
                 hasOBjectOrParam["neg. Pathlength to 5th Chest"] = -hasOBjectOrParam["Pathlength to 5th Chest"];
-                hasOBjectOrParam["neg. Pathlength to Tree Chest"] = -hasOBjectOrParam["Pathlength to Tree Chest"];
+                hasOBjectOrParam["neg. Pathlength to underground Chest"] = -hasOBjectOrParam["Pathlength to underground Chest"];
+                hasOBjectOrParam["neg. Pathlength to 2nd underground Chest"] = -hasOBjectOrParam["Pathlength to 2nd underground Chest"];
+                hasOBjectOrParam["neg. Pathlength to 3rd underground Chest"] = -hasOBjectOrParam["Pathlength to 3rd underground Chest"];
+                hasOBjectOrParam["neg. Pathlength to 4th underground Chest"] = -hasOBjectOrParam["Pathlength to 4th underground Chest"];
+                hasOBjectOrParam["neg. Pathlength to 5th underground Chest"] = -hasOBjectOrParam["Pathlength to 5th underground Chest"];
+
+
+                hasOBjectOrParam["neg. Pathlength to Tree Chest"] = -hasOBjectOrParam["Pathlength to Tree Chest"]; 
+                hasOBjectOrParam["neg. Pathlength to Pyramid Chest"] = -hasOBjectOrParam["Pathlength to Pyramid Chest"];
+                hasOBjectOrParam["neg. Pathlength to cabin"] = -hasOBjectOrParam["Pathlength to cabin"];
                 hasOBjectOrParam["neg. Pathlength to Minecart Track"] = -hasOBjectOrParam["Pathlength to Minecart Track"];
 
                 hasOBjectOrParam["neg. Pathlength to free ShadowOrb/Heart"] = -hasOBjectOrParam["Pathlength to free ShadowOrb/Heart"];
@@ -6368,7 +6700,7 @@ namespace TheTerrariaSeedProject
                 || type == TileID.Bookcases
                 || type == TileID.Anvils
                 || type == TileID.Statues
-                || type == TileID.Chairs
+                || type == TileID.Chairs                
                 || type == TileID.Containers
                 || type == TileID.Containers2
                 || type == TileID.Sunflower
@@ -6692,6 +7024,116 @@ namespace TheTerrariaSeedProject
             }
 
             return inSand;
+        }
+
+        private Tuple<int,int,int> removeInvalidPyrPos()
+        {
+            int numPyramidChanceAdv;
+            int numPyramidChanceAdvUber;
+
+            //more accurate pyramid number
+            List<int> pyrPosX = new List<int>();
+            if (localPyrX != null)
+            {
+                for (int p = 0; p < localPyrX.Length; p++)
+                {
+                    if (localPyrX[p] != 0 && localPyrX[p] > 300 && localPyrX[p] < Main.maxTilesX - 300
+                        && ((localDungeonSide < 0 && localPyrX[p] > 240 + (double)Main.maxTilesX * 0.15)
+                        || (localDungeonSide > 0 && localPyrX[p] < Main.maxTilesX - 240 - (double)Main.maxTilesX * 0.15))
+                        )
+                        pyrPosX.Add(localPyrX[p]);
+                    //writeDebugFile("seed " + seed + " might have pyramid at " + localPyrX[p] + "," + localPyrY[p]);
+                }
+            }
+            numPyramidChanceAdv = pyrPosX.Count;
+
+            //even more accurate pyramid number
+            pyrPosX.Sort();
+            int lastx = -133700;
+            List<int> conflict = new List<int>();
+            int subp = 0;
+            int minDist = Main.maxTilesX;
+            for (int pi = 0; pi < pyrPosX.Count; pi++)
+            {
+                minDist = Math.Min(minDist, Math.Abs(pyrPosX[pi] - Main.maxTilesX / 2));
+
+                if (pyrPosX[pi] - lastx < 250)
+                {
+                    if (conflict.Count == 0)
+                    {
+                        conflict.Add(lastx);
+                    }
+                    conflict.Add(pyrPosX[pi]);
+                }
+                else
+                {
+                    if (conflict.Count > 0)
+                    {
+                        if (conflict.Count == 2) subp++; //reduce count by one
+                        else
+                        {
+                            int fx = conflict[0];
+                            int lx = conflict[0];
+                            int maxp = (lx - fx) / 250 + 1;
+
+                            if (maxp == 1)
+                            {
+                                subp += conflict.Count - 1;
+                            }
+                            else
+                            {
+                                int l = conflict.Count;
+                                bool[] used = new bool[l];
+                                const int maxVal = 8; // else too long
+
+                                int remove = l - maxp;
+                                for (; remove < maxVal; remove++)
+                                {
+                                    int[] which = new int[remove];
+                                    for (int i = 0; i < remove; i++) which[i] = i;
+                                    bool works = false;
+
+                                    while (!works)
+                                    {
+                                        for (int i = 0; i < l; i++) used[i] = true;
+                                        for (int i = 0; i < remove; i++) used[which[i]] = false;
+
+                                        works = true;
+                                        for (int i = 0; i < l && works; i++)
+                                            for (int j = i + 1; j < l && works; j++)
+                                                if (used[i] && used[j])
+                                                    if (conflict[j] - conflict[i] < 250) works = false;
+
+                                        which[0]++;
+                                        for (int i = 0; i < remove - 1; i++) if (which[i] == l) { which[i] = 0; which[i + 1]++; }
+                                        if (which[remove - 1] == l)
+                                            break;
+                                    }
+                                    if (works)
+                                    {
+                                        subp += remove;
+                                        break;
+                                    }
+
+                                }
+                                if (remove == maxVal)
+                                {
+                                    subp += remove;
+                                }
+
+
+
+                            }
+
+                        }
+                        conflict.Clear();
+                    }
+                }
+                lastx = pyrPosX[pi];
+            }
+            numPyramidChanceAdvUber = numPyramidChanceAdv - subp;
+
+            return new Tuple<int, int, int>(numPyramidChanceAdv, numPyramidChanceAdvUber, minDist);
         }
 
         private static bool isPosValid(int xheadLeft, int yheadLeft, int xsize = 1, int ysize = 1, bool checkWallAsWell = false)
@@ -7844,6 +8286,9 @@ namespace TheTerrariaSeedProject
             
             score += hasOBjectOrParam["Minecart Track close to spawn"] > 0 ? 420: 0;
             if (hasOBjectOrParam["Minecart Track close to spawn"] > 0) allScoreText += System.Environment.NewLine + "Score Minecart spawn " + (int)score;
+
+            score += hasOBjectOrParam["ExplosiveDetonator close to spawn"] > 0 ? 1337: 0;
+            if (hasOBjectOrParam["ExplosiveDetonator close to spawn"] > 0) allScoreText += System.Environment.NewLine + "Score ExplosiveDetonator spawn " + (int)score;
             
 
 
@@ -8053,7 +8498,28 @@ namespace TheTerrariaSeedProject
             return allTrue;
         }
 
-        private static void createMapName(ScoreWorld score, bool valid, Configuration config, string worldNameByUser)
+        public class WorldNameInfo
+        {
+            public string worldNameByUser;
+            public string cseed;
+            public string sizeEvilDiff;
+            public string content;
+            public string sscore;
+            public string strares;
+
+            public WorldNameInfo(string worldNameByUser, string cseed, string sizeEvilDiff, string content, string sscore, string strares)
+                
+            {
+                this.worldNameByUser = worldNameByUser;
+                this.cseed = cseed;
+                this.sizeEvilDiff = sizeEvilDiff;
+                this.content = content;
+                this.sscore = sscore;
+                this.strares = strares;
+            }
+        }
+
+        private static WorldNameInfo createMapName(ScoreWorld score, bool valid, Configuration config, string worldNameByUser)
         {
             Dictionary<string, int> hasOBjectOrParam = score.hasOBjectOrParam; //Todo only ref
 
@@ -8263,6 +8729,7 @@ namespace TheTerrariaSeedProject
             if (hasOBjectOrParam[OptionsDict.Phase3.frozenTemple] > 0) strares += "_" + "FrozenTemple";
             if (hasOBjectOrParam[OptionsDict.Phase3.lonelyJungleTree] > 0) strares += "_" + "LonelyJungleTree";
             if (hasOBjectOrParam["Minecart Track close to spawn"] > 0) strares += "_" + "MinecartTrackSpawn";
+            if (hasOBjectOrParam["ExplosiveDetonator close to spawn"] > 0) strares += "_" + "ExplosiveDetonatorSpawn";
             
             if (hasOBjectOrParam["Mushroom Biome above surface"] > 0) strares += "_" + "MushroomSurface";
             if (hasOBjectOrParam["Shadow Chest item in normal chest"] > 0) strares += "_" + "ShadowChestItemNormal";
@@ -8306,6 +8773,8 @@ namespace TheTerrariaSeedProject
 
             Main.ActiveWorldFileData = WorldFile.CreateMetadata(Main.worldName, false, Main.expertMode);
             Main.ActiveWorldFileData.SetSeed(cseed);
+
+            return new WorldNameInfo(worldNameByUser, cseed, sizeEvilDiff, content, sscore, strares);
         }
 
 
@@ -8423,6 +8892,7 @@ namespace TheTerrariaSeedProject
                     rares += checkAdd(OptionsDict.Phase3.greenPyramid);                    
                     rares += checkAdd(OptionsDict.Phase3.frozenTemple);                    
                     rares += checkAdd("Minecart Track close to spawn");                    
+                    rares += checkAdd("ExplosiveDetonator close to spawn");                    
                     
 
                     rares += checkAdd("Spawn in Marble or Granite biome");
@@ -8959,7 +9429,8 @@ namespace TheTerrariaSeedProject
                         && Main.tile[xti, yt].type != TileID.Vines && Main.tile[xti, yt].wall != WallID.LivingWood && Main.tile[xti, yt].type != TileID.Trees
                         && Main.tile[xti, yt].type != TileID.PalmTree && Main.tile[xti, yt].type != TileID.Sunflower && Main.tile[xti, yt].type != TileID.Pots
                         && Main.tile[xti, yt].type != TileID.Plants && Main.tile[xti, yt].type != TileID.JunglePlants && Main.tile[xti, yt].type != TileID.FleshWeeds
-                        && Main.tile[xti, yt].type != TileID.CorruptPlants && Main.tile[xti, yt].type != TileID.SmallPiles && Main.tile[xti, yt].type != TileID.LargePiles))
+                        && Main.tile[xti, yt].type != TileID.CorruptPlants && Main.tile[xti, yt].type != TileID.SmallPiles && Main.tile[xti, yt].type != TileID.LargePiles
+                        && Main.tile[xti, yt].type != TileID.LargePiles2))
                         {
                             isTree = false;
                             break;
@@ -8976,7 +9447,8 @@ namespace TheTerrariaSeedProject
                         && Main.tile[xti, yt].type != TileID.Vines && Main.tile[xti, yt].wall != WallID.LivingWood && Main.tile[xti, yt].type != TileID.Trees
                         && Main.tile[xti, yt].type != TileID.PalmTree && Main.tile[xti, yt].type != TileID.Sunflower && Main.tile[xti, yt].type != TileID.Pots
                         && Main.tile[xti, yt].type != TileID.Plants && Main.tile[xti, yt].type != TileID.JunglePlants && Main.tile[xti, yt].type != TileID.FleshWeeds
-                        && Main.tile[xti, yt].type != TileID.CorruptPlants && Main.tile[xti, yt].type != TileID.SmallPiles && Main.tile[xti, yt].type != TileID.LargePiles))
+                        && Main.tile[xti, yt].type != TileID.CorruptPlants && Main.tile[xti, yt].type != TileID.SmallPiles && Main.tile[xti, yt].type != TileID.LargePiles
+                        && Main.tile[xti, yt].type != TileID.LargePiles2))
                         {
 
                             isTree = false;
@@ -9658,7 +10130,12 @@ namespace TheTerrariaSeedProject
                                     treesPos.Add(x);
                                 }
                             }
+
+                            
+
+
                         }
+
 
                         //Clouds
                         else if (tile.type == TileID.Cloud)
@@ -9677,7 +10154,7 @@ namespace TheTerrariaSeedProject
                                         int newPos = x + i - Math.Sign(i);
                                         cloudPos.Add(newPos);
 
-                                        Console.Write(newPos.ToString() + " ");
+                                        //Console.Write(newPos.ToString() + " ");
 
 
                                     }
@@ -9728,6 +10205,8 @@ namespace TheTerrariaSeedProject
                         }
 
                     }
+
+
                 }
             }
 
