@@ -319,7 +319,7 @@ namespace TheTerrariaSeedProject.UI
         public static readonly List<string> vUndergroundDist = getPatern(0, 25, 1).Concat(getPatern(25, 25).Concat(getPatern(50, 10, 5)).Concat(getPatern(100, 10, 20)).Concat(getPatern(300, 29, 25))).ToList();
         public static readonly List<string> vUndergroundDistNeg = getPatern(0, 25, -1).Concat(getPatern(-25, 25, -1).Concat(getPatern(-50, 10, -5)).Concat(getPatern(-100, 10, -20)).Concat(getPatern(-300, 29, -25))).ToList();
         public static readonly List<string> vHeight = getPatern(0, 100).Concat(getPatern(100, 41, 5)).ToList();
-        public static readonly List<string> vCavernOff = getPatern(0, 300);
+        public static readonly List<string> vCavernOff = getPatern(0, 301);
         public static readonly List<string> vSpawnRockOff = getPatern(-1000, 5, 100).Concat(getPatern(-500, 16, 25).Concat(getPatern(-100, 10, 5).Concat(getPatern(-50, 151, 1)))).ToList();
         public static readonly List<string> vSpawnRockOffNeg = getPatern(1000, 5, -100).Concat(getPatern(500, 16, -25).Concat(getPatern(100, 10, -5).Concat(getPatern(50, 151, -1)))).ToList();
 
