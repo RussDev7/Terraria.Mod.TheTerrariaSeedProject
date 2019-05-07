@@ -1,6 +1,6 @@
-Your map seed search engine. You want a world with
-5 Pyramids or no evil in jungle? With this mod you can find a map seed which has both of it.
-Amaze your friends with playing maps you didn't thought they even can exist. Share your rare findings with the community.
+Your world seed search engine. You want a world with
+5 Pyramids or no evil in jungle? With this mod you can find a world seed which has both of it.
+Amaze your friends with playing worlds you didn't thought they even can exist. Share your rare findings with the community.
 The seeds you found can also be used in the unmodded vanilla version.
 
 [c/BBDDBB:To enter the seed search mode] start either your world name or seed with "?" (question mark without quotes). 
