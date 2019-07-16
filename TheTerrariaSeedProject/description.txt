@@ -36,6 +36,7 @@ If you found some bugs, have some ideas, want to help coding or found some nice 
 Good luck!
 
 Last Update:
+-12iron chest, copper, gold; pathl. to wooden, water, gold chest, rope, recall; cloud lake near mid
 -faster close tree/pyramid detection, tree open to mid, granite/marble at surface
 -much better pyramid prediction, spawn height prediction, close marble/granite detection
 -v0.4: Help text, 4 new rares, 2 new tools, random inverse
