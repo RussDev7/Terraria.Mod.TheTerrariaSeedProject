@@ -273,7 +273,7 @@ namespace TheTerrariaSeedProject.UI
         public static readonly List<string> v0to4 = getPatern(0, 5);
         public static readonly List<string> v0to1 = getPatern(0, 2);
         public static readonly List<string> v0to2 = getPatern(0, 3);
-        public static readonly List<string> vboost = getPatern(10, 40).Concat(getPatern(50, 11, 5).Concat(new string[] {"110","134","150","190","200","300","400" }.ToList())).ToList();
+        public static readonly List<string> vboost = new string[] { "-1" }.Concat(getPatern(10, 40).Concat(getPatern(50, 11, 5).Concat(new string[] {"110","134","150","190","200","300","400" }.ToList()))).ToList();
         public static readonly List<string> vDungeonWalls = getPatern(10000, 19, 5000);
         public static readonly List<string> vDungeonALLWalls = getPatern(0, 3, 50, 1 , 2).Concat(getPatern(250, 3, 250).Concat(getPatern(1000, 9, 1000)).Concat(getPatern(10000, 21, 2000))).ToList();
         public static readonly List<string> vNearEvilOcean = getPatern(0, 8, 25).Concat(getPatern(400, 5, 100)).Concat(getPatern(1000, 10, 200).Concat(getPatern(3000, 22, 250))).ToList();
@@ -419,6 +419,7 @@ namespace TheTerrariaSeedProject.UI
                 "So in short: you are doing good selecting a value of 60, or if you are at pyramid hunting you can go for 70 (small), 110 (medium), 150 (large world). With this pyramids (should) have the best "+
                 "start conditions. Only if you want more lakes or" +
                 " do some tests about other effects of this value some greater values are needed. \n" +
+                "The special value '-1' is about the same (but not equal to) 20 (it's a little less/more). With this you have a floating island lake near mid."+
                 "As the name implies it's an experimental feature. It may not work anymore with futher Terraria update. Also there might be some mistakes in those values above. Have fun testing."
 
 
@@ -933,6 +934,7 @@ namespace TheTerrariaSeedProject.UI
                 "All Cloud Items",
                 "Bee Hives",
                 "High Hive",
+                "Open Bee Hive below lava",
                 "Sharpening Station",
                 "Flower Boots",
                 "Staff of Regrowth",
@@ -1000,8 +1002,11 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Pathlength to Temple Door",
                 "neg. Pathlength to Temple Tile",
                 "neg. Pathlength to Boots",
+                "neg. Pathlength to Copper/Tin Bar",
                 "neg. Pathlength to Iron/Lead Bar",
                 "neg. Pathlength to 10 Iron/Lead Bar Chest",
+                "neg. Pathlength to 12 Iron/Lead Bar Chest",
+                "neg. Pathlength to Silver/Tungsten Bar",
                 "neg. Pathlength to Gold/Platinum Bar",
                 "neg. Pathlength to Bomb",
                 "neg. Pathlength to Dynamite",
@@ -1023,6 +1028,8 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Pathlength to Obsidian Skin Potion", 
                 "neg. Pathlength to Battle Potion",
                 "neg. Pathlength to Lifeforce Potion",
+                "neg. Pathlength to Recall Potion",
+                "neg. Pathlength to Rope",
                 "neg. Pathlength to Enchanted Sword",
                 "neg. Pathlength to Altar",
                 "neg. Pathlength to Bee Hive",
@@ -1030,10 +1037,13 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Pathlength to Flower Boots",
                 "neg. Pathlength to Slime Staute",
                 "neg. Pathlength to Shark Staute",
+                "neg. Pathlength to Heart Staute",
+                "neg. Pathlength to Star Staute",
                 "neg. Pathlength to Anvil",
                 "neg. Pathlength to Ruby",
                 "neg. Pathlength to Cloud in a Bottle",
                 "neg. Pathlength to 2 Herb Bag Chest",
+                "neg. Pathlength to Grenades",
                 "neg. Pathlength to Extractinator",
                 "neg. Pathlength to Detonator",
                 "neg. Pathlength to Explosives",
@@ -1048,7 +1058,10 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Pathlength to 2nd underground Chest",
                 "neg. Pathlength to 3rd underground Chest",
                 "neg. Pathlength to 4th underground Chest",
-                "neg. Pathlength to 5th underground Chest",
+                "neg. Pathlength to 5th underground Chest",                
+                "neg. Pathlength to Wooden Chest",
+                "neg. Pathlength to Golden Chest",
+                "neg. Pathlength to Water Chest",
                 "neg. Pathlength to Tree Chest",
                 "neg. Pathlength to Pyramid Chest",
                 "neg. Pathlength to cabin",
@@ -1106,8 +1119,11 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to Temple Door",
                 "Pathlength to Temple Tile",
                 "Pathlength to Boots",
+                "Pathlength to Copper/Tin Bar",
                 "Pathlength to Iron/Lead Bar",
                 "Pathlength to 10 Iron/Lead Bar Chest",
+                "Pathlength to 12 Iron/Lead Bar Chest",
+                "Pathlength to Silver/Tungsten Bar",
                 "Pathlength to Gold/Platinum Bar",
                 "Pathlength to Bomb",
                 "Pathlength to Dynamite",
@@ -1129,6 +1145,8 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to Obsidian Skin Potion",
                 "Pathlength to Battle Potion",
                 "Pathlength to Lifeforce Potion",
+                "Pathlength to Recall Potion",
+                "Pathlength to Rope",
                 "Pathlength to Enchanted Sword",
                 "Pathlength to Altar",
                 "Pathlength to Bee Hive",
@@ -1136,10 +1154,13 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to Flower Boots",
                 "Pathlength to Slime Staute",
                 "Pathlength to Shark Staute",
+                "Pathlength to Heart Staute",
+                "Pathlength to Star Staute",
                 "Pathlength to Anvil",
                 "Pathlength to Ruby",
                 "Pathlength to Cloud in a Bottle",
                 "Pathlength to 2 Herb Bag Chest",
+                "Pathlength to Grenades",
                 "Pathlength to Extractinator",
                 "Pathlength to Detonator",
                 "Pathlength to Explosives",
@@ -1155,6 +1176,9 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to 3rd underground Chest",
                 "Pathlength to 4th underground Chest",
                 "Pathlength to 5th underground Chest",
+                "Pathlength to Wooden Chest",
+                "Pathlength to Golden Chest",
+                "Pathlength to Water Chest",
                 "Pathlength to Tree Chest",
                 "Pathlength to Pyramid Chest",
                 "Pathlength to cabin",
@@ -1191,6 +1215,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Near Cloud", v0to5);
             Add("Bee Hives", v0to20);
             Add("High Hive", v0to10);
+            Add("Open Bee Hive below lava", v0to10);
             Add("Cloud Chest", v0to9);
             Add("Cloud Ballon", v0to9);
             Add("Cloud Starfury", v0to9);
@@ -1255,8 +1280,11 @@ namespace TheTerrariaSeedProject.UI
             Add("neg. Pathlength to Temple Door", vPathLengthNeg);
             Add("neg. Pathlength to Temple Tile", vPathLengthNeg);
             Add("neg. Pathlength to Boots", vPathLengthNeg);
+            Add("neg. Pathlength to Copper/Tin Bar", vPathLengthNeg);
             Add("neg. Pathlength to Iron/Lead Bar", vPathLengthNeg);
             Add("neg. Pathlength to 10 Iron/Lead Bar Chest", vPathLengthNeg);
+            Add("neg. Pathlength to 12 Iron/Lead Bar Chest", vPathLengthNeg);
+            Add("neg. Pathlength to Silver/Tungsten Bar", vPathLengthNeg);
             Add("neg. Pathlength to Gold/Platinum Bar", vPathLengthNeg);
             Add("neg. Pathlength to Bomb", vPathLengthNeg);
             Add("neg. Pathlength to Dynamite", vPathLengthNeg);
@@ -1278,6 +1306,8 @@ namespace TheTerrariaSeedProject.UI
             Add("neg. Pathlength to Obsidian Skin Potion", vPathLengthNeg);
             Add("neg. Pathlength to Battle Potion", vPathLengthNeg);
             Add("neg. Pathlength to Lifeforce Potion", vPathLengthNeg);
+            Add("neg. Pathlength to Recall Potion", vPathLengthNeg);
+            Add("neg. Pathlength to Rope", vPathLengthNeg);
 
             Add("neg. Pathlength to Enchanted Sword", vPathLengthNeg);
             Add("neg. Pathlength to Altar", vPathLengthNeg);
@@ -1287,10 +1317,13 @@ namespace TheTerrariaSeedProject.UI
 
             Add("neg. Pathlength to Slime Staute", vPathLengthNeg);
             Add("neg. Pathlength to Shark Staute", vPathLengthNeg);
+            Add("neg. Pathlength to Heart Staute", vPathLengthNeg);
+            Add("neg. Pathlength to Star Staute", vPathLengthNeg);
             Add("neg. Pathlength to Anvil", vPathLengthNeg);
             Add("neg. Pathlength to Ruby", vPathLengthNeg);
             Add("neg. Pathlength to Cloud in a Bottle", vPathLengthNeg);
             Add("neg. Pathlength to 2 Herb Bag Chest", vPathLengthNeg);
+            Add("neg. Pathlength to Grenades", vPathLengthNeg);
             Add("neg. Pathlength to Extractinator", vPathLengthNeg);
             Add("neg. Pathlength to Detonator", vPathLengthNeg);
             Add("neg. Pathlength to Explosives", vPathLengthNeg);
@@ -1309,8 +1342,11 @@ namespace TheTerrariaSeedProject.UI
             Add("neg. Pathlength to 3rd underground Chest", vPathLengthNeg);
             Add("neg. Pathlength to 4th underground Chest", vPathLengthNeg);
             Add("neg. Pathlength to 5th underground Chest", vPathLengthNeg);
-            
 
+
+            Add("neg. Pathlength to Wooden Chest", vPathLengthNeg);
+            Add("neg. Pathlength to Golden Chest", vPathLengthNeg);
+            Add("neg. Pathlength to Water Chest", vPathLengthNeg);
             Add("neg. Pathlength to Tree Chest", vPathLengthNeg);
             Add("neg. Pathlength to Pyramid Chest", vPathLengthNeg);
             Add("neg. Pathlength to cabin", vPathLengthNeg);
@@ -1335,8 +1371,11 @@ namespace TheTerrariaSeedProject.UI
 
             Add("Hermes Flurry Boots Distance", vDistanceShort);
             Add("Pathlength to Boots", vPathLength);
+            Add("Pathlength to Copper/Tin Bar", vPathLength);
             Add("Pathlength to Iron/Lead Bar", vPathLength);
             Add("Pathlength to 10 Iron/Lead Bar Chest", vPathLength);
+            Add("Pathlength to 12 Iron/Lead Bar Chest", vPathLength);
+            Add("Pathlength to Silver/Tungsten Bar", vPathLength);
             Add("Pathlength to Gold/Platinum Bar", vPathLength);
             Add("Pathlength to Bomb", vPathLength);
             Add("Pathlength to Dynamite", vPathLength);
@@ -1360,6 +1399,8 @@ namespace TheTerrariaSeedProject.UI
             Add("Pathlength to Obsidian Skin Potion", vPathLength);
             Add("Pathlength to Battle Potion", vPathLength);
             Add("Pathlength to Lifeforce Potion", vPathLength);
+            Add("Pathlength to Recall Potion", vPathLength);
+            Add("Pathlength to Rope", vPathLength);
             Add("Pathlength to Enchanted Sword", vPathLength);
             Add("Pathlength to Altar", vPathLength);
             Add("Pathlength to Bee Hive", vPathLength);
@@ -1367,10 +1408,13 @@ namespace TheTerrariaSeedProject.UI
             Add("Pathlength to Flower Boots", vPathLength);
             Add("Pathlength to Slime Staute", vPathLength);
             Add("Pathlength to Shark Staute", vPathLength);
+            Add("Pathlength to Heart Staute", vPathLength);
+            Add("Pathlength to Star Staute", vPathLength);
             Add("Pathlength to Anvil", vPathLength);
             Add("Pathlength to Ruby", vPathLength);
             Add("Pathlength to Cloud in a Bottle", vPathLength);
             Add("Pathlength to 2 Herb Bag Chest", vPathLength);
+            Add("Pathlength to Grenades", vPathLength);
             Add("Pathlength to Extractinator", vPathLength);
             Add("Pathlength to Detonator", vPathLength);
             Add("Pathlength to Explosives", vPathLength);
@@ -1389,6 +1433,9 @@ namespace TheTerrariaSeedProject.UI
             Add("Pathlength to 5th underground Chest", vPathLengthNeg);
 
 
+            Add("Pathlength to Wooden Chest", vPathLength);
+            Add("Pathlength to Golden Chest", vPathLength);
+            Add("Pathlength to Water Chest", vPathLength);
             Add("Pathlength to Tree Chest", vPathLength);
             Add("Pathlength to Pyramid Chest", vPathLength);
             Add("Pathlength to cabin", vPathLength);
@@ -1640,7 +1687,7 @@ namespace TheTerrariaSeedProject.UI
                 "option '"+Phase1.pyramidsPossible+ "' which has again some influence at the number of pyramids. \n" +
                 " Most times a higher values gives you a beter world. The seed need to have a higher (or equal) value than you selected here to pass that initial very fast test. Too high values can also have " +
                 "some negative effect (e.g. chance for dungeon in ocean seems to be higher, 1st sky lake cloud very far to the right). For more details left click at header '"+ Phase1.title +"'.\n" +
-                " Or in short: you are doing good in most cases with value 60 or if you hunt for pyramids 70 for small worlds, 110 for medium, 150 for large");
+                " Or in short: you are doing good in most cases with value 60 or if you hunt for pyramids 70 for small worlds, 110 for medium, 150 for large, -1 if you want a floating island lake near mid");
 
             HelpDict.Add(Phase1.boostPyr, "This condition is only needed if you are" +
                 " looking for pyramids. If a value other than 0 is selected it introduces an additional world generation cycle which is limited to the crucial steps for guessing an upper bound" +
@@ -1828,6 +1875,8 @@ namespace TheTerrariaSeedProject.UI
 
             
             HelpDict.Add("High Hive", "Counts hives which are located close to the surface (<200 tiles).");
+            HelpDict.Add("Open Bee Hive below lava", "(BETA) Checks if a Bee Hive exists which is not fully enclosed and is located below lava. " +
+                "There is a very small chance it spawns a Queen Bee at start of world. This is very very rare. Currently it only finds candidates which might work.");
 
             HelpDict.Add("Meteorite Bar unlocked", "If meteorite bar is located in a chest which don't need a shadow key.");
 
