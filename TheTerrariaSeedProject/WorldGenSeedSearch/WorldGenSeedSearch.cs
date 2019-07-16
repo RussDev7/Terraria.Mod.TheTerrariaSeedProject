@@ -269,8 +269,9 @@ namespace TheTerrariaSeedProject
                 Main.worldName = worldName.Length == 0 ? "SeedSearch" : worldName;
 
 
+                double boostValueMin=0;
+                double boostValueMax=0;
 
-                
                 Tuple<List<int>,bool, string> conf= readConfigFile();
                 itemIDdoNotWant = conf.Item1;
                 quickStartConf = conf.Item3;
@@ -488,11 +489,25 @@ namespace TheTerrariaSeedProject
                             string boostString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boost, 1);
                             if (boostString.Length > 0)
                                 if(!Int32.TryParse(boostString, out boostValueInt)) boostValueInt = 10;
-                           
-                            
-                            boostValue = 1.0 - (1.0 / (0.1 * ((double)boostValueInt)));
-                            //e.g. living trees can have 3 values for small if boost val =30 it only accept values greater than 0.6666
-                            // if one tree is ok too go for val = 20 and all values greater 0.3333 are fine
+
+                            if (boostValueInt == -1)
+                            {
+                                //special case value
+                                //-1 => skylake shoud be at mid
+                                boostValue = -1;
+                                boostValueMin = 0.5 + 100.0 / ((double)Main.maxTilesX);
+                                boostValueMax = 0.5 + 225.0 / ((double)Main.maxTilesX);
+
+                            }
+                            else
+                            {
+                                boostValue = 1.0 - (1.0 / (0.1 * ((double)boostValueInt)));
+                                //e.g. living trees can have 3 values for small if boost val =30 it only accept values greater than 0.6666
+                                // if one tree is ok too go for val = 20 and all values greater 0.3333 are fine
+                                boostValueMin = boostValue;
+                                boostValueMax = boostValue;
+                            }
+                                                     
 
                             boostPyramidValue = 0;
                             string boostPyramidString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boostPyr, 1);
@@ -686,7 +701,7 @@ namespace TheTerrariaSeedProject
                             if (boostMidTreeValue > 0)
                             {
                                 midtree = false;
-                                if (boostValueSeed > 1.0 / (3 * (Main.maxTilesX / 4200)))
+                                if (boostValueSeed > 1.0 / (3 * (Main.maxTilesX / 4200))) //at least one tree
                                     if (boostMidTreeValueSeed > Main.maxTilesX / 2 - treeDist && boostMidTreeValueSeed < Main.maxTilesX / 2 + treeDist)
                                         if (boostMidTreeValueSeed <= Main.maxTilesX / 2 - 100 || boostMidTreeValueSeed >= Main.maxTilesX / 2 + 100)                                    
                                             midtree = true;
@@ -704,9 +719,12 @@ namespace TheTerrariaSeedProject
                             bool doit = false;
 
 
+                           
 
-
-                            if (boostValueSeed >= boostValue && midtree) //the inverted boostValue can be a little smaller than original value >= --> > ?
+                            if (((boostValue>0 && boostValueSeed >= boostValue) ||  
+                                (boostValue < 0 && boostValueSeed > boostValueMin && boostValueSeed < boostValueMax) ||
+                                (boostValue < 0 && boostValueSeed < 1.0-boostValueMin && boostValueSeed > 1.0-boostValueMax) ) //1st cloud in mid
+                                && midtree) //the inverted boostValue can be a little smaller than original value >= --> > ?
                                 if (!look4dungCol || dungColTrue)
                                 {
                                     doit = true;
@@ -3074,8 +3092,13 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Pathlength to Obsidian Skin Potion", 1000000);
             hasOBjectOrParam.Add("Pathlength to Battle Potion", 1000000);
             hasOBjectOrParam.Add("Pathlength to Lifeforce Potion", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Recall Potion", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Rope", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Copper/Tin Bar", 1000000);
             hasOBjectOrParam.Add("Pathlength to Iron/Lead Bar", 1000000);
             hasOBjectOrParam.Add("Pathlength to 10 Iron/Lead Bar Chest", 1000000);
+            hasOBjectOrParam.Add("Pathlength to 12 Iron/Lead Bar Chest", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Silver/Tungsten Bar", 1000000);
             hasOBjectOrParam.Add("Pathlength to Gold/Platinum Bar", 1000000);
 
             hasOBjectOrParam.Add("Pathlength to Bomb", 1000000);
@@ -3100,10 +3123,13 @@ namespace TheTerrariaSeedProject
 
             hasOBjectOrParam.Add("Pathlength to Slime Staute", 1000000);
             hasOBjectOrParam.Add("Pathlength to Shark Staute", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Heart Staute", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Star Staute", 1000000);
             hasOBjectOrParam.Add("Pathlength to Anvil", 1000000);
             hasOBjectOrParam.Add("Pathlength to Ruby", 1000000);
             hasOBjectOrParam.Add("Pathlength to Cloud in a Bottle", 1000000);
             hasOBjectOrParam.Add("Pathlength to 2 Herb Bag Chest", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Grenades", 1000000);
             hasOBjectOrParam.Add("Pathlength to Extractinator", 1000000);
             hasOBjectOrParam.Add("Pathlength to Detonator", 1000000);
             hasOBjectOrParam.Add("Pathlength to Explosives", 1000000);
@@ -3122,7 +3148,9 @@ namespace TheTerrariaSeedProject
 
 
 
-
+            hasOBjectOrParam.Add("Pathlength to Wooden Chest", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Golden Chest", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Water Chest", 1000000);
             hasOBjectOrParam.Add("Pathlength to Tree Chest", 1000000);
             hasOBjectOrParam.Add("Pathlength to Pyramid Chest", 1000000);
             hasOBjectOrParam.Add("Pathlength to cabin", 1000000);
@@ -3156,9 +3184,14 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("neg. Pathlength to Obsidian Skin Potion", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Battle Potion", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Lifeforce Potion", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Recall Potion", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Rope", -1000000);
 
+            hasOBjectOrParam.Add("neg. Pathlength to Copper/Tin Bar", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Iron/Lead Bar", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to 10 Iron/Lead Bar Chest", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to 12 Iron/Lead Bar Chest", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Silver/Tungsten Bar", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Gold/Platinum Bar", -1000000);
 
             hasOBjectOrParam.Add("neg. Pathlength to Bomb", -1000000);
@@ -3183,10 +3216,13 @@ namespace TheTerrariaSeedProject
 
             hasOBjectOrParam.Add("neg. Pathlength to Slime Staute", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Shark Staute", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Heart Staute", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Star Staute", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Anvil", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Ruby", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Cloud in a Bottle", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to 2 Herb Bag Chest", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Grenades", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Extractinator", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Detonator", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Explosives", -1000000);
@@ -3204,8 +3240,10 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("neg. Pathlength to 4th underground Chest", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to 5th underground Chest", -1000000);
 
-
-
+      
+            hasOBjectOrParam.Add("neg. Pathlength to Wooden Chest", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Golden Chest", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Water Chest", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Tree Chest", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Pyramid Chest", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to cabin", -1000000);
@@ -3254,6 +3292,7 @@ namespace TheTerrariaSeedProject
 
             hasOBjectOrParam.Add("Bee Hives", 0);
             hasOBjectOrParam.Add("High Hive", 0);
+            hasOBjectOrParam.Add("Open Bee Hive below lava", 0);
 
 
             hasOBjectOrParam.Add("Spawn in Sky", 0);
@@ -3740,14 +3779,21 @@ namespace TheTerrariaSeedProject
                                 mostSnowSideIvyChest = Math.Max(mostSnowSideIvyChest, cx);
                         }else if (Main.tile[cx, cy].frameX == 0)
                         {
-                            if(chest.item[0].type == ItemID.GoldenKey)
+                            if (chest.item[0].type == ItemID.GoldenKey)
                                 hasOBjectOrParam["Wooden Chest Dungeon"]++;
                             else
+                            {
                                 hasOBjectOrParam["Wooden Chest"]++;
+                                if (pathl < hasOBjectOrParam["Pathlength to Wooden Chest"])
+                                    hasOBjectOrParam["Pathlength to Wooden Chest"] = pathl;
+
+                            }
                         }
                         else if (Main.tile[cx, cy].frameX == 36)
                         {
                             hasOBjectOrParam["Gold Chest"]++;
+                            if (pathl < hasOBjectOrParam["Pathlength to Golden Chest"])
+                                hasOBjectOrParam["Pathlength to Golden Chest"] = pathl;
                         }
                         else if (Main.tile[cx, cy].frameX == 72)
                         {
@@ -3780,6 +3826,8 @@ namespace TheTerrariaSeedProject
                         else if (Main.tile[cx, cy].frameX == 612)
                         {
                             hasOBjectOrParam["Water Chest"]++;
+                            if (pathl < hasOBjectOrParam["Pathlength to Water Chest"])
+                                hasOBjectOrParam["Pathlength to Water Chest"] = pathl;
                         }
 
 
@@ -3931,6 +3979,19 @@ namespace TheTerrariaSeedProject
                                     hasOBjectOrParam["Nearest Teleportation Potion count"] = 2;
 
                             }
+
+                            else if ((item.type == ItemID.CopperBar || item.type == ItemID.TinBar))
+                            {
+                                if (pathl < hasOBjectOrParam["Pathlength to Copper/Tin Bar"])
+                                {
+                                    hasOBjectOrParam["Pathlength to Copper/Tin Bar"] = pathl;
+                                    if (score.itemLocation.ContainsKey(ItemID.CopperBar))
+                                        score.itemLocation[ItemID.CopperBar] = new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) };
+                                    else
+                                        score.itemLocation.Add(ItemID.CopperBar, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
+                                }
+
+                            }                            
                             else if ((item.type == ItemID.IronBar || item.type == ItemID.LeadBar))
                             {
                                 if (pathl < hasOBjectOrParam["Pathlength to Iron/Lead Bar"])
@@ -3952,9 +4013,33 @@ namespace TheTerrariaSeedProject
                                     else
                                         score.itemLocation.Add(ItemID.CobaltBar, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
                                 }
+                                if (pathl < hasOBjectOrParam["Pathlength to 12 Iron/Lead Bar Chest"] && item.stack > 11)
+                                {
+
+                                    hasOBjectOrParam["Pathlength to 12 Iron/Lead Bar Chest"] = pathl;
+                                    if (score.itemLocation.ContainsKey(ItemID.MythrilBar))
+                                        score.itemLocation[ItemID.MythrilBar] = new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) };
+                                    else
+                                        score.itemLocation.Add(ItemID.MythrilBar, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
+                                }
+
+
+
+
+                            }                            
+                            else if ((item.type == ItemID.SilverBar || item.type == ItemID.TungstenBar))
+                            {
+                                if (pathl < hasOBjectOrParam["Pathlength to Silver/Tungsten Bar"])
+                                {
+                                    hasOBjectOrParam["Pathlength to Silver/Tungsten Bar"] = pathl;
+                                    if (score.itemLocation.ContainsKey(ItemID.SilverBar))
+                                        score.itemLocation[ItemID.SilverBar] = new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) };
+                                    else
+                                        score.itemLocation.Add(ItemID.SilverBar, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
+                                }
 
                             }
-                            else if ((item.type == ItemID.GoldBar || item.type == ItemID.PlatinumBar))
+                             else if ((item.type == ItemID.GoldBar || item.type == ItemID.PlatinumBar))
                             {
                                 if (pathl < hasOBjectOrParam["Pathlength to Gold/Platinum Bar"])
                                 {
@@ -3966,6 +4051,7 @@ namespace TheTerrariaSeedProject
                                 }
 
                             }
+
                             else if ((item.type == ItemID.SuspiciousLookingEye))
                             {
                                 if (pathl < hasOBjectOrParam["Pathlength to Suspicious Looking Eye"])
@@ -4101,7 +4187,18 @@ namespace TheTerrariaSeedProject
                                         score.itemLocation.Add(item.type, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
                                 }
                             }
-                            else if (item.type == ItemID.Extractinator)
+                            else if (item.type == ItemID.Grenade)
+                            {
+                                if (pathl < hasOBjectOrParam["Pathlength to Grenades"])
+                                {
+                                    hasOBjectOrParam["Pathlength to Grenades"] = pathl;
+                                    if (score.itemLocation.ContainsKey(item.type))
+                                        score.itemLocation[item.type] = new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) };
+                                    else
+                                        score.itemLocation.Add(item.type, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
+                                }
+                            }
+                             else if (item.type == ItemID.Extractinator)
                             {
                                 if (pathl < hasOBjectOrParam["Pathlength to Extractinator"])
                                 {
@@ -4153,6 +4250,29 @@ namespace TheTerrariaSeedProject
                             {
                                 hasOBjectOrParam["Pathlength to Seaweed Pet"] = Math.Min(pathl, hasOBjectOrParam["Pathlength to Seaweed Pet"]);
                             }
+                            else if (item.type == ItemID.Rope )
+                            {
+                                if (pathl < hasOBjectOrParam["Pathlength to Rope"])
+                                {
+                                    hasOBjectOrParam["Pathlength to Rope"] = pathl;
+                                    if (score.itemLocation.ContainsKey(item.type))
+                                        score.itemLocation[item.type] = new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) };
+                                    else
+                                        score.itemLocation.Add(item.type, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
+                                }
+                            }
+                            else if (item.type == ItemID.RecallPotion )
+                            {
+                                if (pathl < hasOBjectOrParam["Pathlength to Recall Potion"])
+                                {
+                                    hasOBjectOrParam["Pathlength to Recall Potion"] = pathl;
+                                    if (score.itemLocation.ContainsKey(item.type))
+                                        score.itemLocation[item.type] = new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) };
+                                    else
+                                        score.itemLocation.Add(item.type, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
+                                }
+                            }
+
                             else if (item.type == ItemID.LifeforcePotion && Main.tile[cx, cy].frameX != 144 )
                             {
                                 if (pathl < hasOBjectOrParam["Pathlength to Lifeforce Potion"])
@@ -4164,6 +4284,10 @@ namespace TheTerrariaSeedProject
                                         score.itemLocation.Add(item.type, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
                                 }
                             }
+
+
+
+
                             else if (item.type == ItemID.BattlePotion && Main.tile[cx, cy].frameX != 144)
                             {
                                 if (pathl < hasOBjectOrParam["Pathlength to Battle Potion"])
@@ -4304,12 +4428,17 @@ namespace TheTerrariaSeedProject
             int topmostTempleTiley = Main.maxTilesY;
             int botmostTempleTiley = 0;
 
+            int highestFreeLava = Main.maxTilesY;
+            List<Tuple<int, int>> openHives = new List<Tuple<int, int>>();
+            List<Tuple<int, int>> larveInDanger = new List<Tuple<int, int>>();
+
             List<Tuple<int, int, int, int>> dungeonFarmSpotCandidates = new List<Tuple<int, int, int, int>>(); // xmin xmax of inner wall, ymin ymax of detection
 
             bool treeToUGDung = false;
 
             int liqf = 0;
             int liqt = 0;
+                        
 
             //todo: no border
             for (int x = 10; x < Main.maxTilesX - 10; x++)
@@ -4393,6 +4522,108 @@ namespace TheTerrariaSeedProject
 
                             }
                         }
+
+                        if (doFull)
+                        {
+                            if (tile.liquid == 255 && tile.lava() == true && y < highestFreeLava && (
+                                 ((!Main.tile[x + 1, y].active() || !Main.tileSolid[(int)Main.tile[x + 1, y].type]) && Main.tile[x + 1, y].liquid == 0) ||
+                                ((!Main.tile[x - 1, y].active() || !Main.tileSolid[(int)Main.tile[x - 1, y].type]) && Main.tile[x - 1, y].liquid == 0) ||
+                                ((!Main.tile[x, y + 1].active() || !Main.tileSolid[(int)Main.tile[x, y + 1].type]) && Main.tile[x, y + 1].liquid == 0))                                
+                                )
+                            {
+                                highestFreeLava = y;
+                            }
+                            if(tile.type == TileID.Larva && tile.liquid>0 && tile.honey()== true && Main.tile[x, y - 1].liquid == 0)
+                            {
+                                larveInDanger.Add(new Tuple<int, int>(x, y));
+                            }
+
+                          
+                          
+
+                            
+                            //check for open hive, TODO improve code
+                            if (tile.wall == WallID.HiveUnsafe && (!tile.active() ||!Main.tileSolid[(int)tile.type]) &&  (
+                                ((!Main.tile[x + 1, y].active() || !Main.tileSolid[(int)Main.tile[x + 1, y].type]) && Main.tile[x + 1, y].wall != WallID.HiveUnsafe) ||
+                                ((!Main.tile[x - 1, y].active() || !Main.tileSolid[(int)Main.tile[x - 1, y].type]) && Main.tile[x - 1, y].wall != WallID.HiveUnsafe) ||                                
+                                ((!Main.tile[x, y - 1].active() || !Main.tileSolid[(int)Main.tile[x , y-1].type]) && Main.tile[x, y - 1].wall != WallID.HiveUnsafe))
+                                )
+                            {
+                                List<Tuple<int,int>> waya = new List < Tuple<int, int> >{ };
+                                waya.Add( new Tuple<int,int>(x, y) );
+                                
+
+                                List<Tuple<int, int>> wayn = new List<Tuple<int, int>> { };
+                                wayn.Add(new Tuple<int, int>(x, y));
+                                bool valid = true;
+                                bool lavaFound = false;
+                                for (int i = 0; i < 100 && !lavaFound; i++)
+                                {
+                                    List<Tuple<int, int>> wayn2 = new List<Tuple<int, int>> { };
+                                    foreach (var wp in wayn)
+                                    {
+                                        int xt = wp.Item1;
+                                        int yt = wp.Item2;
+
+                                        if (Main.tile[xt, yt].lava() && Main.tile[xt, yt].liquid == 255)
+                                        {
+                                            lavaFound = true;
+                                            break;
+                                        }
+
+                                        for (int z = -1; z < 4; z += 2)
+                                        {
+                                            int xa, ya;
+                                            if (z == 3)
+                                            {
+                                                xa = 0;
+                                                ya = -1;
+                                            }
+                                            else
+                                            {
+                                                xa = z;
+                                                ya = 0;
+                                            }
+                                            if ((!Main.tile[xt + xa, yt + ya].active() || !Main.tileSolid[(int)Main.tile[xt + xa, yt + ya].type]) && Main.tile[xt + xa, yt + ya].wall != WallID.HiveUnsafe)
+                                            {
+                                                bool contains = false;
+                                                foreach (var wa in waya) { if (wa.Item1 == xt + xa && wa.Item2 == yt + ya) contains = true; }
+                                                if (!contains)
+                                                {
+                                                    wayn2.Add(new Tuple<int, int>(xt + xa, yt + ya));
+                                                    waya.Add(new Tuple<int, int>(xt + xa, yt + ya));
+                                                }
+                                            }
+                                        }
+
+
+                                    }
+                                    wayn = wayn2;
+                                    if ( (waya.Count > 300 && wayn.Count > 300) || waya.Count > 1000  || lavaFound)
+                                    {
+                                        break;
+                                    }
+                                    else if (wayn2.Count == 0 )
+                                    {
+                                        valid = false;
+                                        break;
+                                    }
+                                }
+
+                                if (valid)
+                                {
+                                    openHives.Add(new Tuple<int, int>(x, y));
+                                    
+
+                                }
+
+                            }
+
+                            
+
+
+                        }
+
                     }
 
                     if (!tile.active())
@@ -5146,19 +5377,36 @@ namespace TheTerrariaSeedProject
                                 if (fx == 144 && fy == 0 && pathLength[sx, sy] < hasOBjectOrParam["Pathlength to Slime Staute"])
                                 {
                                     hasOBjectOrParam["Pathlength to Slime Staute"] = pathLength[sx, sy];
-                                    if (score.itemLocation.ContainsKey(ItemID.SlimeCrown))
-                                        score.itemLocation[ItemID.SlimeCrown] = new List<Tuple<int, int>> { new Tuple<int, int>(x, y) };
+                                    if (score.itemLocation.ContainsKey(ItemID.SlimeStatue))
+                                        score.itemLocation[ItemID.SlimeStatue] = new List<Tuple<int, int>> { new Tuple<int, int>(x, y) };
                                     else
-                                        score.itemLocation.Add(ItemID.SlimeCrown, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
+                                        score.itemLocation.Add(ItemID.SlimeStatue, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
                                 }
                                 else if (fx == 1800 && fy == 0 && pathLength[sx, sy] < hasOBjectOrParam["Pathlength to Shark Staute"])
                                 {
                                     hasOBjectOrParam["Pathlength to Shark Staute"] = pathLength[sx, sy];
-                                    if (score.itemLocation.ContainsKey(ItemID.Minishark))
-                                        score.itemLocation[ItemID.Minishark] = new List<Tuple<int, int>> { new Tuple<int, int>(x, y) };
+                                    if (score.itemLocation.ContainsKey(ItemID.SharkStatue))
+                                        score.itemLocation[ItemID.SharkStatue] = new List<Tuple<int, int>> { new Tuple<int, int>(x, y) };
                                     else
-                                        score.itemLocation.Add(ItemID.Minishark, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
+                                        score.itemLocation.Add(ItemID.SharkStatue, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
                                 }
+                                else if (fx == 1332 && fy == 0 && pathLength[sx, sy] < hasOBjectOrParam["Pathlength to Heart Staute"])
+                                {
+                                    hasOBjectOrParam["Pathlength to Heart Staute"] = pathLength[sx, sy];
+                                    if (score.itemLocation.ContainsKey(ItemID.HeartStatue))
+                                        score.itemLocation[ItemID.HeartStatue].Add(new Tuple<int, int>(x, y) );
+                                    else
+                                        score.itemLocation.Add(ItemID.HeartStatue, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
+                                }
+                                else if (fx == 72 && fy == 0 && pathLength[sx, sy] < hasOBjectOrParam["Pathlength to Star Staute"])
+                                {
+                                    hasOBjectOrParam["Pathlength to Star Staute"] = pathLength[sx, sy];
+                                    if (score.itemLocation.ContainsKey(ItemID.StarStatue))
+                                        score.itemLocation[ItemID.StarStatue].Add(new Tuple<int, int>(x, y));
+                                    else
+                                        score.itemLocation.Add(ItemID.StarStatue, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
+                                }
+
 
 
                                 //it counts each tile of each statue, divide by 6 to get the real number == 26 max
@@ -5483,6 +5731,66 @@ namespace TheTerrariaSeedProject
             int totalP = 0;
             foreach (var pic in paintingsCount) totalP += pic.Value / 72;
             hasOBjectOrParam["Number Paintings"] = totalP;
+
+            //open hive
+            
+            List<Tuple<int, int>> openHivesBelowLava = new List<Tuple<int, int>>();
+            if (openHives.Count > 0)
+            {
+                
+                List<Tuple<int, int>> openHivesBelowLavaTmp = new List<Tuple<int, int>>();
+                foreach (var openh in openHives)
+                {
+                    if (openh.Item2 > highestFreeLava)
+                    {
+                        
+                        bool near = false;
+                        foreach (var larve in larveInDanger)
+                        {
+                            if (Math.Abs(larve.Item1 - openh.Item1) < 110 && (larve.Item2 - openh.Item2) < 120 && (larve.Item2 - openh.Item2) > -8)
+                            {
+                                near = true;
+                                break;
+                            }
+                        }
+                        if(near)
+                            openHivesBelowLavaTmp.Add(openh);
+
+                    }
+                }
+
+                if (openHivesBelowLavaTmp.Count > 0)
+                {
+                     
+                    foreach (var openh in openHivesBelowLavaTmp)
+                    {
+                        bool nearIn = false;
+                        foreach (var fin in openHivesBelowLava)
+                        {
+                            if (Math.Abs(fin.Item1 - openh.Item1) < 15 && Math.Abs(fin.Item2 - openh.Item2) < 15)
+                            {
+                                nearIn = true;
+                                break;
+                            }
+                        }
+                        if (!nearIn)
+                        {
+                            openHivesBelowLava.Add(openh);
+                            if (score.itemLocation.ContainsKey(ItemID.HiveWall))
+                                score.itemLocation[ItemID.HiveWall].Add(openh);
+                            else
+                                score.itemLocation.Add(ItemID.HiveWall, new List<Tuple<int, int>> { openh });
+
+                        }
+
+                    }
+                    hasOBjectOrParam["Open Bee Hive below lava"] = openHivesBelowLava.Count;
+                }
+
+            }
+               
+
+
 
             //statues
 
@@ -6164,13 +6472,17 @@ namespace TheTerrariaSeedProject
 
                 hasOBjectOrParam.Add("All Paintings", hasOBjectOrParam["Number different Paintings"] > 50? 1 : 0 );
 
+                
 
                 //negative value of pathlength for postive list
                 hasOBjectOrParam["neg. Pathlength to Temple Door"] = -hasOBjectOrParam["Pathlength to Temple Door"];
                 hasOBjectOrParam["neg. Pathlength to Temple Tile"] = -hasOBjectOrParam["Pathlength to Temple Tile"];
                 hasOBjectOrParam["neg. Pathlength to Boots"] = -hasOBjectOrParam["Pathlength to Boots"];
+                hasOBjectOrParam["neg. Pathlength to Copper/Tin Bar"] = -hasOBjectOrParam["Pathlength to Copper/Tin Bar"];
                 hasOBjectOrParam["neg. Pathlength to Iron/Lead Bar"] = -hasOBjectOrParam["Pathlength to Iron/Lead Bar"];
                 hasOBjectOrParam["neg. Pathlength to 10 Iron/Lead Bar Chest"] = -hasOBjectOrParam["Pathlength to 10 Iron/Lead Bar Chest"];
+                hasOBjectOrParam["neg. Pathlength to 12 Iron/Lead Bar Chest"] = -hasOBjectOrParam["Pathlength to 12 Iron/Lead Bar Chest"];
+                hasOBjectOrParam["neg. Pathlength to Silver/Tungsten Bar"] = -hasOBjectOrParam["Pathlength to Silver/Tungsten Bar"];                
                 hasOBjectOrParam["neg. Pathlength to Gold/Platinum Bar"] = -hasOBjectOrParam["Pathlength to Gold/Platinum Bar"];                
                 hasOBjectOrParam["neg. Pathlength to Bomb"] = -hasOBjectOrParam["Pathlength to Bomb"];
                 hasOBjectOrParam["neg. Pathlength to Dynamite"] = -hasOBjectOrParam["Pathlength to Dynamite"];
@@ -6195,6 +6507,8 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["neg. Pathlength to Obsidian Skin Potion"] = -hasOBjectOrParam["Pathlength to Obsidian Skin Potion"];
                 hasOBjectOrParam["neg. Pathlength to Battle Potion"] = -hasOBjectOrParam["Pathlength to Battle Potion"];
                 hasOBjectOrParam["neg. Pathlength to Lifeforce Potion"] = -hasOBjectOrParam["Pathlength to Lifeforce Potion"];
+                hasOBjectOrParam["neg. Pathlength to Recall Potion"] = -hasOBjectOrParam["Pathlength to Recall Potion"];
+                hasOBjectOrParam["neg. Pathlength to Rope"] = -hasOBjectOrParam["Pathlength to Rope"];
 
                 
 
@@ -6206,10 +6520,13 @@ namespace TheTerrariaSeedProject
 
                 hasOBjectOrParam["neg. Pathlength to Slime Staute"] = -hasOBjectOrParam["Pathlength to Slime Staute"];
                 hasOBjectOrParam["neg. Pathlength to Shark Staute"] = -hasOBjectOrParam["Pathlength to Shark Staute"];
+                hasOBjectOrParam["neg. Pathlength to Heart Staute"] = -hasOBjectOrParam["Pathlength to Heart Staute"];
+                hasOBjectOrParam["neg. Pathlength to Star Staute"] = -hasOBjectOrParam["Pathlength to Star Staute"];
                 hasOBjectOrParam["neg. Pathlength to Anvil"] = -hasOBjectOrParam["Pathlength to Anvil"];
                 hasOBjectOrParam["neg. Pathlength to Ruby"] = -hasOBjectOrParam["Pathlength to Ruby"];
                 hasOBjectOrParam["neg. Pathlength to Cloud in a Bottle"] = -hasOBjectOrParam["Pathlength to Cloud in a Bottle"];
                 hasOBjectOrParam["neg. Pathlength to 2 Herb Bag Chest"] = -hasOBjectOrParam["Pathlength to 2 Herb Bag Chest"];
+                hasOBjectOrParam["neg. Pathlength to Grenades"] = -hasOBjectOrParam["Pathlength to Grenades"];
                 hasOBjectOrParam["neg. Pathlength to Extractinator"] = -hasOBjectOrParam["Pathlength to Extractinator"];
                 hasOBjectOrParam["neg. Pathlength to Detonator"] = -hasOBjectOrParam["Pathlength to Detonator"];
                 hasOBjectOrParam["neg. Pathlength to Explosives"] = -hasOBjectOrParam["Pathlength to Explosives"];
@@ -6227,6 +6544,11 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["neg. Pathlength to 5th underground Chest"] = -hasOBjectOrParam["Pathlength to 5th underground Chest"];
 
 
+                
+
+                hasOBjectOrParam["neg. Pathlength to Wooden Chest"] = -hasOBjectOrParam["Pathlength to Wooden Chest"]; 
+                hasOBjectOrParam["neg. Pathlength to Golden Chest"] = -hasOBjectOrParam["Pathlength to Golden Chest"]; 
+                hasOBjectOrParam["neg. Pathlength to Water Chest"] = -hasOBjectOrParam["Pathlength to Water Chest"]; 
                 hasOBjectOrParam["neg. Pathlength to Tree Chest"] = -hasOBjectOrParam["Pathlength to Tree Chest"]; 
                 hasOBjectOrParam["neg. Pathlength to Pyramid Chest"] = -hasOBjectOrParam["Pathlength to Pyramid Chest"];
                 hasOBjectOrParam["neg. Pathlength to cabin"] = -hasOBjectOrParam["Pathlength to cabin"];
@@ -7552,10 +7874,10 @@ namespace TheTerrariaSeedProject
             //191 == living wood, 78 wall, 192 leaf
             //32 = corruption thorns
             //352 = crimtane thorns
-            //fffffffffff   in Terrarai schienen die nicht solid zu sein, in Tedit jedoch wohl
+            //fffffffffff   in Terrarai maybe not solid, but they are in Tedit
 
 
-            //hier vines sind nicht solid aber schlimm wenn man nach oben geht?
+            //here vines not solid but bad if you go up there?
             //if (tile.IsActive && World.TileProperties[Main.tile[posX, posY - dist].Type].IsSolid &&
             //    Main.tile[posX, posY - dist].Type != 51 && Main.tile[posX, posY - dist].Type != 52 &&
             //        Main.tile[posX, posY - dist].Type != 62)
@@ -7739,7 +8061,7 @@ namespace TheTerrariaSeedProject
             const int BEACH_MAX_VAR = 4;
             const int BEACH_LOCAL_MAX_FAC = 2;
             const float BEACH_MAX_VAR_TOTAL_FACTOR = 10;
-            const int CHECK_ABOVE_RANGE = 52; //hatte 40, aber dungeon erkkents da nicht min 50, zu hoch? //TODO cloud tiles nicht beachten
+            const int CHECK_ABOVE_RANGE = 52; //40 before, but dungeon detection did not work there, min 50, too high? //TODO ignore cloud tiles
 
             //int bend = posX + (int)BEACH_SEARCH_RANGE;
             int bend = (int)BEACH_SEARCH_RANGE;
@@ -8123,6 +8445,7 @@ namespace TheTerrariaSeedProject
             //near objects
             tval = 0.1 * (500 - hasOBjectOrParam["Pathlength to Iron/Lead Bar"]);
             tval += hasOBjectOrParam["Pathlength to 10 Iron/Lead Bar Chest"] < 500 ? 0.1 * (500 - hasOBjectOrParam["Pathlength to 10 Iron/Lead Bar Chest"]) : 0;
+            tval += hasOBjectOrParam["Pathlength to 12 Iron/Lead Bar Chest"] < 500 ? 0.05 * (500 - hasOBjectOrParam["Pathlength to 12 Iron/Lead Bar Chest"]) : 0;
             score += tval > -10 ? tval : -10;
             allScoreText += System.Environment.NewLine + "Score Path Iron/Lead Bar " + (int)score;
 
@@ -9791,12 +10114,19 @@ namespace TheTerrariaSeedProject
                         DrawItemImage(ref rgbValues, ItemID.IronBar, point, scale);
 
                     }
+                if (score.itemLocation.ContainsKey(ItemID.MythrilBar))
+                    foreach (var point in score.itemLocation[ItemID.MythrilBar])
+                    {
+                        //12 iron chest
+                        DrawItemImage(ref rgbValues, ItemID.IronBar, point, scale);
+
+                    }
 
                 foreach (var itemloclist in score.itemLocation)
                 {
                     if (itemloclist.Key != ItemID.StoneBlock && itemloclist.Key != ItemID.JungleShirt && itemloclist.Key != ItemID.JunglePants 
                         && itemloclist.Key != ItemID.PaladinsHammer && itemloclist.Key != ItemID.Ectoplasm && itemloclist.Key != ItemID.ChaosFish
-                        && itemloclist.Key != ItemID.CobaltBar)
+                        && itemloclist.Key != ItemID.CobaltBar && itemloclist.Key != ItemID.MythrilBar)
                         foreach (var itemloc in itemloclist.Value)
                         {                          
                             DrawItemImage(ref rgbValues, itemloclist.Key, itemloc, scale);                        
