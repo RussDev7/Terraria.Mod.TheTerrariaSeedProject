@@ -721,7 +721,7 @@ namespace TheTerrariaSeedProject
 
                            
 
-                            if (((boostValue>0 && boostValueSeed >= boostValue) ||  
+                            if (((boostValue>=0 && boostValueSeed >= boostValue) ||  
                                 (boostValue < 0 && boostValueSeed > boostValueMin && boostValueSeed < boostValueMax) ||
                                 (boostValue < 0 && boostValueSeed < 1.0-boostValueMin && boostValueSeed > 1.0-boostValueMax) ) //1st cloud in mid
                                 && midtree) //the inverted boostValue can be a little smaller than original value >= --> > ?
