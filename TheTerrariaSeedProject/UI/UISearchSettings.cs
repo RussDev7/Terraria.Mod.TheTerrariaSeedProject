@@ -844,6 +844,7 @@ namespace TheTerrariaSeedProject.UI
 
                     currentConfig.ChangeValueOfSelectableText(1, Configuration.ConfigItemType.Header, OptionsDict.Phase1.pyramidsPossible, "3");
 
+
                     
                     currentConfig.ChangeValueOfSelectableText(0, Configuration.ConfigItemType.InputField, OptionsDict.Configuration.searchSeedNum, "1000");
                     currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListPositive, "Pyramid Bottle", "1");

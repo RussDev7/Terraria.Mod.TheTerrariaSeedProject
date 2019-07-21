@@ -57,7 +57,7 @@ namespace TheTerrariaSeedProject.UI
             public const string boostHeightMin = "pred. spawn height min >=";
             public const string boostHeightMax = "pred. spawn height max <=";
             public const string boostUGheightMin = "Underground layer height min >=";
-            public const string boostUGheightMax = "Underground layer height max >=";            
+            public const string boostUGheightMax = "Underground layer height max <=";            
             public const string boostRockLayerOffset = "Boost rock layer offset >=";//np
             public const string boostCavernLayeroffsetMin = "Boost cavern layer offset min(%) >=";
             public const string boostCavernLayeroffsetMax = "Boost cavern layer offset max(%) <=";//np
@@ -1743,7 +1743,7 @@ namespace TheTerrariaSeedProject.UI
 
             HelpDict.Add("Number of Living Trees", "Max number is 2 for small and medium, 5 for large worlds");
 
-            HelpDict.Add("Number of Pyramids", "Max number known is 4 for small, 5 for medium, 6 for large worlds."); //upper bound 10,16,20
+            HelpDict.Add("Number of Pyramids", "Max number known is 5 for small, 6 for medium, 7 for large worlds. But very rare."); //upper bound 10,16,20
 
 
 
