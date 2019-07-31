@@ -10231,7 +10231,7 @@ namespace TheTerrariaSeedProject
         {
 
 
-            Microsoft.Xna.Framework.Graphics.Texture2D cit = ModLoader.GetTexture("Terraria/Item_" + itemID);
+            Microsoft.Xna.Framework.Graphics.Texture2D cit = ModContent.GetTexture("Terraria/Item_" + itemID);
             
             Color[] tc = new Color[cit.Width * cit.Height];
             cit.GetData<Color>(tc);
