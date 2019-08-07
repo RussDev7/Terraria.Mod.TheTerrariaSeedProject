@@ -214,7 +214,7 @@ namespace TheTerrariaSeedProject.UI
                 "other conditions you made. \nSome rares can only be detected during phase 3. So if a seed does not fulfill the conditions in phase 1 or 2 it won’t get detected. Same for phase 2 if phase 1 not fulfilled. " +
                 "It can’t detect any rare in phase 1. \n \n>> Omit All: no rare counts, each seed need to fulfill all conditions you set up \n>> Omit bad rare: omits no ocean, Dungeon far above surface or below ground " +
                 "(except there is also a living tree reaching to it), and also omits if a floating island got no chest \n>>Omit more common rare: omits Chest duplication Glitch, Pre Skeletron Dungeon Chest Risky/Grab " +
-                "(except its a Muramasa for NE), Dungeon in Snow Biome, Near Enchanted Sword, Enchanted Sword near Tree/Pyramid, Spawn in Snow biome, Lonely jungle tree \n>>Omit bad and more common rare: combines both";
+                "(except its a Muramasa for NE), Dungeon in Snow Biome, Near Enchanted Sword, Enchanted Sword near Tree/Pyramid, Spawn in Snow biome, Lonely jungle tree, Pot duplication Glitch Single, Life Crystal duplication Glitch \n>>Omit bad and more common rare: combines both";
 
 
 
@@ -239,7 +239,7 @@ namespace TheTerrariaSeedProject.UI
                     "(v.) a Altar near spawn(A) \n" +
                     "(vi.) the number of chests near spawn \n" +
                     "9.) Fantasy score divided by 333 to scale it from 1 to 9+, if greater than 9 it shows(x), greater 10 (X), if it has less than 0 it shows(-). It can be overwritten if the map has some rare stuff, that could be: \n" +
-                    "(i.) Chest duplication Glitch(D)\n" +
+                    "(i.) Chest/Pot/ES/LifeCrystal duplication Glitch(D)\n" +
                     "(ii.) A Enchanted Sword which is very near to Spawn(#) \n" +
                     "(iii.) Spawn in Sky(Y) \n" +
                     "(iv.) "+Phase3.allChestItemsNoCraftFish+" (@) \n" +
@@ -288,7 +288,7 @@ namespace TheTerrariaSeedProject.UI
         public static readonly List<string> vDistanceShort = getPatern(0, 5, 5).Concat(getPatern(25, 9, 25).Concat(getPatern(250, 4, 50)).Concat(getPatern(500, 16, 100))).ToList();
         public static readonly List<string> vDistanceShortNeg = getPatern(0, 5, -5).Concat(getPatern(-25, 9, -25).Concat(getPatern(-250, 4, -50)).Concat(getPatern(-500, 16, -100))).ToList();
                 
-        public static readonly List<string> vDistanceShortNegTree = getPatern(100, 6, -5).Concat(getPatern(-130, 2, -10).Concat(getPatern(-150, 3, -25).Concat(getPatern(-250, 4, -50)).Concat(getPatern(-500, 16, -100)))).ToList();
+        public static readonly List<string> vDistanceShortNegTree = getPatern(-100, 6, -5).Concat(getPatern(-130, 2, -10).Concat(getPatern(-150, 3, -25).Concat(getPatern(-250, 4, -50)).Concat(getPatern(-500, 16, -100)))).ToList();
         public static readonly List<string> vDistanceLong = getPatern(200, 8, 100).Concat(getPatern(1000, 17, 200)).ToList();
         public static readonly List<string> vDistanceLongNeg = getPatern(-200, 8, -100).Concat(getPatern(-1000, 17, -200)).ToList();
         public static readonly List<string> vNumTiles = getPatern(0, 10, 10).Concat(getPatern(100, 9, 100)).Concat(getPatern(1000, 9, 1000).Concat(getPatern(10000, 9, 5000))).ToList();
@@ -1041,6 +1041,7 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Pathlength to Star Staute",
                 "neg. Pathlength to Anvil",
                 "neg. Pathlength to Ruby",
+                "neg. Pathlength to Diamond",
                 "neg. Pathlength to Cloud in a Bottle",
                 "neg. Pathlength to 2 Herb Bag Chest",
                 "neg. Pathlength to Grenades",
@@ -1067,6 +1068,7 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Pathlength to cabin",
                 "neg. Pathlength to Minecart Track",
                 "neg. Pathlength to free ShadowOrb/Heart",
+                "neg. Pathlength to Pot dupl. Glitch",
                 "neg. Pathlength to underground MarbleGranite",
                 "neg. Pathlength into cavern layer",
                 "neg. Pathlength into 40% cavern layer",
@@ -1094,7 +1096,12 @@ namespace TheTerrariaSeedProject.UI
                 "Web Covered Chest", 
                 "Shadow Chest", 
                 "Lihzahrd Chest", 
-                "Living Wood Chest", 
+                "Living Wood Chest",
+                "Chest duplication Glitch",
+                "Pot duplication Glitch",
+                "Pot duplication Glitch Single",
+                "Enchanted Sword duplication Glitch",
+                "Life Crystal duplication Glitch",
                 "Score",
                 OptionsDict.Tools.conditionConnector,
                 OptionsDict.Tools.dummyPlus
@@ -1158,6 +1165,7 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to Star Staute",
                 "Pathlength to Anvil",
                 "Pathlength to Ruby",
+                "Pathlength to Diamond",
                 "Pathlength to Cloud in a Bottle",
                 "Pathlength to 2 Herb Bag Chest",
                 "Pathlength to Grenades",
@@ -1184,6 +1192,7 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to cabin",
                 "Pathlength to Minecart Track",
                 "Pathlength to free ShadowOrb/Heart",
+                "Pathlength to Pot dupl. Glitch",
                 "Pathlength to underground MarbleGranite",
                 "Pathlength into cavern layer",
                 "Pathlength into 40% cavern layer",
@@ -1321,6 +1330,7 @@ namespace TheTerrariaSeedProject.UI
             Add("neg. Pathlength to Star Staute", vPathLengthNeg);
             Add("neg. Pathlength to Anvil", vPathLengthNeg);
             Add("neg. Pathlength to Ruby", vPathLengthNeg);
+            Add("neg. Pathlength to Diamond", vPathLengthNeg);
             Add("neg. Pathlength to Cloud in a Bottle", vPathLengthNeg);
             Add("neg. Pathlength to 2 Herb Bag Chest", vPathLengthNeg);
             Add("neg. Pathlength to Grenades", vPathLengthNeg);
@@ -1355,6 +1365,7 @@ namespace TheTerrariaSeedProject.UI
 
 
             Add("neg. Pathlength to free ShadowOrb/Heart", vPathLengthNeg);
+            Add("neg. Pathlength to Pot dupl. Glitch", vPathLengthNeg);
             Add("neg. Pathlength to underground MarbleGranite", vPathLengthNeg);
             Add("neg. Pathlength into cavern layer", vPathLengthNeg);
             Add("neg. Pathlength into 40% cavern layer", vPathLengthNeg);
@@ -1412,6 +1423,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Pathlength to Star Staute", vPathLength);
             Add("Pathlength to Anvil", vPathLength);
             Add("Pathlength to Ruby", vPathLength);
+            Add("Pathlength to Diamond", vPathLength);
             Add("Pathlength to Cloud in a Bottle", vPathLength);
             Add("Pathlength to 2 Herb Bag Chest", vPathLength);
             Add("Pathlength to Grenades", vPathLength);
@@ -1443,6 +1455,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Pathlength to Temple Door", vPathLength);
             Add("Pathlength to Temple Tile", vPathLength);
             Add("Pathlength to free ShadowOrb/Heart", vPathLength);  
+            Add("Pathlength to Pot dupl. Glitch", vPathLength);  
             Add("Pathlength to underground MarbleGranite", vPathLength);  
             Add("Pathlength into cavern layer", vPathLength);  
             Add("Pathlength into 40% cavern layer", vPathLength);  
@@ -1484,6 +1497,11 @@ namespace TheTerrariaSeedProject.UI
             Add("Shadow Chest", v0to20);
             Add("Lihzahrd Chest", v0to20);
             Add("Living Wood Chest", v0to5);
+            Add("Chest duplication Glitch", v0to5);
+            Add("Pot duplication Glitch", v0to20);
+            Add("Pot duplication Glitch Single", v0to10);
+            Add("Life Crystal duplication Glitch", v0to5);
+            Add("Enchanted Sword duplication Glitch", v0to5);
 
             Add("Score", vScore);
 
@@ -1621,7 +1639,7 @@ namespace TheTerrariaSeedProject.UI
                 "(except there is also a living tree reaching to it),\n Floating Island without chest");
 
             HelpDict.Add(GeneralOptions.omitCommonRare, "Omits \nChest duplication Glitch,\n Pre Skeletron Dungeon Chest Risky/Grab " +
-                "(except its a Muramasa (for NE) you can grab or has a near golden key you can grab),\n Dungeon in Snow Biome,\n Near Enchanted Sword,\n Enchanted Sword near Tree/Pyramid,\n Spawn in Snow biome,\n Shadow Chest item in normal chest, \n" + Phase3.lonelyJungleTree + ",\n " + Phase3.openTemple);
+                "(except its a Muramasa (for NE) you can grab or has a near golden key you can grab),\n Dungeon in Snow Biome,\n Near Enchanted Sword,\n Enchanted Sword near Tree/Pyramid,\n Spawn in Snow biome,\n Shadow Chest item in normal chest, \n" + Phase3.lonelyJungleTree + ",\n " + Phase3.openTemple + ",\n" + "Pot duplication Glitch Single"+ ",\n" + "Life Crystal duplication Glitch");
 
             HelpDict.Add(GeneralOptions.omitBaCRare, "Combines omitting bad and more common rare. Look there for me details.");
 
@@ -1978,8 +1996,16 @@ namespace TheTerrariaSeedProject.UI
             HelpDict.Add("Cavern Distance to spawn", "How many tiles downwards until start of cavern layer");
 
 
+            HelpDict.Add("Chest duplication Glitch", "This allows the player to duplicate a Chest (without content). Their minimap-picture-icon is a dynasty chest. It may not detect all of them, some might also not work. Contact me pls if you have a seed with an undetected chest.");
+            HelpDict.Add("Pot duplication Glitch Single", "This allows the player to duplicate a Pot e.g. with placing/removing a torch which also works in single player. Their minimap-picture-icon is a pot statue. Icon is shared with "+
+                "normal Pot duplication Glitch which only works at multiplayer. Those which are working for singleplayer are located directly below Demon Altar or a Chest. It may not detect all of them, some might also not work. Contact me pls if you have a seed with an undetected pot.");
+            HelpDict.Add("Pot duplication Glitch", "This allows the player to duplicate a Pot e.g. with a near (trap) door. With door only works at multiplayer. This option also contains 'Pot duplication Glitch Single' which work for singleplayer as well. Their minimap-picture-icon is a pot statue. It may not detect all of them, some might also not work. Contact me pls if you have a seed with an undetected pot.");
+            HelpDict.Add("Life Crystal duplication Glitch", "This allows the player to duplicate a Life Crystal e.g. with a near (trap) door. With door only works at multiplayer. If they are placed directly below a Demon Altar or Chest placing/removing e.g. a torch works as well (this also for single player). Their minimap-picture-icon is a Heart Lantern. It may also not detect all of them, some might also not work. Contact me pls if you have a seed with an undetected Life Crystal.");
+            HelpDict.Add("Enchanted Sword duplication Glitch", "This allows the player to duplicate an Enchanted Sword e.g. with a near (trap) door. Only works at multiplayer (afaik). Their minimap-picture-icon is an Arkhalis. It may also not detect all of them. Contact me pls if you have a seed with an undetected Enchanted Sword.");
 
-         
+
+
+
 
             HelpDict.Add("Pathlength to Temple Tile", "Smallest pathlength to a tile close to Jungle Temple");
             HelpDict.Add("Pathlength to underground MarbleGranite", "Smallest pathlength to a granite or marble biome wall located in underground or below.");
