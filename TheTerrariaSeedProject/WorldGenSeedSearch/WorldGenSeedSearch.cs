@@ -3116,6 +3116,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Pathlength to Temple Door", 1000000);
             hasOBjectOrParam.Add("Pathlength to Temple Tile", 1000000);
             hasOBjectOrParam.Add("Pathlength to free ShadowOrb/Heart", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Pot dupl. Glitch", 1000000);
             hasOBjectOrParam.Add("Pathlength to Boomstick", 1000000);
             hasOBjectOrParam.Add("Pathlength to Flower Boots", 1000000);
             hasOBjectOrParam.Add("Pathlength to Suspicious Looking Eye", 1000000);
@@ -3127,6 +3128,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Pathlength to Star Staute", 1000000);
             hasOBjectOrParam.Add("Pathlength to Anvil", 1000000);
             hasOBjectOrParam.Add("Pathlength to Ruby", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Diamond", 1000000);
             hasOBjectOrParam.Add("Pathlength to Cloud in a Bottle", 1000000);
             hasOBjectOrParam.Add("Pathlength to 2 Herb Bag Chest", 1000000);
             hasOBjectOrParam.Add("Pathlength to Grenades", 1000000);
@@ -3209,6 +3211,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("neg. Pathlength to Temple Door", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Temple Tile", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to free ShadowOrb/Heart", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Pot dupl. Glitch", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Boomstick", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Flower Boots", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Suspicious Looking Eye", -1000000);
@@ -3220,6 +3223,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("neg. Pathlength to Star Staute", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Anvil", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Ruby", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Diamond", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Cloud in a Bottle", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to 2 Herb Bag Chest", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Grenades", -1000000);
@@ -3359,6 +3363,10 @@ namespace TheTerrariaSeedProject
 
 
             hasOBjectOrParam.Add("Chest duplication Glitch", 0);
+            hasOBjectOrParam.Add("Pot duplication Glitch", 0);
+            hasOBjectOrParam.Add("Pot duplication Glitch Single", 0);
+            hasOBjectOrParam.Add("Life Crystal duplication Glitch", 0);
+            hasOBjectOrParam.Add("Enchanted Sword duplication Glitch", 0);
 
 
 
@@ -5157,7 +5165,10 @@ namespace TheTerrariaSeedProject
 
 
                             //ESS                    
-                            if ((tile.type == TileID.LargePiles2) && (tile.frameX == (short)918) && (tile.frameY == (short)0))
+                            if ((tile.type == TileID.LargePiles2) && ((tile.frameX == (short)918 || (Main.tile[x - 1, y].frameX != 918 && tile.frameX == (short)936) ) && (tile.frameY == (short)0)
+                                || (tile.frameY == (short)18 && (tile.frameX == (short)954)  && Main.tile[x - 2, y-1].frameX != (short)918 && Main.tile[x - 1, y - 1].frameX != (short)936)
+                                ) 
+                                ) // it may miss some which only partly exist, if added more also change duplication
                             {
 
                                 if (score.itemLocation.ContainsKey(ItemID.EnchantedSword))
@@ -5175,6 +5186,7 @@ namespace TheTerrariaSeedProject
 
                                 }
                                 hasOBjectOrParam["Enchanted Sword"] += 1;
+                                
 
 
                                 if (checkIfNearSpawn(x, y, 165, 100) && pathl < 330)
@@ -5218,9 +5230,104 @@ namespace TheTerrariaSeedProject
                                     hasOBjectOrParam["Pathlength to Enchanted Sword"] = pathl;
                                 }
 
+                                //able to duplicate? unkown if any seed has it
+                                {
+                                    int bx = x;
+                                    int by = y;
+
+                                    if (tile.frameX == (short)936) bx--;
+                                    if (tile.frameX == (short)954) { bx -= 2; by--; }
+
+                                    int invalid = 0;
+                                    for (int bxi = bx; bxi < bx + 3; bxi++)
+                                    {
+                                        for (int byi = by; byi < by + 2; byi++)
+                                            if (!Main.tile[bxi, byi].active() ||  Main.tile[bxi, byi].type != TileID.LargePiles2 || Main.tile[bxi,byi].frameX != 918+(bxi-bx)*18 || Main.tile[bxi, byi].frameY != (byi - by) * 18)
+                                                invalid++;
+                                        if (!Main.tile[bxi, by+2].active() || (Main.tile[bxi, by + 2].active() && (Main.tile[bxi, by + 2].type == TileID.ClosedDoor || Main.tile[bxi, by + 2].type == TileID.Cobweb || Main.tile[bxi, by + 2].slope()>0 )))
+                                            invalid++;
+                                    }
+                                    if (invalid > 0)
+                                    {
+                                        hasOBjectOrParam["Enchanted Sword duplication Glitch"] += 1;
+                                        if (score.itemLocation.ContainsKey(ItemID.Arkhalis))
+                                            score.itemLocation[ItemID.Arkhalis].Add(new Tuple<int, int>(x, y));
+                                        else
+                                            score.itemLocation.Add(ItemID.Arkhalis, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
+
+                                    }
+
+
+                                }
 
 
 
+
+                            }
+
+                            //pot duplication
+                            if(tile.type == TileID.Pots)
+                            {
+                                bool m36x = tile.frameX % 36 == 0;
+                                bool m36y = tile.frameY % 36 == 0;
+
+                                int bx = x;
+                                int by = y;
+                                int bfx = tile.frameX;
+                                int bfy = tile.frameY;
+                                //dont account overlapping pots
+                                // (Main.tile[x - 1, y].type != TileID.Pots || Main.tile[x - 1, y].frameX%36 == 0 )
+                                if (!m36x) { bx--; bfx -= 18; }
+                                if (!m36y) { by--; bfy -= 18; }
+                                                              
+
+                                int invalid = 0;
+                                int invalidSingle = 0;
+                                int[] invalidTile = new int[4];
+                                
+                                for (int bxi = bx; bxi < bx + 2; bxi++)
+                                {
+                                    for (int byi = by; byi < by + 2; byi++)
+                                    {                                        
+                                        if (!Main.tile[bxi, byi].active() || Main.tile[bxi, byi].type != TileID.Pots || Main.tile[bxi, byi].frameX != bfx + (bxi - bx) * 18 || Main.tile[bxi, byi].frameY != bfy + (byi - by) * 18)
+                                        {                                            
+                                            invalidTile[(bxi - bx) * 2 + byi - by] = 1;
+                                        }
+                                    }
+                                    if (!Main.tile[bxi, by + 2].active() || (Main.tile[bxi, by + 2].active() && (Main.tile[bxi, by + 2].type == TileID.ClosedDoor || Main.tile[bxi, by + 2].type == TileID.Cobweb || Main.tile[bxi, by + 2].slope() > 0)))
+                                        invalid++;
+                                    if ((Main.tile[bxi, by - 1].type == TileID.DemonAltar || Main.tile[bxi, by - 1].type == TileID.Containers))
+                                        invalidSingle++;
+
+                                }
+                                invalid += invalidTile[0] + invalidTile[1] + invalidTile[2] + invalidTile[3] + invalidSingle;
+
+
+                                // only count once, 00 10 01 11
+                                int countIt = 1;
+                                if (!m36x && !m36y && (invalidTile[0] != 1 || invalidTile[1] != 1 || invalidTile[2] != 1)) { invalid = 0; countIt = 0; }
+                                else if (m36x && !m36y && (invalidTile[0] != 1 || invalidTile[2] != 1)) { invalid = 0; ; countIt = 0; }
+                                else if (!m36x && m36y && (invalidTile[0] != 1)) { invalid = 0; ; countIt = 0; }
+
+
+
+                                if (invalid > 0)
+                                {
+                                    
+                                    hasOBjectOrParam["Pot duplication Glitch"] += 1;
+                                    if(invalidSingle>0)
+                                        hasOBjectOrParam["Pot duplication Glitch Single"] += 1;
+
+                                    int pathl = FindShortestPathInRange(ref pathLength, x, y, 3, 3, 3, 3);
+                                    if (pathl < hasOBjectOrParam["Pathlength to Pot dupl. Glitch"])
+                                        hasOBjectOrParam["Pathlength to Pot dupl. Glitch"] = pathl;
+
+                                    if (score.itemLocation.ContainsKey(ItemID.PotStatue))
+                                        score.itemLocation[ItemID.PotStatue].Add(new Tuple<int, int>(x, y));
+                                    else
+                                        score.itemLocation.Add(ItemID.PotStatue, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
+
+                                }
                             }
 
                             //cabin finder
@@ -5635,30 +5742,113 @@ namespace TheTerrariaSeedProject
                                         score.itemLocation.Add(ItemID.IronAnvil, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
                                 }
                             }
-                            else if(Main.tile[x, y].type == TileID.Heart && Main.tile[x, y].frameX == 0 && Main.tile[x, y].frameY == 0)
+                            else if(Main.tile[x, y].type == TileID.Heart )
                             {
-                                int pathl = FindShortestPathInRange(ref pathLength, x, y, 2, 3, 2, 3);
+                                
+                                //check for duplication
+                                bool m36x = tile.frameX % 36 == 0;
+                                bool m36y = tile.frameY % 36 == 0;
 
-                                if (pathl < hasOBjectOrParam["Pathlength to Crystal Heart"])
+                                int bx = x;
+                                int by = y;
+                                int bfx = tile.frameX;
+                                int bfy = tile.frameY;
+                                //dont account all overlapping
+                                
+                                if (!m36x) { bx--; bfx -= 18; }
+                                if (!m36y) { by--; bfy -= 18; }
+
+                                int invalid = 0;
+                                int invalidSingle = 0;
+                                int[] invalidTile = new int[4];
+
+                                for (int bxi = bx; bxi < bx + 2; bxi++)
                                 {
-                                    hasOBjectOrParam["Pathlength to 2nd Crystal Heart"] = hasOBjectOrParam["Pathlength to Crystal Heart"];
-                                    hasOBjectOrParam["Pathlength to Crystal Heart"] = pathl;
+                                    for (int byi = by; byi < by + 2; byi++)
+                                    {
+                                        if (!Main.tile[bxi, byi].active() || Main.tile[bxi, byi].type != TileID.Heart || Main.tile[bxi, byi].frameX != bfx + (bxi - bx) * 18 || Main.tile[bxi, byi].frameY != bfy + (byi - by) * 18)
+                                        {
+                                            invalidTile[(bxi - bx) * 2 + byi - by] = 1;
+                                        }
+                                    }
+                                    if (!Main.tile[bxi, by + 2].active() || (Main.tile[bxi, by + 2].active() && (Main.tile[bxi, by + 2].type == TileID.ClosedDoor || Main.tile[bxi, by + 2].type == TileID.Cobweb || Main.tile[bxi, by + 2].slope() > 0)))
+                                        invalid++;
+                                    if ((Main.tile[bxi, by - 1].type == TileID.DemonAltar || Main.tile[bxi, by - 1].type == TileID.Containers))
+                                        invalidSingle++;
+
                                 }
-                                else if (pathl < hasOBjectOrParam["Pathlength to 2nd Crystal Heart"])
+                                invalid += invalidTile[0] + invalidTile[1] + invalidTile[2] + invalidTile[3] + invalidSingle;
+
+
+                                // only count once, 00 10 01 11
+                                int countIt = 1;
+                                if (!m36x && !m36y && (invalidTile[0] != 1 || invalidTile[1] != 1 || invalidTile[2] != 1)) { invalid = 0; countIt = 0; }
+                                else if (m36x && !m36y && (invalidTile[0] != 1 || invalidTile[2] != 1)) { invalid = 0; ; countIt = 0; }
+                                else if (!m36x && m36y && (invalidTile[0] != 1)) { invalid = 0; ; countIt = 0; }
+
+
+                                if (invalid > 0)
+                                {
+                                    hasOBjectOrParam["Life Crystal duplication Glitch"] += 1;
+                                    if (score.itemLocation.ContainsKey(ItemID.HeartLantern))
+                                        score.itemLocation[ItemID.HeartLantern].Add(new Tuple<int, int>(x, y));
+                                    else
+                                        score.itemLocation.Add(ItemID.HeartLantern, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
+
+                                }
+
+                                if (countIt == 1)
                                 {
 
-                                    hasOBjectOrParam["Pathlength to 2nd Crystal Heart"] = pathl;
+                                    int pathl = FindShortestPathInRange(ref pathLength, x, y, 2, 3, 2, 3);
+
+                                    if (pathl < hasOBjectOrParam["Pathlength to Crystal Heart"])
+                                    {
+                                        hasOBjectOrParam["Pathlength to 2nd Crystal Heart"] = hasOBjectOrParam["Pathlength to Crystal Heart"];
+                                        hasOBjectOrParam["Pathlength to Crystal Heart"] = pathl;
+                                    }
+                                    else if (pathl < hasOBjectOrParam["Pathlength to 2nd Crystal Heart"])
+                                    {
+
+                                        hasOBjectOrParam["Pathlength to 2nd Crystal Heart"] = pathl;
+                                    }
                                 }
+
+
 
                             }
-                            else if (Main.tile[x, y].active() && Main.tile[x, y].type == TileID.Ruby || (Main.tile[x, y].type == TileID.ExposedGems && Main.tile[x, y].frameX == 72))
+                            else if (Main.tile[x, y].active() && Main.tile[x, y].type == TileID.Ruby || (Main.tile[x, y].type == TileID.ExposedGems && Main.tile[x, y].frameX == 72) || (Main.tile[x, y].type == TileID.SmallPiles && Main.tile[x, y].frameX == 828 && Main.tile[x, y].frameY == 18))
                             {
                                 int pathl = FindShortestPathInRange(ref pathLength, x, y, 2, 2, 2, 2);
 
                                 if (pathl < hasOBjectOrParam["Pathlength to Ruby"])
+                                {
                                     hasOBjectOrParam["Pathlength to Ruby"] = pathl;
+                                    if (score.itemLocation.ContainsKey(ItemID.Ruby))
+                                        score.itemLocation[ItemID.Ruby] = new List<Tuple<int, int>> { new Tuple<int, int>(x, y) };
+                                    else
+                                        score.itemLocation.Add(ItemID.Ruby, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
+
+
+                                }
 
                             }
+                            else if (Main.tile[x, y].active() && Main.tile[x, y].type == TileID.Diamond || (Main.tile[x, y].type == TileID.ExposedGems && Main.tile[x, y].frameX == 90) || (Main.tile[x, y].type == TileID.SmallPiles && Main.tile[x, y].frameX == 864 && Main.tile[x, y].frameY == 18) )
+                            {
+                                int pathl = FindShortestPathInRange(ref pathLength, x, y, 2, 2, 2, 2);
+
+                                if (pathl < hasOBjectOrParam["Pathlength to Diamond"])
+                                {
+                                    hasOBjectOrParam["Pathlength to Diamond"] = pathl;
+                                    if (score.itemLocation.ContainsKey(ItemID.Diamond))
+                                        score.itemLocation[ItemID.Diamond] = new List<Tuple<int, int>> { new Tuple<int, int>(x, y) };
+                                    else
+                                        score.itemLocation.Add(ItemID.Diamond, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
+                                }
+
+                            }
+
+
                             else if (Main.tile[x, y].type == TileID.Extractinator && Main.tile[x, y].frameX == 0 && Main.tile[x, y].frameY == 0)
                             {
                                 int pathl = FindShortestPathInRange(ref pathLength, x, y, 2, 4, 2, 4);
@@ -6524,6 +6714,7 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["neg. Pathlength to Star Staute"] = -hasOBjectOrParam["Pathlength to Star Staute"];
                 hasOBjectOrParam["neg. Pathlength to Anvil"] = -hasOBjectOrParam["Pathlength to Anvil"];
                 hasOBjectOrParam["neg. Pathlength to Ruby"] = -hasOBjectOrParam["Pathlength to Ruby"];
+                hasOBjectOrParam["neg. Pathlength to Diamond"] = -hasOBjectOrParam["Pathlength to Diamond"];
                 hasOBjectOrParam["neg. Pathlength to Cloud in a Bottle"] = -hasOBjectOrParam["Pathlength to Cloud in a Bottle"];
                 hasOBjectOrParam["neg. Pathlength to 2 Herb Bag Chest"] = -hasOBjectOrParam["Pathlength to 2 Herb Bag Chest"];
                 hasOBjectOrParam["neg. Pathlength to Grenades"] = -hasOBjectOrParam["Pathlength to Grenades"];
@@ -6555,6 +6746,7 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["neg. Pathlength to Minecart Track"] = -hasOBjectOrParam["Pathlength to Minecart Track"];
 
                 hasOBjectOrParam["neg. Pathlength to free ShadowOrb/Heart"] = -hasOBjectOrParam["Pathlength to free ShadowOrb/Heart"];
+                hasOBjectOrParam["neg. Pathlength to Pot dupl. Glitch"] = -hasOBjectOrParam["Pathlength to Pot dupl. Glitch"];
                 hasOBjectOrParam["neg. Pathlength to underground MarbleGranite"] = -hasOBjectOrParam["Pathlength to underground MarbleGranite"];
                 hasOBjectOrParam["neg. Pathlength into cavern layer"] = -hasOBjectOrParam["Pathlength into cavern layer"];
                 hasOBjectOrParam["neg. Pathlength into 40% cavern layer"] = -hasOBjectOrParam["Pathlength into 40% cavern layer"];
@@ -8468,8 +8660,9 @@ namespace TheTerrariaSeedProject
             allScoreText += System.Environment.NewLine + "Score Path Dynamite " + (int)score;
 
             tval = 0.02 * (1000 - hasOBjectOrParam["Pathlength to Ruby"]);
+            tval = 0.05 * (1000 - hasOBjectOrParam["Pathlength to Diamond"]);
             score += tval > -10 ? tval : -10;
-            allScoreText += System.Environment.NewLine + "Score Path Ruby " + (int)score;
+            allScoreText += System.Environment.NewLine + "Score Path Ruby/Diamond " + (int)score;
 
             tval = 0.02 * (600 - hasOBjectOrParam["Pathlength to Jester's Arrow"]);
             score += tval > -3 ? tval : -3;
@@ -8623,8 +8816,25 @@ namespace TheTerrariaSeedProject
 
             if (hasOBjectOrParam["Chest duplication Glitch"] > 0)
             {
-                score += hasOBjectOrParam["Chest duplication Glitch"] > 0 ? 120 * hasOBjectOrParam["Chest duplication Glitch"] : 0;
+                score += hasOBjectOrParam["Chest duplication Glitch"] > 0 ? 80 * hasOBjectOrParam["Chest duplication Glitch"] : 0;
                 allScoreText += System.Environment.NewLine + "Score Chest duplication Glitch " + (int)score;
+            }
+            if (hasOBjectOrParam["Pot duplication Glitch"] > 0)
+            {
+                score += hasOBjectOrParam["Pot duplication Glitch"] > 0 ? 10 * hasOBjectOrParam["Pot duplication Glitch"] : 0;
+                score += hasOBjectOrParam["Pot duplication Glitch Single"] > 0 ? 90 * hasOBjectOrParam["Pot duplication Glitch Single"] : 0;
+                score += hasOBjectOrParam["Pathlength to Pot dupl. Glitch"] < 1000 ? (1000-hasOBjectOrParam["Pathlength to Pot dupl. Glitch"])/10 : 0;
+                allScoreText += System.Environment.NewLine + "Score Pot duplication Glitch " + (int)score;
+            }
+            if (hasOBjectOrParam["Life Crystal duplication Glitch"] > 0)
+            {
+                score += hasOBjectOrParam["Life Crystal duplication Glitch"] > 0 ? 120 * hasOBjectOrParam["Life Crystal duplication Glitch"] : 0;                
+                allScoreText += System.Environment.NewLine + "Score Life Crystal duplication Glitch " + (int)score;
+            }
+            if (hasOBjectOrParam["Enchanted Sword duplication Glitch"] > 0)
+            {
+                score += hasOBjectOrParam["Enchanted Sword duplication Glitch"] > 0 ? 250 * hasOBjectOrParam["Enchanted Sword duplication Glitch"] : 0;
+                allScoreText += System.Environment.NewLine + "Score Enchanted Sword duplication Glitch " + (int)score;
             }
 
             if (hasOBjectOrParam[OptionsDict.Phase3.allChestItemsNoCraftFish] > 0)
@@ -9010,7 +9220,7 @@ namespace TheTerrariaSeedProject
             int allscore = ((int)(((float)(score.score)) / 333.0 + 0.5));
             nextDigit = allscore < 10 ? allscore.ToString() : (allscore < 11 ? "x" : "X");
             nextDigit = allscore < 0 ? "-" : nextDigit;
-            if (hasOBjectOrParam["Chest duplication Glitch"] > 0) nextDigit = "D";
+            if (hasOBjectOrParam["Chest duplication Glitch"] > 0 || hasOBjectOrParam["Pot duplication Glitch"] > 0 || hasOBjectOrParam["Life Crystal duplication Glitch"] > 0 || hasOBjectOrParam["Enchanted Sword duplication Glitch"] > 0) nextDigit = "D";
             else if (hasOBjectOrParam["Very Near Enchanted Sword"] > 0) nextDigit = "#";
             else if (hasOBjectOrParam["Spawn in Sky"] > 0) nextDigit = "Y";
             else if (hasOBjectOrParam[OptionsDict.Phase3.allChestItemsNoCraftFish] > 0) nextDigit = "@";
@@ -9039,6 +9249,9 @@ namespace TheTerrariaSeedProject
             if (hasOBjectOrParam["Pre Skeletron Dungeon Chest Grab"] > 0) strares += "_" + "DungeonPreSkelChestGrab";
 
             if (hasOBjectOrParam["Chest duplication Glitch"] > 0) strares += "_" + "ChestDuplGlitch";
+            if (hasOBjectOrParam["Pot duplication Glitch Single"] > 0) strares += "_" + "PotDuplGlitchSi";
+            if (hasOBjectOrParam["Life Crystal duplication Glitch"] > 0) strares += "_" + "LifeCryDuplGlitch";
+            if (hasOBjectOrParam["Enchanted Sword duplication Glitch"] > 0) strares += "_" + "ESDuplGlitch";
             if (hasOBjectOrParam["Near Enchanted Sword near Tree"] > 0) strares += "_" + "NearESnearTree";
             if (hasOBjectOrParam["Near Enchanted Sword near Pyramid"] > 0) strares += "_" + "NearESnearPyramid";
             if (hasOBjectOrParam["Near Enchanted Sword"] - hasOBjectOrParam["Very Near Enchanted Sword"] > 0 
@@ -9198,6 +9411,8 @@ namespace TheTerrariaSeedProject
                         rares += checkAdd(OptionsDict.Phase3.lonelyJungleTree);
                         rares += checkAdd(OptionsDict.Phase3.openTemple);
                         rares += checkAdd("Shadow Chest item in normal chest");
+                        rares += checkAdd("Pot duplication Glitch Single");
+                        rares += checkAdd("Life Crystal duplication Glitch");
                     }
 
                     if (!omitRare.Contains(OptionsDict.GeneralOptions.omitBadRare) && !omitRare.Contains(OptionsDict.GeneralOptions.omitBaCRare))
@@ -9216,6 +9431,8 @@ namespace TheTerrariaSeedProject
                     rares += checkAdd(OptionsDict.Phase3.frozenTemple);                    
                     rares += checkAdd("Minecart Track close to spawn");                    
                     rares += checkAdd("ExplosiveDetonator close to spawn");                    
+                    rares += checkAdd("Enchanted Sword duplication Glitch");                    
+                                     
                     
 
                     rares += checkAdd("Spawn in Marble or Granite biome");
@@ -9999,6 +10216,7 @@ namespace TheTerrariaSeedProject
             List<Tuple<int,int>> hearts = new List<Tuple<int, int>>();
             List<Tuple<int, int>> demonAltars = new List<Tuple<int, int>>();
             List<Tuple<int, int>> rubies = new List<Tuple<int, int>>();
+            List<Tuple<int, int>> diamonds = new List<Tuple<int, int>>();
             List<Tuple<int, int>> explosive = new List<Tuple<int, int>>();
 
 
@@ -10018,8 +10236,10 @@ namespace TheTerrariaSeedProject
                             (Main.tile[x, y].frameX == 72 && Main.tile[x, y].wall != WallID.CrimstoneUnsafe && Main.tile[x, y].wall != WallID.CrimsonGrassUnsafe && Main.tile[x, y + 2].type != TileID.Crimstone && Main.tile[x - 1, y + 2].type != TileID.Crimstone && Main.tile[x + 1, y + 2].type != TileID.Crimstone)
                             ))
                             demonAltars.Add(new Tuple<int, int>(x, y));
-                        else if (Main.tile[x, y].active() && Main.tile[x, y].type == TileID.Ruby || (Main.tile[x, y].type == TileID.ExposedGems && Main.tile[x, y].frameX == 72))
+                        else if (Main.tile[x, y].active() && Main.tile[x, y].type == TileID.Ruby || (Main.tile[x, y].type == TileID.ExposedGems && Main.tile[x, y].frameX == 72) || (Main.tile[x, y].type == TileID.SmallPiles && Main.tile[x, y].frameX == 828 && Main.tile[x, y].frameY == 18) )
                             rubies.Add(new Tuple<int, int>(x, y));
+                        else if (Main.tile[x, y].active() && Main.tile[x, y].type == TileID.Diamond || (Main.tile[x, y].type == TileID.ExposedGems && Main.tile[x, y].frameX == 90) || (Main.tile[x, y].type == TileID.SmallPiles && Main.tile[x, y].frameX == 864 && Main.tile[x, y].frameY == 18))
+                            diamonds.Add(new Tuple<int, int>(x, y));
                         else if (Main.tile[x, y].active() && Main.tile[x, y].type == TileID.Explosives)
                             explosive.Add(new Tuple<int, int>(x, y));
                     }
@@ -10157,6 +10377,14 @@ namespace TheTerrariaSeedProject
                     if(Main.chest[ci] != null && Main.chest[ci].x > Main.offLimitBorderTiles && Main.chest[ci].y > Main.offLimitBorderTiles && Main.chest[ci].x < Main.maxTilesX-Main.offLimitBorderTiles)
                         DrawCircle(ref rgbValues, new Tuple<int,int>(Main.chest[ci].x, Main.chest[ci].y), scale, new Color(245, 228, 24));
                 }
+                foreach (var diamond in diamonds)
+                {
+                    DrawCircle(ref rgbValues, diamond, scale, new Color(200, 200, 200), 5);
+                }
+                foreach (var diamond in diamonds)
+                {
+                    DrawCircle(ref rgbValues, diamond, scale, new Color(230, 230, 230), 3);
+                }
                 foreach (var ruby in rubies)
                 {
                     DrawCircle(ref rgbValues, ruby, scale, new Color(255, 0, 180), 5);                    
@@ -10251,12 +10479,12 @@ namespace TheTerrariaSeedProject
                 //if (rgbValues[offt + 0] != (byte)255 || rgbValues[offt + 1] != (byte)255 || rgbValues[offt + 2] != (byte)255)
 
                 if (offt + 3 > maxoff)
-                    continue;
+                    return;// changed from continue ??? bug maybe here possible
 
                 if (rgbValues[offt + 3] != (byte)254)
                     break;
                 else
-                    y += iconbgs-1;
+                    y += 1;//iconbgs-1;
                 
             }
 
@@ -10268,12 +10496,12 @@ namespace TheTerrariaSeedProject
                     //if (rgbValues[offt + 0] != (byte)255 || rgbValues[offt + 1] != (byte)255 || rgbValues[offt + 2] != (byte)255)
 
                     if (offt + 3 > maxoff)
-                        continue;
+                        return;// changed from continue ??? bug maybe here possible
 
                     if (rgbValues[offt + 3] != (byte)254)
                         break;
                     else
-                        x += iconbgs - 1;
+                        x += 1;//iconbgs - 1;
 
                 }
             }
