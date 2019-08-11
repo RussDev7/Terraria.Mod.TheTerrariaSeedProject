@@ -47,6 +47,9 @@ namespace TheTerrariaSeedProject
 
     public class WorldGenSeedSearch : ModWorld
     {
+
+
+
         public const bool isPubRel = true;
 
         public int stage = 0;
@@ -973,7 +976,7 @@ namespace TheTerrariaSeedProject
                             {
                                 bool valid = true; // !tryAgain && runs < 2, legacy
                                 createMapName(score, valid, currentConfiguration, worldName);
-
+                                                               
                                 WorldFile.saveWorld(false, true);//Main.ActiveWorldFileData.IsCloudSave = false
 
                                 bool generated = true;
@@ -3048,6 +3051,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Distance Tree Chest to mid", 100000);
 
             hasOBjectOrParam.Add("Lake near mid (guess)", 0);
+            hasOBjectOrParam.Add("Water / Duck Score (guess)", 0);
 
             hasOBjectOrParam.Add("Water Bolt before Skeletron", 0);
             hasOBjectOrParam.Add("Water Bolt", 0);
@@ -3117,6 +3121,10 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Pathlength to Temple Tile", 1000000);
             hasOBjectOrParam.Add("Pathlength to free ShadowOrb/Heart", 1000000);
             hasOBjectOrParam.Add("Pathlength to Pot dupl. Glitch", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Pot dupl. Glitch Single", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Life Crystal dupl. Glitch", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Life Crystal dupl. Glitch Single", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Floating dupl. Glitch structure", 1000000);
             hasOBjectOrParam.Add("Pathlength to Boomstick", 1000000);
             hasOBjectOrParam.Add("Pathlength to Flower Boots", 1000000);
             hasOBjectOrParam.Add("Pathlength to Suspicious Looking Eye", 1000000);
@@ -3211,7 +3219,10 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("neg. Pathlength to Temple Door", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Temple Tile", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to free ShadowOrb/Heart", -1000000);
-            hasOBjectOrParam.Add("neg. Pathlength to Pot dupl. Glitch", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Pot dupl. Glitch Single", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Life Crystal dupl. Glitch", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Life Crystal dupl. Glitch Single", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Floating dupl. Glitch structure", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Boomstick", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Flower Boots", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Suspicious Looking Eye", -1000000);
@@ -3365,8 +3376,12 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Chest duplication Glitch", 0);
             hasOBjectOrParam.Add("Pot duplication Glitch", 0);
             hasOBjectOrParam.Add("Pot duplication Glitch Single", 0);
+            hasOBjectOrParam.Add("Pot duplication Glitch Single Cavern", 0);
             hasOBjectOrParam.Add("Life Crystal duplication Glitch", 0);
+            hasOBjectOrParam.Add("Life Crystal duplication Glitch Single", 0);
             hasOBjectOrParam.Add("Enchanted Sword duplication Glitch", 0);
+            hasOBjectOrParam.Add("Floating duplication Glitch structure", 0);
+            hasOBjectOrParam.Add("Game breaker", 0);
 
 
 
@@ -4446,6 +4461,8 @@ namespace TheTerrariaSeedProject
 
             int liqf = 0;
             int liqt = 0;
+
+            int[] waterDuckSpawn = new int[601];
                         
 
             //todo: no border
@@ -4632,6 +4649,54 @@ namespace TheTerrariaSeedProject
 
                         }
 
+
+                        if ( y < Main.worldSurface && y > 150 && x > Main.maxTilesX / 2 - 300 && x < Main.maxTilesX / 2 + 300 && waterDuckSpawn[x - Main.maxTilesX / 2 + 300] == 0 && Main.tile[x, y].liquid > 0 && Main.tile[x, y - 1].liquid > 0)
+                        {
+                            
+                            bool duckCanSpawn = false;
+                            int yi = y - 2;
+                            for (; yi > y - 50; yi--)
+                            {
+                                if (Main.tile[x, yi].liquid == 0 && !WorldGen.SolidTile(x, yi) && !WorldGen.SolidTile(x, yi + 1) && !WorldGen.SolidTile(x, yi + 2))
+                                {
+                                    duckCanSpawn = true;
+                                    break;
+                                }
+                            }
+                            if (duckCanSpawn)
+                            {
+                                
+                                int badTiles = 0;
+                                for (int dd = yi; dd > yi - 6; dd--)
+                                {
+                                    //dummy to avoid below surface
+                                    if (Main.tile[x, dd].wall != 0 || WorldGen.SolidTile(x, dd))
+                                        badTiles++;
+                                }
+                                if (badTiles > 1)
+                                    duckCanSpawn = false;
+                                if (duckCanSpawn)
+                                {
+
+                                    int count = 0;
+                                    int maxv = Math.Min((int)Main.worldSurface, yi + 50);
+                                    badTiles = 0;
+                                    for (; yi < maxv; yi++)
+                                    {
+                                        if (Main.tile[x, yi - 1].liquid > 0 && Main.tile[x, yi - 2].liquid > 0)
+                                            count++;
+                                        if (Main.tile[x, yi].wall != 0)
+                                            badTiles++;
+                                        if (WorldGen.SolidTile(x, yi) || Main.tile[x, yi].liquid == 0)
+                                            badTiles += 2;
+                                        if (badTiles > 6)
+                                            break;
+                                    }
+                                    waterDuckSpawn[x - Main.maxTilesX / 2 + 300] = count;
+                                }
+                            }
+                        }
+
                     }
 
                     if (!tile.active())
@@ -4651,26 +4716,51 @@ namespace TheTerrariaSeedProject
                         }
 
                         //find lake close to spawn (guessing)
-                        if (tile.wall == 0 && tile.liquid == 255 && y < Main.worldSurface && x > liqt && x< 2*Main.maxTilesX/2-liqf && x > 500 && x < Main.maxTilesX-500)
+                        if (tile.wall == 0 && y < Main.worldSurface )
                         {
-                            int size = 0;
-                            int xl = x;
-                            int yl = y;
-                            while(Main.tile[xl,yl].liquid == 255 && xl<Main.maxTilesX-500)
+                            
+                            if (tile.liquid == 255 && x > liqt && x < 2 * Main.maxTilesX / 2 - liqf && x > 500 && x < Main.maxTilesX - 500)
                             {
-                                int yli = yl;
-                                while (Main.tile[xl, yli++].liquid == 255 && yli<Main.rockLayer)  size++;
-                                xl++;
-                            }
-                            if(size > 200 )
-                            {
-                                liqf = x;
-                                liqt = xl;
+                                int size = 0;
+                                int xl = x;
+                                int yl = y;
+                                while (Main.tile[xl, yl].liquid == 255 && xl < Main.maxTilesX - 500)
+                                {
+                                    int yli = yl;
+                                    while (Main.tile[xl, yli++].liquid == 255 && yli < Main.rockLayer) size++;
+                                    xl++;
+                                }
+                                if (size > 200)
+                                {
+                                    liqf = x;
+                                    liqt = xl;
+                                }
                             }
 
                         }
 
-                        
+                        if (doFull)
+                        {
+                            //Floating duplication Glitch structure
+                            if (Main.tile[x, y - 1].active() && (Main.tile[x, y - 1].type == TileID.Containers || Main.tile[x, y - 1].type == TileID.DemonAltar))
+                            {
+
+                                int pathl = FindShortestPathInRange(ref pathLength, x, y, 3, 3, 4, 4);
+                                
+                                if (pathl < hasOBjectOrParam["Pathlength to Floating dupl. Glitch structure"])
+                                {
+                                    hasOBjectOrParam["Pathlength to Floating dupl. Glitch structure"] = pathl;
+                                }
+
+
+
+                                hasOBjectOrParam["Floating duplication Glitch structure"] += 1;
+                                if (score.itemLocation.ContainsKey(ItemID.Glass))
+                                    score.itemLocation[ItemID.Glass].Add(new Tuple<int, int>(x, y));
+                                else
+                                    score.itemLocation.Add(ItemID.Glass, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
+                            }
+                        }
 
                     }
                     else
@@ -5284,6 +5374,7 @@ namespace TheTerrariaSeedProject
                                 int invalid = 0;
                                 int invalidSingle = 0;
                                 int[] invalidTile = new int[4];
+                                int gameBreaker = 0;
                                 
                                 for (int bxi = bx; bxi < bx + 2; bxi++)
                                 {
@@ -5296,8 +5387,13 @@ namespace TheTerrariaSeedProject
                                     }
                                     if (!Main.tile[bxi, by + 2].active() || (Main.tile[bxi, by + 2].active() && (Main.tile[bxi, by + 2].type == TileID.ClosedDoor || Main.tile[bxi, by + 2].type == TileID.Cobweb || Main.tile[bxi, by + 2].slope() > 0)))
                                         invalid++;
-                                    if ((Main.tile[bxi, by - 1].type == TileID.DemonAltar || Main.tile[bxi, by - 1].type == TileID.Containers))
+                                    if ((!Main.tile[bxi, by].active() || Main.tile[bxi, by].type == TileID.Pots) && Main.tile[bxi, by - 1].active() && (Main.tile[bxi, by - 1].type == TileID.DemonAltar || Main.tile[bxi, by - 1].type == TileID.Containers))
                                         invalidSingle++;
+                                    if ( (Main.tile[bxi, by+2].active() && Main.tile[bxi, by + 2].type == TileID.ClosedDoor && Main.tile[bxi, by + 3].active() && Main.tile[bxi, by + 3].type == TileID.ClosedDoor && ( (Main.tile[bxi, by + 4].active() && Main.tile[bxi, by + 4].type != TileID.ClosedDoor) || !Main.tile[bxi, by + 4].active()) ) ||
+                                         (Main.tile[bxi, by - 1].active() && Main.tile[bxi, by - 1].type == TileID.ClosedDoor && Main.tile[bxi, by - 2].active() && Main.tile[bxi, by - 2].type == TileID.ClosedDoor && ((Main.tile[bxi, by - 3].active() && Main.tile[bxi, by - 3].type != TileID.ClosedDoor) || !Main.tile[bxi, by - 3].active())) ||
+                                         (Main.tile[bxi, by - 1].active() && Main.tile[bxi, by - 1].type == TileID.ClosedDoor && ((Main.tile[bxi, by - 2].active() && Main.tile[bxi, by - 2].type != TileID.ClosedDoor) || !Main.tile[bxi, by - 2].active())) 
+                                        )
+                                        gameBreaker++;
 
                                 }
                                 invalid += invalidTile[0] + invalidTile[1] + invalidTile[2] + invalidTile[3] + invalidSingle;
@@ -5309,7 +5405,15 @@ namespace TheTerrariaSeedProject
                                 else if (m36x && !m36y && (invalidTile[0] != 1 || invalidTile[2] != 1)) { invalid = 0; ; countIt = 0; }
                                 else if (!m36x && m36y && (invalidTile[0] != 1)) { invalid = 0; ; countIt = 0; }
 
+                                if (gameBreaker > 0)
+                                {
+                                    hasOBjectOrParam["Game breaker"] += 1;
+                                    if (score.itemLocation.ContainsKey(ItemID.AvengerEmblem))
+                                        score.itemLocation[ItemID.AvengerEmblem].Add(new Tuple<int, int>(x, y));
+                                    else
+                                        score.itemLocation.Add(ItemID.AvengerEmblem, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
 
+                                }
 
                                 if (invalid > 0)
                                 {
@@ -5317,15 +5421,36 @@ namespace TheTerrariaSeedProject
                                     hasOBjectOrParam["Pot duplication Glitch"] += 1;
                                     if(invalidSingle>0)
                                         hasOBjectOrParam["Pot duplication Glitch Single"] += 1;
+                                    if(y> Main.rockLayer && invalidSingle>0)
+                                        hasOBjectOrParam["Pot duplication Glitch Single Cavern"] += 1;
 
                                     int pathl = FindShortestPathInRange(ref pathLength, x, y, 3, 3, 3, 3);
                                     if (pathl < hasOBjectOrParam["Pathlength to Pot dupl. Glitch"])
                                         hasOBjectOrParam["Pathlength to Pot dupl. Glitch"] = pathl;
 
-                                    if (score.itemLocation.ContainsKey(ItemID.PotStatue))
-                                        score.itemLocation[ItemID.PotStatue].Add(new Tuple<int, int>(x, y));
+                                    
+
+
+                                    if (invalidSingle > 0)
+                                    {
+                                        if (pathl < hasOBjectOrParam["Pathlength to Pot dupl. Glitch Single"])
+                                            hasOBjectOrParam["Pathlength to Pot dupl. Glitch Single"] = pathl;
+
+                                        if (score.itemLocation.ContainsKey(ItemID.PotStatue))
+                                            score.itemLocation[ItemID.PotStatue].Add(new Tuple<int, int>(x, y));
+                                        else
+                                            score.itemLocation.Add(ItemID.PotStatue, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
+                                    }
                                     else
-                                        score.itemLocation.Add(ItemID.PotStatue, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
+                                    {
+                                        if (score.itemLocation.ContainsKey(ItemID.PotionStatue))
+                                            score.itemLocation[ItemID.PotionStatue].Add(new Tuple<int, int>(x, y));
+                                        else
+                                            score.itemLocation.Add(ItemID.PotionStatue, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
+                                    }
+
+
+
 
                                 }
                             }
@@ -5773,7 +5898,7 @@ namespace TheTerrariaSeedProject
                                     }
                                     if (!Main.tile[bxi, by + 2].active() || (Main.tile[bxi, by + 2].active() && (Main.tile[bxi, by + 2].type == TileID.ClosedDoor || Main.tile[bxi, by + 2].type == TileID.Cobweb || Main.tile[bxi, by + 2].slope() > 0)))
                                         invalid++;
-                                    if ((Main.tile[bxi, by - 1].type == TileID.DemonAltar || Main.tile[bxi, by - 1].type == TileID.Containers))
+                                    if ((!Main.tile[bxi, by].active() || Main.tile[bxi, by].type == TileID.Heart) && Main.tile[bxi, by - 1].active() && Main.tile[bxi, by - 1].active() && (Main.tile[bxi, by - 1].type == TileID.DemonAltar || Main.tile[bxi, by - 1].type == TileID.Containers))
                                         invalidSingle++;
 
                                 }
@@ -5786,21 +5911,37 @@ namespace TheTerrariaSeedProject
                                 else if (m36x && !m36y && (invalidTile[0] != 1 || invalidTile[2] != 1)) { invalid = 0; ; countIt = 0; }
                                 else if (!m36x && m36y && (invalidTile[0] != 1)) { invalid = 0; ; countIt = 0; }
 
-
-                                if (invalid > 0)
-                                {
-                                    hasOBjectOrParam["Life Crystal duplication Glitch"] += 1;
-                                    if (score.itemLocation.ContainsKey(ItemID.HeartLantern))
-                                        score.itemLocation[ItemID.HeartLantern].Add(new Tuple<int, int>(x, y));
-                                    else
-                                        score.itemLocation.Add(ItemID.HeartLantern, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
-
-                                }
-
+                                
                                 if (countIt == 1)
                                 {
-
                                     int pathl = FindShortestPathInRange(ref pathLength, x, y, 2, 3, 2, 3);
+
+                                    if (invalid > 0)
+                                    {
+                                        hasOBjectOrParam["Life Crystal duplication Glitch"] += 1;
+
+                                        if (invalidSingle > 0)
+                                        {
+                                            hasOBjectOrParam["Life Crystal duplication Glitch Single"] += 1;
+
+                                            if (pathl < hasOBjectOrParam["Pathlength to Life Crystal dupl. Glitch Single"])
+                                            {
+                                                hasOBjectOrParam["Pathlength to Life Crystal dupl. Glitch Single"] = pathl;
+                                            }
+                                        }
+                                        if (pathl < hasOBjectOrParam["Pathlength to Life Crystal dupl. Glitch"])
+                                        {
+                                            hasOBjectOrParam["Pathlength to Life Crystal dupl. Glitch"] = pathl;
+                                        }
+
+                                        if (score.itemLocation.ContainsKey(ItemID.HeartLantern))
+                                            score.itemLocation[ItemID.HeartLantern].Add(new Tuple<int, int>(x, y));
+                                        else
+                                            score.itemLocation.Add(ItemID.HeartLantern, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
+
+                                    }
+
+                                    
 
                                     if (pathl < hasOBjectOrParam["Pathlength to Crystal Heart"])
                                     {
@@ -6031,7 +6172,72 @@ namespace TheTerrariaSeedProject
 
                 hasOBjectOrParam["Lake near mid (guess)"] = 1;                
             }
-            
+
+            //Duckspawn
+            //
+            {
+                int dim = waterDuckSpawn.Length / 2;
+                double dwscore = 0;
+                for(int i=-dim; i<dim;i++)
+                {
+                    int val =waterDuckSpawn[i + dim];
+                    if (Math.Abs(i) < 63)
+                    {
+                        dwscore += val * (Math.Abs(i) / 62 / 2 + 0.5);
+                    } else if (Math.Abs(i) < 169)
+                    {
+                        dwscore += val ;
+                    }
+                    else if (Math.Abs(i) < 231)
+                    {
+                        dwscore += val * ((230-Math.Abs(i)) / 62 / 2 +0.5);
+                    }
+                    else if (Math.Abs(i) < 301)
+                    {
+                        dwscore += val * ((300 - Math.Abs(i)) / 70 / 2);
+                    }
+                }
+                double contl=0, contr = 0;
+                int newLakeV = -2 * dim;
+                int sl = newLakeV, sr = newLakeV;
+                for (int i = 0; i < dim-1; i++)
+                {
+                    if (sl == -i+1 && sr == -i+1 && i != 0 && waterDuckSpawn[dim - i] > 0 && waterDuckSpawn[dim + i] > 0)
+                    {                        
+                        contl += 0.5 * (2.0 + 0.1 * (2*i) - 0.3);
+                        contr += 0.5 * (2.0 + 0.1 * (2*i) - 0.3);
+                        sl = -i;
+                        sr = -i;
+                    }
+                    else
+                    {
+                        if (waterDuckSpawn[dim - i] > 0)
+                        {
+                            if (sl == newLakeV) sl = i;
+                            contl += 1.0 * (2.0 + 0.1 * (i - sl) - 0.3 - (i < 63 && waterDuckSpawn[dim - i] > 3 ? 0.2 : 0)  -(i<63&& waterDuckSpawn[dim - i]>6?0.2:0) - (i < 63 && waterDuckSpawn[dim - i] > 9 ? 0.4 : 0));
+                        }
+                        else
+                        {
+                            contl--;
+                            sl = newLakeV;
+                        }
+                        if (waterDuckSpawn[dim + i] > 0)
+                        {
+                            if (sr == newLakeV) sr = i;
+                            contr += 1.0 * (2.0 + 0.1 * (i - sr) - 0.3 - (i < 63 && waterDuckSpawn[dim + i] > 3 ? 0.2 : 0) - (i < 63 && waterDuckSpawn[dim + i] > 6 ? 0.2 : 0) - (i < 63 && waterDuckSpawn[dim + i] > 9 ? 0.4 : 0));
+                        }
+                        else
+                        {
+                            contr--;
+                            sr = newLakeV;
+                        }
+                    }
+                }               
+                
+                dwscore = dwscore + Math.Max(contl , contr) + Math.Max(Math.Min(contl, contr), 0)  + (waterDuckSpawn[dim]>0?-1.7:0 );
+                hasOBjectOrParam["Water/Duck Score (guess)"] = (int)(dwscore+0.5+dim); //dim ... >=0,   //about 22k max
+
+            }
 
             //writeDebugFile(" analyze all took " + elapsedTime);
             //tallest tree finder TODO ext fun
@@ -6747,6 +6953,10 @@ namespace TheTerrariaSeedProject
 
                 hasOBjectOrParam["neg. Pathlength to free ShadowOrb/Heart"] = -hasOBjectOrParam["Pathlength to free ShadowOrb/Heart"];
                 hasOBjectOrParam["neg. Pathlength to Pot dupl. Glitch"] = -hasOBjectOrParam["Pathlength to Pot dupl. Glitch"];
+                hasOBjectOrParam["neg. Pathlength to Pot dupl. Glitch Single"] = -hasOBjectOrParam["Pathlength to Pot dupl. Glitch Single"];
+                hasOBjectOrParam["neg. Pathlength to Life Crystal dupl. Glitch"] = -hasOBjectOrParam["Pathlength to Life Crystal dupl. Glitch"];
+                hasOBjectOrParam["neg. Pathlength to Life Crystal dupl. Glitch Single"] = -hasOBjectOrParam["Pathlength to Life Crystal dupl. Glitch Single"];                
+                hasOBjectOrParam["neg. Pathlength to Floating dupl. Glitch structure"] = -hasOBjectOrParam["Pathlength to Floating dupl. Glitch structure"];                
                 hasOBjectOrParam["neg. Pathlength to underground MarbleGranite"] = -hasOBjectOrParam["Pathlength to underground MarbleGranite"];
                 hasOBjectOrParam["neg. Pathlength into cavern layer"] = -hasOBjectOrParam["Pathlength into cavern layer"];
                 hasOBjectOrParam["neg. Pathlength into 40% cavern layer"] = -hasOBjectOrParam["Pathlength into 40% cavern layer"];
@@ -8822,19 +9032,30 @@ namespace TheTerrariaSeedProject
             if (hasOBjectOrParam["Pot duplication Glitch"] > 0)
             {
                 score += hasOBjectOrParam["Pot duplication Glitch"] > 0 ? 10 * hasOBjectOrParam["Pot duplication Glitch"] : 0;
-                score += hasOBjectOrParam["Pot duplication Glitch Single"] > 0 ? 90 * hasOBjectOrParam["Pot duplication Glitch Single"] : 0;
-                score += hasOBjectOrParam["Pathlength to Pot dupl. Glitch"] < 1000 ? (1000-hasOBjectOrParam["Pathlength to Pot dupl. Glitch"])/10 : 0;
+                score += hasOBjectOrParam["Pot duplication Glitch Single"] > 0 ? 80 * hasOBjectOrParam["Pot duplication Glitch Single"] : 0;
+                score += hasOBjectOrParam["Pot duplication Glitch Single Cavern"] > 0 ? 90 * hasOBjectOrParam["Pot duplication Glitch Single Cavern"] : 0;
+                score += hasOBjectOrParam["Pathlength to Pot dupl. Glitch"] < 1000 ? (1000-hasOBjectOrParam["Pathlength to Pot dupl. Glitch"])/20 : 0;
+                score += hasOBjectOrParam["Pathlength to Pot dupl. Glitch Single"] < 1000 ? (1000-hasOBjectOrParam["Pathlength to Pot dupl. Glitch Single"])/20 : 0;
+                
                 allScoreText += System.Environment.NewLine + "Score Pot duplication Glitch " + (int)score;
             }
             if (hasOBjectOrParam["Life Crystal duplication Glitch"] > 0)
             {
-                score += hasOBjectOrParam["Life Crystal duplication Glitch"] > 0 ? 120 * hasOBjectOrParam["Life Crystal duplication Glitch"] : 0;                
+                score += hasOBjectOrParam["Life Crystal duplication Glitch"] > 0 ? 70 * hasOBjectOrParam["Life Crystal duplication Glitch"] : 0;                
+                score += hasOBjectOrParam["Life Crystal duplication Glitch Single"] > 0 ? 80 * hasOBjectOrParam["Life Crystal duplication Glitch Single"] : 0;
+                score += hasOBjectOrParam["Pathlength to Life Crystal dupl. Glitch"] < 1000 ? (1000 - hasOBjectOrParam["Pathlength to Life Crystal dupl. Glitch"]) / 10 : 0;
+                score += hasOBjectOrParam["Pathlength to Life Crystal dupl. Glitch Single"] < 1000 ? (1000 - hasOBjectOrParam["Pathlength to Life Crystal dupl. Glitch Single"]) / 5 : 0;
                 allScoreText += System.Environment.NewLine + "Score Life Crystal duplication Glitch " + (int)score;
             }
             if (hasOBjectOrParam["Enchanted Sword duplication Glitch"] > 0)
             {
                 score += hasOBjectOrParam["Enchanted Sword duplication Glitch"] > 0 ? 250 * hasOBjectOrParam["Enchanted Sword duplication Glitch"] : 0;
                 allScoreText += System.Environment.NewLine + "Score Enchanted Sword duplication Glitch " + (int)score;
+            }
+            if (hasOBjectOrParam["Floating duplication Glitch structure"] > 0)
+            {
+                score += hasOBjectOrParam["Floating duplication Glitch structure"] > 0 ? 100 * hasOBjectOrParam["Floating duplication Glitch structure"] : 0;
+                allScoreText += System.Environment.NewLine + "Score Floating duplication Glitch structure " + (int)score;
             }
 
             if (hasOBjectOrParam[OptionsDict.Phase3.allChestItemsNoCraftFish] > 0)
@@ -9249,9 +9470,12 @@ namespace TheTerrariaSeedProject
             if (hasOBjectOrParam["Pre Skeletron Dungeon Chest Grab"] > 0) strares += "_" + "DungeonPreSkelChestGrab";
 
             if (hasOBjectOrParam["Chest duplication Glitch"] > 0) strares += "_" + "ChestDuplGlitch";
-            if (hasOBjectOrParam["Pot duplication Glitch Single"] > 0) strares += "_" + "PotDuplGlitchSi";
-            if (hasOBjectOrParam["Life Crystal duplication Glitch"] > 0) strares += "_" + "LifeCryDuplGlitch";
+            if (hasOBjectOrParam["Pot duplication Glitch Single"] > 0 && hasOBjectOrParam["Pot duplication Glitch Single Cavern"]==0) strares += "_" + "PotDuplGlitchSi";            
+            if (hasOBjectOrParam["Pot duplication Glitch Single Cavern"] > 0) strares += "_" + "PotDuplGlitchSiCav";            
+            if (hasOBjectOrParam["Life Crystal duplication Glitch Single"] > 0) strares += "_" + "LifeCryDuplGlitchSi";
+            if (hasOBjectOrParam["Life Crystal duplication Glitch"] > 0 && hasOBjectOrParam["Life Crystal duplication Glitch Single"]==0) strares += "_" + "LifeCryDuplGlitch";
             if (hasOBjectOrParam["Enchanted Sword duplication Glitch"] > 0) strares += "_" + "ESDuplGlitch";
+            if (hasOBjectOrParam["Game breaker"] > 0) strares += "_" + "GameBreakerGlitch";
             if (hasOBjectOrParam["Near Enchanted Sword near Tree"] > 0) strares += "_" + "NearESnearTree";
             if (hasOBjectOrParam["Near Enchanted Sword near Pyramid"] > 0) strares += "_" + "NearESnearPyramid";
             if (hasOBjectOrParam["Near Enchanted Sword"] - hasOBjectOrParam["Very Near Enchanted Sword"] > 0 
@@ -9410,9 +9634,11 @@ namespace TheTerrariaSeedProject
                         rares += checkAdd("Spawn in Snow biome");
                         rares += checkAdd(OptionsDict.Phase3.lonelyJungleTree);
                         rares += checkAdd(OptionsDict.Phase3.openTemple);
-                        rares += checkAdd("Shadow Chest item in normal chest");
-                        rares += checkAdd("Pot duplication Glitch Single");
+                        rares += checkAdd("Shadow Chest item in normal chest");                        
                         rares += checkAdd("Life Crystal duplication Glitch");
+                        rares += checkAdd("Pot duplication Glitch Single");
+                        
+
                     }
 
                     if (!omitRare.Contains(OptionsDict.GeneralOptions.omitBadRare) && !omitRare.Contains(OptionsDict.GeneralOptions.omitBaCRare))
@@ -9431,9 +9657,10 @@ namespace TheTerrariaSeedProject
                     rares += checkAdd(OptionsDict.Phase3.frozenTemple);                    
                     rares += checkAdd("Minecart Track close to spawn");                    
                     rares += checkAdd("ExplosiveDetonator close to spawn");                    
-                    rares += checkAdd("Enchanted Sword duplication Glitch");                    
-                                     
-                    
+                    rares += checkAdd("Enchanted Sword duplication Glitch");
+                    rares += checkAdd("Life Crystal duplication Glitch Single");
+                    rares += checkAdd("Pot duplication Glitch Single Cavern");
+
 
                     rares += checkAdd("Spawn in Marble or Granite biome");
                     
@@ -10346,7 +10573,7 @@ namespace TheTerrariaSeedProject
                 {
                     if (itemloclist.Key != ItemID.StoneBlock && itemloclist.Key != ItemID.JungleShirt && itemloclist.Key != ItemID.JunglePants 
                         && itemloclist.Key != ItemID.PaladinsHammer && itemloclist.Key != ItemID.Ectoplasm && itemloclist.Key != ItemID.ChaosFish
-                        && itemloclist.Key != ItemID.CobaltBar && itemloclist.Key != ItemID.MythrilBar)
+                        && itemloclist.Key != ItemID.CobaltBar && itemloclist.Key != ItemID.MythrilBar && itemloclist.Key != ItemID.PotionStatue)
                         foreach (var itemloc in itemloclist.Value)
                         {                          
                             DrawItemImage(ref rgbValues, itemloclist.Key, itemloc, scale);                        
@@ -10393,11 +10620,23 @@ namespace TheTerrariaSeedProject
                 {                    
                     DrawCircle(ref rgbValues, ruby, scale, new Color(255, 0, 0), 3);
                 }
+                if (score.itemLocation.ContainsKey(ItemID.PotionStatue))
+                    foreach (var spot in score.itemLocation[ItemID.PotionStatue])
+                    {
+                        DrawCircle(ref rgbValues, spot, scale, new Color(86, 195, 220), 17);
+                        DrawCircle(ref rgbValues, spot, scale, new Color(100, 60, 40), 13);                        
+                        DrawCircle(ref rgbValues, spot, scale, new Color(240, 200, 180), 11);
+                    }
+
                 foreach (var expl in explosive)
                 {
                     DrawCircle(ref rgbValues, expl, scale, new Color(255, 240, 0), 3);
                     DrawCircle(ref rgbValues, expl, scale, new Color(255, 255, 160), 5);
                 }
+
+
+
+
             }
 
 
@@ -10493,12 +10732,14 @@ namespace TheTerrariaSeedProject
                 while (x < Main.maxTilesX / scale - 4 * iconbgs)
                 {
                     int offt = (y + 4) * Main.maxTilesX * 4 / scale + x * 4;
+                    int offt2 = (y + 4 + iconbgs/2) * Main.maxTilesX * 4 / scale + x * 4;
+                    int offt3 = (y + 4 + iconbgs/2) * Main.maxTilesX * 4 / scale + (x-iconbgs/2+4) * 4;
                     //if (rgbValues[offt + 0] != (byte)255 || rgbValues[offt + 1] != (byte)255 || rgbValues[offt + 2] != (byte)255)
 
-                    if (offt + 3 > maxoff)
+                    if (offt + 3 > maxoff || offt2 + 3> maxoff || offt3 + 3 > maxoff)
                         return;// changed from continue ??? bug maybe here possible
 
-                    if (rgbValues[offt + 3] != (byte)254)
+                    if (rgbValues[offt + 3] != (byte)254 && rgbValues[offt2 + 3] != (byte)254 && rgbValues[offt3 + 3] != (byte)254)
                         break;
                     else
                         x += 1;//iconbgs - 1;
