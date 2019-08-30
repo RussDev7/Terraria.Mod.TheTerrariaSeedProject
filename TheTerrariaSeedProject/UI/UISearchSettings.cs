@@ -369,6 +369,8 @@ namespace TheTerrariaSeedProject.UI
             addDictToInfo(OptionsDict.Phase1.dungeonWallColor).SetValue("Random");
             addDictToInfo(OptionsDict.Phase1.dungeonSide).SetValue("Random");
             addDictToInfo(OptionsDict.Phase1.boost).SetValue("10");
+            if (!WorldGenSeedSearch.isPubRel)
+                addDictToInfo(OptionsDict.Phase1.boostMax).SetValue("10");
             addDictToInfo(OptionsDict.Phase1.boostUGheightMin).SetValue("0");
             addDictToInfo(OptionsDict.Phase1.boostUGheightMax).SetValue("1000");
             addDictToInfo(OptionsDict.Phase1.boostHeightMin).SetValue("0");

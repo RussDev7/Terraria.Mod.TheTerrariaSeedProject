@@ -51,6 +51,7 @@ namespace TheTerrariaSeedProject.UI
             public const string dungeonWallColor = "Dungeon wall color";
             public const string dungeonSide = "Dungeon side";
             public const string boost = "Boost (experimental) >=";
+            public const string boostMax = "Boost max (experimental) <=";
             public const string boostPyr = "pred. Pyramid count >=";            
             public const string boostES = "Boost ES mid Tree (experimental) >="; //np
             public const string boostESgran = "Boost ES mid Granite (experimental) >=";//np
@@ -577,6 +578,7 @@ namespace TheTerrariaSeedProject.UI
             Add(Phase1.dungeonWallColor, new List<string> { "Random", "Blue", "Green", "Pink"});
             Add(Phase1.dungeonSide, new List<string> { "Random", "Left", "Right"});
             Add(Phase1.boost, vboost);
+            Add(Phase1.boostMax, vboost);
             Add(Phase1.boostPyr, v0to10);            
             Add(Phase1.boostES, v0to10);
             Add(Phase1.boostESgran, v0to10);
@@ -596,6 +598,11 @@ namespace TheTerrariaSeedProject.UI
             Add(Phase1.boostMidCloudInner2, vCloudsMidDist);
             Add(Phase1.boostMidCloudNum, v0to9);
             Add(Phase1.boostMidCloud1stLake, v0to2);
+
+            if (WorldGenSeedSearch.isPubRel)
+            {
+                this.Remove(Phase1.boostMax);
+            }
 
 
             //phase 2 content
@@ -638,14 +645,14 @@ namespace TheTerrariaSeedProject.UI
                 "Pre Skeletron Dungeon Chest Grab",
                 "Pre Skeletron Dungeon Chest Any",
                 "Pre Skeletron Muramasa good positon",
-                "Pre Skeletron Muramasa Chest reachable",                
+                "Pre Skeletron Muramasa Chest reachable",
                 "Pre Skeletron Cobalt Shield Chest reachable",
                 "Pre Skeletron Handgun Chest reachable",
                 "Pre Skeletron Shadow Key Chest reachable",
                 "Pre Skeletron Golden Key Grab",
                 "Pre Skeletron Golden Key Risky",
                 "Pre Skeletron Golden Key Any",
-                "Water Bolt before Skeletron",                
+                "Water Bolt before Skeletron",
                 "Water Bolt",
                 "Muramasa",
                 "Cobalt Shield",
@@ -657,7 +664,7 @@ namespace TheTerrariaSeedProject.UI
                 "Dungeon farm spot",
                 "Dungeon farm spot 3Wall inters.",
                 "Dungeon farm spot 3Wall in line",
-                "All Dungeon Items",                
+                "All Dungeon Items",
                 "Beach penalty mean",
                 "Beach penalty max",
                 //"Nearest Evil left Ocean",
@@ -666,7 +673,7 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Nearest Evil Dungeon Ocean",
                 "Nearest Evil Jungle Ocean",
                 "neg. Nearest Evil Jungle Ocean",
-                "Evil only one side",                               
+                "Evil only one side",
                 "Evil Tiles for Jungle Grass",
                 "Evil Tiles for Sand",
                 "Evil Tiles for Ice",
@@ -678,7 +685,7 @@ namespace TheTerrariaSeedProject.UI
                 "MarbleGranite at surf dist. to mid",
                 "Top MarbleGranite dist. to spawn (guess)",
                 "UG MarbleGranite dist. to spawn (guess)",
-                "Evil biome distance to mid",                
+                "Evil biome distance to mid",
                 "Surface average height (aprox.)",
                 "Surface height (sqrt) variance",
                 "Surface max-min height",
@@ -686,15 +693,15 @@ namespace TheTerrariaSeedProject.UI
                 "Underground Distance to spawn (guess)",
                 "Spawn rock layer offset (guess)",
                 "neg. Underground layer height",
-                "neg. Underground Distance to spawn (guess)",                
+                "neg. Underground Distance to spawn (guess)",
                 "neg. Spawn rock layer offset (guess)",
-                "neg. Distance Tree to mid", 
+                "neg. Distance Tree to mid",
                 "neg. Distance Tree Chest to mid",
-                "neg. Distance Cloud to mid", 
-                "neg. Distance Pyramid to mid", 
-                "neg. Distance Dungeon to mid", 
+                "neg. Distance Cloud to mid",
+                "neg. Distance Pyramid to mid",
+                "neg. Distance Dungeon to mid",
                 "neg. Distance ShadowOrb/Heart to mid",
-                "neg. Distance Lake to mid (guess)",                
+                "neg. Distance Lake to mid (guess)",
                 "neg. Jungle biome distance to mid",
                 "neg. Snow biome distance to mid",
                 "neg. MarbleGranite at surf dist. to mid",
@@ -790,7 +797,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Ocean Pyramid", v0to2);
             Add("Tree Chest", v0to5);
             Add("Tree Chest Loom", v0to5);
-            Add("Trees near mid", v0to4);
+            Add("Trees near mid", v0to5);
             Add("Tree near mid open to mid", v0to4);
             Add("Tree chests near mid", v0to5);            
             Add("Tree to cavern layer", v0to5);
@@ -1040,6 +1047,7 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Pathlength to Battle Potion",
                 "neg. Pathlength to Lifeforce Potion",
                 "neg. Pathlength to Recall Potion",
+                "neg. Pathlength to Builder Potion",
                 "neg. Pathlength to Rope",
                 "neg. Pathlength to Enchanted Sword",
                 "neg. Pathlength to Altar",
@@ -1079,6 +1087,7 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Pathlength to cabin",
                 "neg. Pathlength to Minecart Track",
                 "neg. Pathlength to free ShadowOrb/Heart",
+                "neg. Pathlength to Chest duplication Glitch",
                 "neg. Pathlength to Pot dupl. Glitch",
                 "neg. Pathlength to Pot dupl. Glitch Single",
                 "neg. Pathlength to Life Crystal dupl. Glitch",
@@ -1121,10 +1130,14 @@ namespace TheTerrariaSeedProject.UI
                 "Life Crystal duplication Glitch Single",
                 "Floating duplication Glitch structure",
                 "Game breaker",
+                "Quick Plantera bulb prediction (beta)",
                 "Score",
                 OptionsDict.Tools.conditionConnector,
                 OptionsDict.Tools.dummyPlus
                 });
+
+            
+
             Add(Phase3.negative, new List<string> {
                 "Hermes Flurry Boots Distance", 
                 "Underground Distance to spawn",
@@ -1172,6 +1185,7 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to Battle Potion",
                 "Pathlength to Lifeforce Potion",
                 "Pathlength to Recall Potion",
+                "Pathlength to Builder Potion",
                 "Pathlength to Rope",
                 "Pathlength to Enchanted Sword",
                 "Pathlength to Altar",
@@ -1211,6 +1225,7 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to cabin",
                 "Pathlength to Minecart Track",
                 "Pathlength to free ShadowOrb/Heart",
+                "Pathlength to Chest duplication Glitch",
                 "Pathlength to Pot dupl. Glitch",
                 "Pathlength to Pot dupl. Glitch Single",
                 "Pathlength to Life Crystal dupl. Glitch",
@@ -1339,6 +1354,7 @@ namespace TheTerrariaSeedProject.UI
             Add("neg. Pathlength to Battle Potion", vPathLengthNeg);
             Add("neg. Pathlength to Lifeforce Potion", vPathLengthNeg);
             Add("neg. Pathlength to Recall Potion", vPathLengthNeg);
+            Add("neg. Pathlength to Builder Potion", vPathLengthNeg);
             Add("neg. Pathlength to Rope", vPathLengthNeg);
 
             Add("neg. Pathlength to Enchanted Sword", vPathLengthNeg);
@@ -1388,6 +1404,7 @@ namespace TheTerrariaSeedProject.UI
 
 
             Add("neg. Pathlength to free ShadowOrb/Heart", vPathLengthNeg);
+            Add("neg. Pathlength to Chest duplication Glitch", vPathLengthNeg);
             Add("neg. Pathlength to Pot dupl. Glitch", vPathLengthNeg);
             Add("neg. Pathlength to Pot dupl. Glitch Single", vPathLengthNeg);
             Add("neg. Pathlength to Life Crystal dupl. Glitch", vPathLengthNeg);
@@ -1438,6 +1455,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Pathlength to Battle Potion", vPathLength);
             Add("Pathlength to Lifeforce Potion", vPathLength);
             Add("Pathlength to Recall Potion", vPathLength);
+            Add("Pathlength to Builder Potion", vPathLength);
             Add("Pathlength to Rope", vPathLength);
             Add("Pathlength to Enchanted Sword", vPathLength);
             Add("Pathlength to Altar", vPathLength);
@@ -1482,6 +1500,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Pathlength to Temple Door", vPathLength);
             Add("Pathlength to Temple Tile", vPathLength);
             Add("Pathlength to free ShadowOrb/Heart", vPathLength);  
+            Add("Pathlength to Chest duplication Glitch", vPathLength);  
             Add("Pathlength to Pot dupl. Glitch", vPathLength);  
             Add("Pathlength to Pot dupl. Glitch Single", vPathLength);  
             Add("Pathlength to Life Crystal dupl. Glitch", vPathLength);  
@@ -1537,6 +1556,8 @@ namespace TheTerrariaSeedProject.UI
             Add("Enchanted Sword duplication Glitch", v0to5);
             Add("Floating duplication Glitch structure", v0to5);
             Add("Game breaker", v0to5);
+            Add("Quick Plantera bulb prediction (beta)", v0to5);
+            
 
             Add("Score", vScore);
 
@@ -2045,7 +2066,10 @@ namespace TheTerrariaSeedProject.UI
             HelpDict.Add("Life Crystal duplication Glitch Single", "This allows the player to duplicate a Life Crystal e.g. with a near torch. Works also for single player. Their minimap-picture-icon is a Heart Lantern. It may also not detect all of them, some might also not work. Contact me pls if you have a seed with an undetected Life Crystal.");
             HelpDict.Add("Enchanted Sword duplication Glitch", "This allows the player to duplicate an Enchanted Sword e.g. with a near (trap) door. Only works at multiplayer (afaik). Their minimap-picture-icon is an Arkhalis. It may also not detect all of them. Contact me pls if you have a seed with an undetected Enchanted Sword.");
             HelpDict.Add("Floating duplication Glitch structure", "This is looking for a chest or a demon altar with missing tiles below. This allows you to duplicated objects with 1-2 width and 2-3 height (no chests). Not all tested. Have fun trying around. Start testing with e.g. chairs. Crates are tricky (they can break your game), so far known they only work at Linux & Mac. Their minimap-picture-icon is a Glassblock. It may also not detect all of them. Contact me pls if you have a seed with some undetected.");
-            HelpDict.Add("Game breaker", "This can break the game (if exists). If you open the door to the wrong side. Minimap-picture-icon is Avenger Emblem. No seed found yet.");
+            HelpDict.Add("Game breaker", "This can break the game if you open the door to the wrong side. Minimap-picture-icon is Avenger Emblem. Rare.");
+            HelpDict.Add("Quick Plantera bulb prediction (beta)", "Plantera Bulbs which can spawn in less than "+WorldGenSeedSearch.PlanBulbQuicTime + "sec after entering the world (after all mech bosses) get detected. However the most won't spawn and need some extra work. Besides some values which can't be predicted (rare) or hard to and some internal dependencies the spawn location has a big influence at RNG. Only at single player, after playing other seed or new game!! With other spawn locations or adding/removing tiles/wall you can shift the random numbers. " +
+                "Only stuff with 1 block frame works (e.g. dirt, stone...; Stuff with some bigger structure or unique forms like Stone Slab, tree, platforms does not work). Adding/removing about 160 (small, 360med, 640large) tiles (up to two times) can have a big impact in bulb spawn. But with other number shifting new/less conditions can be true/false which can result in a new shift. That means also adding/removing less/more tiles can have a larger/smaller impact. Some bulbs are also inaccessible. In Beta state! So far only " +
+                "a few tested in single player. About 40% of detected Bulbs generated (with some help). Trophy+pink circle at minimap. If you run analysis at existiong world also bulbs with less than "+((WorldGenSeedSearch.PlanBulbQuicTime*100)/60)+ "min are shown at mini map with Planteramask icon. Times in stats file. New/less Bulbs are possible after some game play.");
 
 
 
