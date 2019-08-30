@@ -51,6 +51,7 @@ namespace TheTerrariaSeedProject
 
 
         public const bool isPubRel = true;
+        public const int PlanBulbQuicTime = 20;
 
         public int stage = 0;
         public bool ended = false;
@@ -379,8 +380,10 @@ namespace TheTerrariaSeedProject
                             PostWorldGen();
                             setHights(true);
                             checkAndSetIfESmidPossible(false);
-                            checkAndSetIfESmidPossible(true);                            
-                            analyzeWorld(score, genInfo);
+                            checkAndSetIfESmidPossible(true);
+                            
+                            analyzeWorld(score, genInfo, true, lines.Length==1);
+
                             computeScore(score);
                             var name = createMapName(score, true, currentConfiguration, worldName);
 
@@ -411,6 +414,7 @@ namespace TheTerrariaSeedProject
                         if (gotoCreation) stage = 1;
                         if (gotoCreation) { StoreLastStats(); }
 
+                        
                         if (stage == 1 && !ended && searchForSeed == false)
                         {
 
@@ -493,6 +497,12 @@ namespace TheTerrariaSeedProject
                             if (boostString.Length > 0)
                                 if(!Int32.TryParse(boostString, out boostValueInt)) boostValueInt = 10;
 
+                            int boostValueIntMax = 10;
+                            string boostStringMax = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boostMax, 1);
+                            if (boostStringMax.Length > 0)
+                                if (!Int32.TryParse(boostStringMax, out boostValueIntMax)) boostValueIntMax = 10;
+
+
                             if (boostValueInt == -1)
                             {
                                 //special case value
@@ -507,8 +517,9 @@ namespace TheTerrariaSeedProject
                                 boostValue = 1.0 - (1.0 / (0.1 * ((double)boostValueInt)));
                                 //e.g. living trees can have 3 values for small if boost val =30 it only accept values greater than 0.6666
                                 // if one tree is ok too go for val = 20 and all values greater 0.3333 are fine
+                                
                                 boostValueMin = boostValue;
-                                boostValueMax = boostValue;
+                                boostValueMax = (1.0 / (0.1 * ((double)boostValueIntMax)));
                             }
                                                      
 
@@ -633,10 +644,11 @@ namespace TheTerrariaSeedProject
                             continueEval = !currentConfiguration.FindConfigItemValue(OptionsDict.Phase3.continueEvaluation, 3).Equals(OptionsDict.Phase3.continueEvaluationResetTag);
 
                             if(seedFile==null)
-                            numSeedSearch = currentConfiguration.numSeedSearch;
+                                numSeedSearch = currentConfiguration.numSeedSearch;
                             Int32.TryParse(currentConfiguration.FindConfigItemValue(OptionsDict.Configuration.stopSearchNum, 0), out numStopSearch);
                             bool cp = Int32.TryParse(currentConfiguration.FindConfigItemValue(OptionsDict.Configuration.stepSize, 0), out stepsize);
                             if (!cp) stepsize = 1;
+
 
                             InitSearch();
                             Main.ActiveWorldFileData.SetSeed(seed.ToString());
@@ -724,7 +736,7 @@ namespace TheTerrariaSeedProject
 
                            
 
-                            if (((boostValue>=0 && boostValueSeed >= boostValue) ||  
+                            if (((boostValue>=0 && boostValueSeed >= boostValueMin && boostValueSeed <= boostValueMax) ||  
                                 (boostValue < 0 && boostValueSeed > boostValueMin && boostValueSeed < boostValueMax) ||
                                 (boostValue < 0 && boostValueSeed < 1.0-boostValueMin && boostValueSeed > 1.0-boostValueMax) ) //1st cloud in mid
                                 && midtree) //the inverted boostValue can be a little smaller than original value >= --> > ?
@@ -793,7 +805,7 @@ namespace TheTerrariaSeedProject
                                 //if ( ((legacyPyrNum > 4 && numPyramidChanceAdv > numPyramidChanceAdvUber) && numPyramidChanceAdvUber == 1) || (legacyPyrNum > 4 && numPyramidChanceAdv==0) )
                                 //    writeDebugFile("seed "+seed+ " has pyspot " + legacyPyrNum + " adv " + numPyramidChanceAdv + " uber " + numPyramidChanceAdvUber);
                                 if (minDist < 0.058*Main.maxTilesX && !isPubRel)
-                                    writeDebugFile("seed " + seed + " has min " + minDist);
+                                    writeDebugFile("seed " + seed + " has min pyramid dist " + minDist);
                                                                 
 
                                 //chanceCount[numPyr] += 1;
@@ -890,7 +902,7 @@ namespace TheTerrariaSeedProject
                             skipStage3 = false;
                             writeToDescList(GenerateSeedStateText(), 1);
 
-                            analyzeWorld(score, genInfo);
+                            analyzeWorld(score, genInfo, true);
                             paterScore = computeScore(score);
                             paterCondsTrue = acond.checkConditions(score, currentConfiguration, stage);
 
@@ -955,7 +967,7 @@ namespace TheTerrariaSeedProject
 
                             if (skipStage3)
                             {                                
-                                analyzeWorld(score, genInfo);
+                                analyzeWorld(score, genInfo, true);
                                 scoreVal = computeScore(score);
                                 condsTrue = acond.checkConditions(score, currentConfiguration, 3);
                             }
@@ -989,7 +1001,7 @@ namespace TheTerrariaSeedProject
                                     PostWorldGen();
 
 
-                                    analyzeWorld(score, genInfo);
+                                    analyzeWorld(score, genInfo, true);
                                     computeScore(score);
                                     condsTrue = acond.checkConditions(score, currentConfiguration, 3);
 
@@ -2088,10 +2100,8 @@ namespace TheTerrariaSeedProject
                 {
                     //if (Main.tile[x, y].wall != WallID.None)
                     if ( (Main.tile[x, y].active() && Main.tile[x, y].wall == WallID.None)  
-                        || (!Main.tile[x, y].active() && (Main.tile[x, y].wall != WallID.None 
-                                                         || Main.tile[x, y].wall != WallID.GraniteUnsafe 
-                                                         || Main.tile[x, y].wall != WallID.MarbleUnsafe )) )
-                    {
+                        || (!Main.tile[x, y].active()  )) //&& (Main.tile[x, y].wall == WallID.None  || Main.tile[x, y].wall == WallID.GraniteUnsafe  || Main.tile[x, y].wall == WallID.MarbleUnsafe))
+                        {
 
                     }
                     else
@@ -2848,7 +2858,8 @@ namespace TheTerrariaSeedProject
 
             for (int x = 0; x < Main.maxTilesX; x++)
                 for (int y = 0; y < Main.maxTilesY; y++)
-                    pathLength[x, y] = Int32.MaxValue;
+                    pathLength[x, y] = Int32.MaxValue;           
+
             for (int x = 0; x < Main.maxTilesX; x++)
                 for (int y = 0; y < Main.maxTilesY; y++)
                     travelCost[x, y] = (short)TravelCost(x, y);
@@ -2986,7 +2997,7 @@ namespace TheTerrariaSeedProject
 
 
 
-        private void analyzeWorld(ScoreWorld score, generatorInfo genInfo, bool doFull = true)
+        private void analyzeWorld(ScoreWorld score, generatorInfo genInfo, bool doFull, bool doBulbExtra = false)
         {
 
 
@@ -3097,6 +3108,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Pathlength to Battle Potion", 1000000);
             hasOBjectOrParam.Add("Pathlength to Lifeforce Potion", 1000000);
             hasOBjectOrParam.Add("Pathlength to Recall Potion", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Builder Potion", 1000000);
             hasOBjectOrParam.Add("Pathlength to Rope", 1000000);
             hasOBjectOrParam.Add("Pathlength to Copper/Tin Bar", 1000000);
             hasOBjectOrParam.Add("Pathlength to Iron/Lead Bar", 1000000);
@@ -3120,6 +3132,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Pathlength to Temple Door", 1000000);
             hasOBjectOrParam.Add("Pathlength to Temple Tile", 1000000);
             hasOBjectOrParam.Add("Pathlength to free ShadowOrb/Heart", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Chest duplication Glitch", 1000000);
             hasOBjectOrParam.Add("Pathlength to Pot dupl. Glitch", 1000000);
             hasOBjectOrParam.Add("Pathlength to Pot dupl. Glitch Single", 1000000);
             hasOBjectOrParam.Add("Pathlength to Life Crystal dupl. Glitch", 1000000);
@@ -3195,6 +3208,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("neg. Pathlength to Battle Potion", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Lifeforce Potion", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Recall Potion", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Builder Potion", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Rope", -1000000);
 
             hasOBjectOrParam.Add("neg. Pathlength to Copper/Tin Bar", -1000000);
@@ -3219,6 +3233,8 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("neg. Pathlength to Temple Door", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Temple Tile", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to free ShadowOrb/Heart", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Chest duplication Glitch", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Pot dupl. Glitch", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Pot dupl. Glitch Single", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Life Crystal dupl. Glitch", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Life Crystal dupl. Glitch Single", -1000000);
@@ -3382,6 +3398,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Enchanted Sword duplication Glitch", 0);
             hasOBjectOrParam.Add("Floating duplication Glitch structure", 0);
             hasOBjectOrParam.Add("Game breaker", 0);
+            hasOBjectOrParam.Add("Quick Plantera bulb prediction (beta)", 0);
 
 
 
@@ -3588,9 +3605,8 @@ namespace TheTerrariaSeedProject
             int mostSnowSideIvyChest = localDungeonSide < 0 ? Main.maxTilesX : 0;
 
             if (doFull)
-            {
+            {                
                 ComputePathlength(ref pathLength);
-
             }
             List<Tuple<int, int>> goldenKeyReach = new List<Tuple<int, int>>();
             List<Tuple<int, int>> muramasaKeyReach = new List<Tuple<int, int>>();
@@ -3644,6 +3660,14 @@ namespace TheTerrariaSeedProject
                             score.itemLocation[ItemID.DynastyChest].Add(new Tuple<int, int>(cx, cy));
                         else
                             score.itemLocation.Add(ItemID.DynastyChest, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
+
+                        if (doFull)
+                        {
+                            int pl = FindShortestPathInRange(ref pathLength, cx, cy);
+                            hasOBjectOrParam["Pathlength to Chest duplication Glitch"] = Math.Min(hasOBjectOrParam["Pathlength to Chest duplication Glitch"], pl);
+                        }
+
+
 
                     }
 
@@ -4295,6 +4319,17 @@ namespace TheTerrariaSeedProject
                                         score.itemLocation.Add(item.type, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
                                 }
                             }
+                            else if (item.type == ItemID.BuilderPotion)
+                            {
+                                if (pathl < hasOBjectOrParam["Pathlength to Builder Potion"])
+                                {
+                                    hasOBjectOrParam["Pathlength to Builder Potion"] = pathl;
+                                    if (score.itemLocation.ContainsKey(item.type))
+                                        score.itemLocation[item.type] = new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) };
+                                    else
+                                        score.itemLocation.Add(item.type, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
+                                }
+                            }
 
                             else if (item.type == ItemID.LifeforcePotion && Main.tile[cx, cy].frameX != 144 )
                             {
@@ -4467,10 +4502,14 @@ namespace TheTerrariaSeedProject
 
             //todo: no border
             for (int x = 10; x < Main.maxTilesX - 10; x++)
-            {
+           {
                 for (int y = 10; y < Main.maxTilesY - 10; y++)
-                {
+                { 
                     var tile = Main.tile[x, y];
+                    if (tile == null && !isPubRel)
+                    {
+                        writeDebugFile("tile null at " + x + " " + y);
+                    }
 
                     if (tile != null && (tile.wall == WallID.GraniteUnsafe || tile.wall == WallID.MarbleUnsafe))
                     {
@@ -4518,6 +4557,8 @@ namespace TheTerrariaSeedProject
 
                     if(tile!=null)
                     {
+                        
+
                         if (tile.wall == WallID.LivingWood && (!tile.active() || tile.type!= TileID.LivingWood) )
                         {              
                             if (y < Main.worldSurface && Main.tile[x, y - 1].wall == WallID.LivingWood
@@ -5409,7 +5450,20 @@ namespace TheTerrariaSeedProject
                                 {
                                     hasOBjectOrParam["Game breaker"] += 1;
                                     if (score.itemLocation.ContainsKey(ItemID.AvengerEmblem))
-                                        score.itemLocation[ItemID.AvengerEmblem].Add(new Tuple<int, int>(x, y));
+                                    {
+                                        bool insert = true;
+                                        foreach(var gb in score.itemLocation[ItemID.AvengerEmblem])
+                                        {
+                                            if (Math.Abs(gb.Item1 - x) < 2 && Math.Abs(gb.Item2 - y) < 2)
+                                            {
+                                                insert = false;
+                                                break;
+                                            }
+                                        }
+                                        if(insert)
+                                            score.itemLocation[ItemID.AvengerEmblem].Add(new Tuple<int, int>(x, y));
+
+                                    }
                                     else
                                         score.itemLocation.Add(ItemID.AvengerEmblem, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
 
@@ -6153,16 +6207,30 @@ namespace TheTerrariaSeedProject
 
             hasOBjectOrParam["Tree"] = treesPos.Count;
 
-            
-            foreach (var treeX in treesPos)
+            int offp = 0;
+            int offpc = 0;
+           
+            while (true)
             {
-                int midDist = Math.Abs(Main.maxTilesX/2 - treeX);                
-
-                if (midDist <= 300)
+                foreach (var treeX in treesPos)
                 {
-                    hasOBjectOrParam["Trees near mid"] += 1;
-                }                
+                    int midDist = Math.Abs(Main.maxTilesX / 2 - treeX);
+
+                    if (midDist <= 300+offp)
+                    {
+                        hasOBjectOrParam["Trees near mid"] += 1;
+                    }
+                }
+                if (hasOBjectOrParam["Trees near mid"] > offpc)
+                {
+                    offpc++;
+                    offp += 75;
+                    hasOBjectOrParam["Trees near mid"] = 0;
+                }
+                else
+                    break;
             }
+
 
             //lake
 
@@ -6389,7 +6457,214 @@ namespace TheTerrariaSeedProject
 
             if (hasOBjectOrParam["Dungeon below ground"] > 0 || hasOBjectOrParam["Dungeon far above surface"] > 0 || hasOBjectOrParam["Dungeon in Snow Biome"] > 0)
                 hasOBjectOrParam[OptionsDict.Phase2.dungeonStrangePos] = 1;
+            
+            //test
+            if(doFull )
+            {
+                //Stopwatch ss = new Stopwatch();
+                //ss.Start();
 
+                //at night start you can't trust anymore -> firefly spawns use rand 1/9 chance +1
+                UnifiedRandom genRand = new UnifiedRandom(0);
+
+                int recm = 11;
+                double[] randrec = new double[recm];
+
+                int above = 2 * (int)Math.Ceiling(3.0 * 1e-5 * Main.maxTilesX * Main.maxTilesY);//some more can happen
+                int below = 2 * (int)Math.Ceiling(1.5 * 1e-5 * Main.maxTilesX * Main.maxTilesY);
+                int timesPerUpdate = above + below;
+
+
+                //if weather changes and more/less clouds, can't trust anymore
+                
+                int rvc = 0;
+                int rvcw = 0;
+                int rvcu = 0;
+              
+                int fx = ((Main.spawnTileX-34)/200);
+                int tx = ((Main.spawnTileX+34)/200);
+                int fy = ((Main.spawnTileY-27)/150);
+                int ty = ((Main.spawnTileY+27)/150);
+
+                //writeDebugFile("pos" + fx + " " + fy + " " + tx + " " + ty + " sw" + Main.screenWidth);
+
+                
+                for (int fxi = fx; fxi <= tx; fxi++)
+                    for (int fyi = fy; fyi <= ty; fyi++)
+                    {
+                        
+                        for (int x = (fxi) * 200 - 1; x < (fxi + 1) * 200 + 1; x++)
+                        {
+                            for (int y = Math.Max((fyi) * 150 - 1,0); y < (fyi + 1) * 150 + 1; y++)
+                            {
+
+                                Tile tile = Main.tile[x, y];
+                                if (tile != null)
+                                {
+                                    if (tile.wall != 0 && Main.wallLargeFrames[(int)tile.wall] != 1 && Main.wallLargeFrames[(int)tile.wall] != 2)
+                                        rvcw++;
+
+                                    if (tile.active())
+                                    {
+                                        ushort type = tile.type;
+                                        bool a = true; bool b = true;
+                                        if (!TileLoader.TileFrame(x, y, tile.type, ref a, ref b))
+                                        {
+                                            continue;
+                                        }
+                                        if (Main.tileFrameImportant[(int)tile.type] && !TileLoader.IsTorch(tile.type))
+                                        {
+                                            continue;
+                                        }
+                                        if (!Main.tileFrameImportant[(int)tile.type])
+                                        {
+                                            rvcu++;
+                                        }
+
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                
+                int w = 0;
+                int nc = Main.numClouds;
+                int o = (int)(1.05*timesPerUpdate +3+1000); //600  to be above for sure
+                //134,000 possible (tested for large worlds), 44k for small
+                for (int c = 0; c < (rvc + rvcw + rvcu+nc+o); c++)
+                {
+                    w += (int)genRand.NextDouble();
+                }
+                if (w > 0 && !isPubRel) writeDebugFile("something wrong with seed " + seed);
+                //writeDebugFile("" + rvc + " " + rvcw+  " " + rvcu +" " + nc+" " +o + " random values for seed " + seed + " total" + (rvc+ rvcw+ rvcu+nc+o));
+
+
+                //for (int f = recm; f < 1e9; f++)//start from recm to avoid negative index in randrec
+                //somehow ~36133 rands happen after 0th update.
+                for (int f = recm; f < timesPerUpdate*60*PlanBulbQuicTime * (doBulbExtra?100:1); f++)//strat from recm to avoid negative index in randrec
+                {
+                    randrec[f%recm]=genRand.NextDouble();
+
+                    if((int)(randrec[f % recm]*60.0)==0 && (int)(randrec[(f-1) % recm]*25.0)==0)
+                    {
+                        
+                        for (int s = 3; s < 8; s++)
+                        {
+                            int off = 0;
+                            int x = (int)((randrec[(f - s) % recm] * (Main.maxTilesX - 20)) + 10);
+                            int y = (int)((randrec[(f - s+ (++off)) % recm] * (Main.maxTilesY - 20 - ((int)Main.worldSurface - 1))) + (int)Main.worldSurface - 1);
+                            
+                            
+                            if (Main.tile[x, y] == null)
+                                continue;
+
+                            ushort type = Main.tile[x, y].type;
+
+                            if (!Main.tile[x, y].active() || type != (ushort)60)
+                                continue;
+                                                        
+                            if ((double)y > (Main.worldSurface + Main.rockLayer) / 2.0)
+                            {
+                                if (   (int)(randrec[(f - s+ (++off) ) % recm]*300)  == 0)
+                                {
+                                    ++off; ++off;                                        
+                                }
+                            }   
+
+                            if (!Main.tile[x, y].active() || type != (ushort)60)
+                                continue;
+
+                            if (!Main.tile[x, y-1].active() && (int)(randrec[(f - s + (++off)) % recm] * 10.0) == 0)
+                            {
+                                continue;
+                            }
+
+                            if ((int)(randrec[(f - s + (++off)) % recm] * 25.0) == 0 && Main.tile[x, y-1].liquid == 0)
+                            {
+                        
+                                if ((int)(randrec[(f - s + (++off)) % recm] * 60.0) == 0 && off==s  )
+                                {
+
+                                    int xi = x;
+                                    int yi = y-1;
+                                    bool bulb = true;
+
+                                    for (int i = xi - 1; i < xi + 1; i++)
+                                    {
+                                        if (Main.tile[i, yi + 1] == null)
+                                        {
+                                            continue;
+                                        }
+                                        for (int j = yi - 1; j < yi + 1; j++)
+                                        {
+                                            if (Main.tile[i, j] == null)
+                                            {
+                                                continue;
+                                            }                                            
+                                            if (Main.tile[i, j].active() &&
+                                                Main.tile[i, j].type != TileID.JunglePlants && 
+                                                Main.tile[i, j].type != TileID.JungleVines && 
+                                                Main.tile[i, j].type != TileID.JungleThorns && 
+                                                Main.tile[i, j].type != TileID.JunglePlants2 &&
+                                                (Main.tile[i, j].type != TileID.SmallPiles || Main.tile[i, j].frameY != 0) &&
+                                                Main.tile[i, j].type != TileID.PlantDetritus                  
+                                                )
+                                            {
+                                                bulb = false;
+                                            }
+                                        }                                        
+                                        //placed on solid jungle grass
+                                        if (!WorldGen.SolidTile(i, yi + 1) || Main.tile[i, yi + 1].type != 60)
+                                        {
+                                            bulb = false;
+                                        }
+                                    }
+
+                                    if (bulb)
+                                    {
+                                        int min = (f-recm-s) / timesPerUpdate / 60 / 60;
+                                        int sec = (f-recm-s) / timesPerUpdate / 60 - min*60;
+
+                                        
+                                        //writeDebugFile("" + seed + " bulb at " + x + " " + y + " upd:" + (f-recm-s) + " max time: " + min + "min "+ sec + "sec" + " off:" + s );
+                                        if (f < timesPerUpdate * 60 * PlanBulbQuicTime)
+                                        {
+                                            hasOBjectOrParam["Quick Plantera bulb prediction (beta)"]++;
+                                            int yt = (-y * 10000) - (min * 100) - (sec );
+                                            if (score.itemLocation.ContainsKey(ItemID.PlanteraTrophy))
+                                                score.itemLocation[ItemID.PlanteraTrophy].Add(new Tuple<int, int>(x, yt));
+                                            else
+                                                score.itemLocation.Add(ItemID.PlanteraTrophy, new List<Tuple<int, int>> { new Tuple<int, int>(x, yt) });
+                                        }
+                                        else
+                                        {
+                                            int yt = (-y * 10000)- (min*10)-(sec/10);
+                                            if (score.itemLocation.ContainsKey(ItemID.PlanteraMask))
+                                                score.itemLocation[ItemID.PlanteraMask].Add( new Tuple<int, int>(x, yt) );
+                                            else
+                                                score.itemLocation.Add(ItemID.PlanteraMask, new List<Tuple<int, int>> { new Tuple<int, int>(x, yt) });
+
+
+
+                                        }
+
+                                    }
+
+                                }
+
+
+                            }
+
+
+                        }
+
+
+                    }
+                }
+                //ss.Stop();
+                //writeDebugFile("quick bulb took "+ss.ElapsedMilliseconds);
+            }
 
 
             //dungeon Farm spot line
@@ -6904,6 +7179,7 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["neg. Pathlength to Battle Potion"] = -hasOBjectOrParam["Pathlength to Battle Potion"];
                 hasOBjectOrParam["neg. Pathlength to Lifeforce Potion"] = -hasOBjectOrParam["Pathlength to Lifeforce Potion"];
                 hasOBjectOrParam["neg. Pathlength to Recall Potion"] = -hasOBjectOrParam["Pathlength to Recall Potion"];
+                hasOBjectOrParam["neg. Pathlength to Builder Potion"] = -hasOBjectOrParam["Pathlength to Builder Potion"];
                 hasOBjectOrParam["neg. Pathlength to Rope"] = -hasOBjectOrParam["Pathlength to Rope"];
 
                 
@@ -6952,6 +7228,7 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["neg. Pathlength to Minecart Track"] = -hasOBjectOrParam["Pathlength to Minecart Track"];
 
                 hasOBjectOrParam["neg. Pathlength to free ShadowOrb/Heart"] = -hasOBjectOrParam["Pathlength to free ShadowOrb/Heart"];
+                hasOBjectOrParam["neg. Pathlength to Chest duplication Glitch"] = -hasOBjectOrParam["Pathlength to Chest duplication Glitch"];
                 hasOBjectOrParam["neg. Pathlength to Pot dupl. Glitch"] = -hasOBjectOrParam["Pathlength to Pot dupl. Glitch"];
                 hasOBjectOrParam["neg. Pathlength to Pot dupl. Glitch Single"] = -hasOBjectOrParam["Pathlength to Pot dupl. Glitch Single"];
                 hasOBjectOrParam["neg. Pathlength to Life Crystal dupl. Glitch"] = -hasOBjectOrParam["Pathlength to Life Crystal dupl. Glitch"];
@@ -7333,8 +7610,8 @@ namespace TheTerrariaSeedProject
 
             const short costWebThorn = 25; //maybe too high e..g 2 dynamite 2127639275 , pathlegnth of 1st and 2nd dynamite
             const short costMineCart = -17; //maybe too good
-            const short costDirt = 60;
-            const short costStone = 120;
+            const short costDirt = 50; //maybe too high, changed from 60 to 50
+            const short costStone = 100; //maybe too high, changed from 120 to 100
 
             const short costEvilWall = 2;
 
@@ -7522,7 +7799,7 @@ namespace TheTerrariaSeedProject
                 {
                     if (waypoints[npl] == null)
                         waypoints[npl] = new List<Tuple<int, int>>();
-                    waypoints[npl].Add(new Tuple<int, int>(x, y)); //can be in more than on list, remove from old?                    
+                    waypoints[npl].Add(new Tuple<int, int>(x, y)); //can be in more than one list, remove from old?                    
                 }
             }
 
@@ -8116,7 +8393,7 @@ namespace TheTerrariaSeedProject
         public static void writeDebugFile(string content, bool newFile = false)
         {
             using (System.IO.StreamWriter file =
-             new System.IO.StreamWriter(Main.SavePath + OptionsDict.Paths.debugPath + @".\debug.txt", !newFile))
+             new System.IO.StreamWriter(Main.SavePath + OptionsDict.Paths.debugPath + @"debug.txt", !newFile))
             {
                 file.WriteLine(content);
             }
@@ -8124,7 +8401,7 @@ namespace TheTerrariaSeedProject
 
         public static Tuple<List<int>, bool, string> readConfigFile()
         {
-            string path = Main.SavePath + OptionsDict.Paths.debugPath + @".\modconfig.txt";
+            string path = Main.SavePath + OptionsDict.Paths.debugPath + @"modconfig.txt";
 
 
             if (!System.IO.File.Exists(path))
@@ -9027,6 +9304,7 @@ namespace TheTerrariaSeedProject
             if (hasOBjectOrParam["Chest duplication Glitch"] > 0)
             {
                 score += hasOBjectOrParam["Chest duplication Glitch"] > 0 ? 80 * hasOBjectOrParam["Chest duplication Glitch"] : 0;
+                score += hasOBjectOrParam["Pathlength to Chest duplication Glitch"] < 1000 ? (1000 - hasOBjectOrParam["PathlengthPathlength to Chest duplication Glitch"]) / 20 : 0;
                 allScoreText += System.Environment.NewLine + "Score Chest duplication Glitch " + (int)score;
             }
             if (hasOBjectOrParam["Pot duplication Glitch"] > 0)
@@ -9034,7 +9312,7 @@ namespace TheTerrariaSeedProject
                 score += hasOBjectOrParam["Pot duplication Glitch"] > 0 ? 10 * hasOBjectOrParam["Pot duplication Glitch"] : 0;
                 score += hasOBjectOrParam["Pot duplication Glitch Single"] > 0 ? 80 * hasOBjectOrParam["Pot duplication Glitch Single"] : 0;
                 score += hasOBjectOrParam["Pot duplication Glitch Single Cavern"] > 0 ? 90 * hasOBjectOrParam["Pot duplication Glitch Single Cavern"] : 0;
-                score += hasOBjectOrParam["Pathlength to Pot dupl. Glitch"] < 1000 ? (1000-hasOBjectOrParam["Pathlength to Pot dupl. Glitch"])/20 : 0;
+                score += hasOBjectOrParam["Pathlength to Pot dupl. Glitch"] < 1000 ? (1000-hasOBjectOrParam["Pathlength to Pot dupl. Glitch"])/20 : 0;                
                 score += hasOBjectOrParam["Pathlength to Pot dupl. Glitch Single"] < 1000 ? (1000-hasOBjectOrParam["Pathlength to Pot dupl. Glitch Single"])/20 : 0;
                 
                 allScoreText += System.Environment.NewLine + "Score Pot duplication Glitch " + (int)score;
@@ -9172,6 +9450,33 @@ namespace TheTerrariaSeedProject
             double bonScor = sumUp(bonimult, 13.37, 1.337);
             allScoreText += System.Environment.NewLine + "Bonus score: " + (int)bonScor;
             score += bonScor;
+
+
+            string quickBulbs = "";
+            if (scoreW.itemLocation.ContainsKey(ItemID.PlanteraTrophy) || scoreW.itemLocation.ContainsKey(ItemID.PlanteraMask))
+                quickBulbs = System.Environment.NewLine +System.Environment.NewLine + System.Environment.NewLine + "Quick Plantera Bulb:";
+            if (scoreW.itemLocation.ContainsKey(ItemID.PlanteraTrophy))                          
+                foreach (var bulb in scoreW.itemLocation[ItemID.PlanteraTrophy])
+                {
+                    int time = (bulb.Item2 / 10000) * 10000 - bulb.Item2;
+                    int tims = (time % 100);
+                    int timm = (time / 100);
+                    quickBulbs += System.Environment.NewLine + "Plantera bulb might spawn at ( " + bulb.Item1 + " , " + -bulb.Item2 / 10000 + " ) after about " + (timm > 0 ? (timm + "min ") : "") + ( (tims + "sec") );
+                }
+            
+            if (scoreW.itemLocation.ContainsKey(ItemID.PlanteraMask))
+                foreach (var bulb in scoreW.itemLocation[ItemID.PlanteraMask])
+                {
+                    int time = (bulb.Item2 / 10000)*10000- bulb.Item2;
+                    int tims = (time % 10)*10;
+                    int timm = (time / 10);
+                    quickBulbs += System.Environment.NewLine + "Plantera bulb might spawn at ( " + bulb.Item1 + " , " + -bulb.Item2/10000 + " ) after about " + (timm>0?(timm + "min "):"") + (timm<10 && tims>0 ? (tims + "sec"):"") ;
+                    
+                }
+            if (scoreW.itemLocation.ContainsKey(ItemID.PlanteraTrophy) || scoreW.itemLocation.ContainsKey(ItemID.PlanteraMask))
+                quickBulbs += System.Environment.NewLine + "(small values can be a little longer in game (+/- 5s), high values are shorter (90%+/-1min))" + System.Environment.NewLine;
+
+
             string missingItems = AcceptConditons.GetMissingUnmakeAbleItems(scoreW);
             allScoreText += System.Environment.NewLine + "Missing unmakeable items types: (" + scoreW.missingCount + "/" + (scoreW.missingCount + scoreW.missingCountNot) + ")";
 
@@ -9179,14 +9484,18 @@ namespace TheTerrariaSeedProject
 
             allScoreText += System.Environment.NewLine + "Seed " + seed + " total Score (beta): " + (int)score;
 
-            
+
 
 
             //totod 4Pyramid min 1000 points ...............................
+            string writeScoreStr = "";
 
-            writeScore(allScoreText);
 
-            writeScore(System.Environment.NewLine + "====", true);
+            //writeScore(allScoreText);
+            writeScoreStr = allScoreText;
+
+            //writeScore(System.Environment.NewLine + "====", true);
+            writeScoreStr += System.Environment.NewLine + "====";
             scoreW.hasOBjectOrParam["Score"] = (int)Math.Round(score);
             string itemlist = "";
             
@@ -9199,12 +9508,13 @@ namespace TheTerrariaSeedProject
                     itemlist += System.Environment.NewLine + item.Key + ": " + item.Value;
             }
             //all stuff
-            writeScore(itemlist, true);
+            //writeScore(itemlist, true);
+            writeScoreStr += itemlist;
 
-            
-            allScoreText = itemlist + Environment.NewLine + Environment.NewLine + missingItems + Environment.NewLine + Environment.NewLine + "Score(beta) for seed: " + allScoreText;
+            allScoreText = itemlist + quickBulbs + Environment.NewLine + Environment.NewLine + missingItems + Environment.NewLine + Environment.NewLine + "Score(beta) for seed: " + allScoreText;
 
-            writeScore(System.Environment.NewLine + "==== all stuff ", true);
+            //writeScore(System.Environment.NewLine + "==== all stuff ", true);
+            writeScoreStr += System.Environment.NewLine + "==== all stuff ";
             itemlist = "";
             foreach (var item in hasOBjectOrParam)
             {
@@ -9222,8 +9532,9 @@ namespace TheTerrariaSeedProject
                 }
 
             }
-            writeScore(itemlist, true);
-
+            //writeScore(itemlist, true);
+            writeScoreStr += itemlist;
+            writeScore(writeScoreStr);
 
 
 
@@ -9660,6 +9971,7 @@ namespace TheTerrariaSeedProject
                     rares += checkAdd("Enchanted Sword duplication Glitch");
                     rares += checkAdd("Life Crystal duplication Glitch Single");
                     rares += checkAdd("Pot duplication Glitch Single Cavern");
+                    rares += checkAdd("Game breaker");
 
 
                     rares += checkAdd("Spawn in Marble or Granite biome");
@@ -10569,11 +10881,27 @@ namespace TheTerrariaSeedProject
 
                     }
 
+                if (score.itemLocation.ContainsKey(ItemID.PlanteraMask))
+                    foreach (var bulb in score.itemLocation[ItemID.PlanteraMask])
+                    {
+                        
+                        DrawItemImage(ref rgbValues, ItemID.PlanteraMask, new Tuple<int, int>(bulb.Item1, -bulb.Item2 / 10000), scale);
+
+                    }
+                if (score.itemLocation.ContainsKey(ItemID.PlanteraTrophy))
+                    foreach (var bulb in score.itemLocation[ItemID.PlanteraTrophy])
+                    {
+
+                        DrawItemImage(ref rgbValues, ItemID.PlanteraTrophy, new Tuple<int, int>(bulb.Item1, -bulb.Item2 / 10000), scale);
+
+                    }
+
                 foreach (var itemloclist in score.itemLocation)
                 {
                     if (itemloclist.Key != ItemID.StoneBlock && itemloclist.Key != ItemID.JungleShirt && itemloclist.Key != ItemID.JunglePants 
                         && itemloclist.Key != ItemID.PaladinsHammer && itemloclist.Key != ItemID.Ectoplasm && itemloclist.Key != ItemID.ChaosFish
-                        && itemloclist.Key != ItemID.CobaltBar && itemloclist.Key != ItemID.MythrilBar && itemloclist.Key != ItemID.PotionStatue)
+                        && itemloclist.Key != ItemID.CobaltBar && itemloclist.Key != ItemID.MythrilBar && itemloclist.Key != ItemID.PotionStatue
+                        && itemloclist.Key != ItemID.PlanteraMask && itemloclist.Key != ItemID.PlanteraTrophy )
                         foreach (var itemloc in itemloclist.Value)
                         {                          
                             DrawItemImage(ref rgbValues, itemloclist.Key, itemloc, scale);                        
@@ -10634,8 +10962,22 @@ namespace TheTerrariaSeedProject
                     DrawCircle(ref rgbValues, expl, scale, new Color(255, 255, 160), 5);
                 }
 
+                if (score.itemLocation.ContainsKey(ItemID.PlanteraTrophy))
+                    foreach (var bulb in score.itemLocation[ItemID.PlanteraTrophy])
+                    {
 
+                        DrawCircle(ref rgbValues, new Tuple<int, int>(bulb.Item1, -(bulb.Item2 / 10000) - 1), scale, new Color(255, 147, 182), 7);
+                        DrawCircle(ref rgbValues, new Tuple<int, int>(bulb.Item1, -(bulb.Item2 / 10000) - 1), scale, new Color(255, 147, 182), 9);
 
+                    }
+                if (score.itemLocation.ContainsKey(ItemID.PlanteraMask))
+                    foreach (var bulb in score.itemLocation[ItemID.PlanteraMask])
+                    {
+
+                        DrawCircle(ref rgbValues, new Tuple<int, int>(bulb.Item1, -(bulb.Item2/10000)-1), scale, new Color(255, 147, 182), 7);
+                        DrawCircle(ref rgbValues, new Tuple<int, int>(bulb.Item1, -(bulb.Item2/10000)-1), scale, new Color(255, 147, 182), 9);
+
+                    }
 
             }
 
