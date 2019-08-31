@@ -3109,6 +3109,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Pathlength to Lifeforce Potion", 1000000);
             hasOBjectOrParam.Add("Pathlength to Recall Potion", 1000000);
             hasOBjectOrParam.Add("Pathlength to Builder Potion", 1000000);
+            hasOBjectOrParam.Add("Pathlength to 2 Builder Potion Chest", 1000000);
             hasOBjectOrParam.Add("Pathlength to Rope", 1000000);
             hasOBjectOrParam.Add("Pathlength to Copper/Tin Bar", 1000000);
             hasOBjectOrParam.Add("Pathlength to Iron/Lead Bar", 1000000);
@@ -3209,6 +3210,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("neg. Pathlength to Lifeforce Potion", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Recall Potion", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Builder Potion", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to 2 Builder Potion Chest", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Rope", -1000000);
 
             hasOBjectOrParam.Add("neg. Pathlength to Copper/Tin Bar", -1000000);
@@ -3399,6 +3401,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Floating duplication Glitch structure", 0);
             hasOBjectOrParam.Add("Game breaker", 0);
             hasOBjectOrParam.Add("Quick Plantera bulb prediction (beta)", 0);
+            hasOBjectOrParam.Add("Quick Plantera bulb prediction MP only(beta)", 0);
 
 
 
@@ -4329,6 +4332,17 @@ namespace TheTerrariaSeedProject
                                     else
                                         score.itemLocation.Add(item.type, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
                                 }
+                                if (pathl < hasOBjectOrParam["Pathlength to 2 Builder Potion Chest"] && item.stack > 1)
+                                {
+                                    hasOBjectOrParam["PathlengthPathlength to 2 Builder Potion Chest"] = pathl;
+                                    if (score.itemLocation.ContainsKey(ItemID.Blinkroot))
+                                        score.itemLocation[ItemID.Blinkroot] = new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) };
+                                    else
+                                        score.itemLocation.Add(ItemID.Blinkroot, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
+                                }
+
+
+
                             }
 
                             else if (item.type == ItemID.LifeforcePotion && Main.tile[cx, cy].frameX != 144 )
@@ -6532,7 +6546,8 @@ namespace TheTerrariaSeedProject
                 int nc = Main.numClouds;
                 int o = (int)(1.05*timesPerUpdate +3+1000); //1000  to be above for sure
                 //134,000 possible (tested for large worlds), 44k for small
-                for (int c = 0; c < (rvc + rvcw + rvcu+nc+o); c++)
+                int spshift = (rvc + rvcw + rvcu + nc + o);
+                for (int c = 0; c < spshift; c++)
                 {
                     w += (int)genRand.NextDouble();
                 }
@@ -6541,9 +6556,13 @@ namespace TheTerrariaSeedProject
 
 
                 //for (int f = recm; f < 1e9; f++)//start from recm to avoid negative index in randrec
-                
-                for (int f = recm; f < timesPerUpdate*60*PlanBulbQuicTime * (doBulbExtra?100:1); f++)//strat from recm to avoid negative index in randrec
+
+                //single player is shifted by about 
+
+                int searchdepth = timesPerUpdate * 60 * PlanBulbQuicTime;
+                for (int f = recm; f < spshift + searchdepth * (doBulbExtra?100:1); f++)//strat from recm to avoid negative index in randrec
                 {
+                    
                     randrec[f%recm]=genRand.NextDouble();
 
                     if((int)(randrec[f % recm]*60.0)==0 && (int)(randrec[(f-1) % recm]*25.0)==0)
@@ -6623,27 +6642,53 @@ namespace TheTerrariaSeedProject
 
                                     if (bulb)
                                     {
-                                        int min = (f-recm-s) / timesPerUpdate / 60 / 60;
-                                        int sec = (f-recm-s) / timesPerUpdate / 60 - min*60;
 
-                                        
-                                        //writeDebugFile("" + seed + " bulb at " + x + " " + y + " upd:" + (f-recm-s) + " max time: " + min + "min "+ sec + "sec" + " off:" + s );
-                                        if (f < timesPerUpdate * 60 * PlanBulbQuicTime)
+                                        int minMP = (f - recm - s) / timesPerUpdate / 60 / 60;
+                                        int secMP = (f - recm - s) / timesPerUpdate / 60 - minMP * 60;
+
+                                        int chance = -1;
+                                        if (f < searchdepth)
+                                        {
+                                            int fc = 0;
+                                            int vc = 0;
+                                            for (float ff = 1.0f; ff < 1.05; ff += 0.001f)
+                                            {
+                                                fc++;
+                                                int val = (((f - recm - s)) % ((int)(ff * timesPerUpdate))) - (int)(ff * above);
+                                                if (val > 0 && val < (int)(ff * below)) vc++;
+                                            }
+                                            chance = Math.Min((vc * 100) / fc,99);
+                                        }
+                                        if(f < spshift && chance>0)
+                                        {
+                                            //can only be found in MP
+                                            hasOBjectOrParam["Quick Plantera bulb prediction MP only(beta)"]++;
+                                        }
+
+                                        int fs = f - spshift;
+                                        int minSP = fs>=0?(fs - recm - s) / timesPerUpdate / 60 / 60:chance;
+                                        int secSP = fs>=0?(fs - recm - s) / timesPerUpdate / 60 - minMP * 60:99;
+
+                                        //writeDebugFile("" + seed + " bulb at " + x + " " + y + " upd:" + (f-recm-s) + " spu:"+ (fs - recm - s) + " shift: "+ spshift + " max time: " + minMP + "min "+ secMP + "sec" +" sp: "+minSP+" " +secSP  + " off:" + s +" chance aprox. " + chance);
+
+                                        if (fs < searchdepth)
                                         {
                                             hasOBjectOrParam["Quick Plantera bulb prediction (beta)"]++;
-                                            int yt = (-y * 10000) - (min * 100) - (sec );
+                                            int xt = (-x * 10000) - (minSP * 100) - (secSP);
+                                            int yt = (-y * 10000) - (minMP * 100) - (secMP);
                                             if (score.itemLocation.ContainsKey(ItemID.PlanteraTrophy))
-                                                score.itemLocation[ItemID.PlanteraTrophy].Add(new Tuple<int, int>(x, yt));
+                                                score.itemLocation[ItemID.PlanteraTrophy].Add(new Tuple<int, int>(xt, yt));
                                             else
-                                                score.itemLocation.Add(ItemID.PlanteraTrophy, new List<Tuple<int, int>> { new Tuple<int, int>(x, yt) });
+                                                score.itemLocation.Add(ItemID.PlanteraTrophy, new List<Tuple<int, int>> { new Tuple<int, int>(xt, yt) });
                                         }
                                         else
                                         {
-                                            int yt = (-y * 10000)- (min*10)-(sec/10);
+                                            int xt = (-x * 10000) - (minSP * 10) - (secSP / 10);
+                                            int yt = (-y * 10000) - (minMP * 10) - (secMP / 10);
                                             if (score.itemLocation.ContainsKey(ItemID.PlanteraMask))
-                                                score.itemLocation[ItemID.PlanteraMask].Add( new Tuple<int, int>(x, yt) );
+                                                score.itemLocation[ItemID.PlanteraMask].Add(new Tuple<int, int>(xt, yt));
                                             else
-                                                score.itemLocation.Add(ItemID.PlanteraMask, new List<Tuple<int, int>> { new Tuple<int, int>(x, yt) });
+                                                score.itemLocation.Add(ItemID.PlanteraMask, new List<Tuple<int, int>> { new Tuple<int, int>(xt, yt) });
 
 
 
@@ -7180,6 +7225,7 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["neg. Pathlength to Lifeforce Potion"] = -hasOBjectOrParam["Pathlength to Lifeforce Potion"];
                 hasOBjectOrParam["neg. Pathlength to Recall Potion"] = -hasOBjectOrParam["Pathlength to Recall Potion"];
                 hasOBjectOrParam["neg. Pathlength to Builder Potion"] = -hasOBjectOrParam["Pathlength to Builder Potion"];
+                hasOBjectOrParam["neg. Pathlength to 2 Builder Potion Chest"] = -hasOBjectOrParam["Pathlength to 2 Builder Potion Chest"];
                 hasOBjectOrParam["neg. Pathlength to Rope"] = -hasOBjectOrParam["Pathlength to Rope"];
 
                 
@@ -9458,20 +9504,30 @@ namespace TheTerrariaSeedProject
             if (scoreW.itemLocation.ContainsKey(ItemID.PlanteraTrophy))                          
                 foreach (var bulb in scoreW.itemLocation[ItemID.PlanteraTrophy])
                 {
-                    int time = (bulb.Item2 / 10000) * 10000 - bulb.Item2;
-                    int tims = (time % 100);
-                    int timm = (time / 100);
-                    quickBulbs += System.Environment.NewLine + "Plantera bulb might spawn at ( " + bulb.Item1 + " , " + -bulb.Item2 / 10000 + " ) after about " + (timm > 0 ? (timm + "min ") : "") + ( (tims + "sec") );
+                    int timeSP = (bulb.Item1 / 10000) * 10000 - bulb.Item1;
+                    int timsSP = (timeSP % 100);
+                    int timmSP = (timeSP / 100);
+
+                    int timeMP = (bulb.Item2 / 10000) * 10000 - bulb.Item2;
+                    int timsMP = (timeMP % 100);
+                    int timmMP = (timeMP / 100);
+                    bool equal = timsSP == timsMP && timmSP == timmMP;
+                    quickBulbs += System.Environment.NewLine + "Plantera bulb might spawn at ( " + -bulb.Item1/10000 + " , " + -bulb.Item2 / 10000 + " ) in MP"+(equal?"/SP":"")+" after about " + (timmMP > 0 ? (timmMP + "min ") : "") + ( (timsMP + "sec")) + (timsSP<61 && !equal?", in SP after about " + (timmSP > 0 ? (timmSP + "min ") : "") + (timsSP + "sec") : (timsSP>60? ", chance about "+timmSP:"")) ;
                 }
             
             if (scoreW.itemLocation.ContainsKey(ItemID.PlanteraMask))
                 foreach (var bulb in scoreW.itemLocation[ItemID.PlanteraMask])
-                {
-                    int time = (bulb.Item2 / 10000)*10000- bulb.Item2;
-                    int tims = (time % 10)*10;
-                    int timm = (time / 10);
-                    quickBulbs += System.Environment.NewLine + "Plantera bulb might spawn at ( " + bulb.Item1 + " , " + -bulb.Item2/10000 + " ) after about " + (timm>0?(timm + "min "):"") + (timm<10 && tims>0 ? (tims + "sec"):"") ;
-                    
+                {                    
+                    int timeSP = (bulb.Item1 / 10000) * 10000 - bulb.Item1;
+                    int timsSP = (timeSP % 10)*10;
+                    int timmSP = (timeSP / 10);
+
+                    int timeMP = (bulb.Item2 / 10000) * 10000 - bulb.Item2;
+                    int timsMP = (timeMP % 10)*10;
+                    int timmMP = (timeMP / 10);
+                    bool equal = timsSP == timsMP && timmSP == timmMP;
+                    quickBulbs += System.Environment.NewLine + "Plantera bulb might spawn at ( " + -bulb.Item1 / 10000 + " , " + -bulb.Item2 / 10000 + " ) in MP" + (equal ? "/SP" : "") + " after about " + (timmMP > 0 ? (timmMP + "min ") : "") + (timmMP < 10 && timsMP > 0 ? (timsMP + "sec") : "") + (timsSP < 61 && !equal? ", in SP after about " + (timmSP > 0 ? (timmSP + "min ") : "") + (timmSP < 10 && timsSP > 0 ? (timsSP + "sec") : "") : (timsSP>60? ", chance about "+timmSP:""));
+
                 }
             if (scoreW.itemLocation.ContainsKey(ItemID.PlanteraTrophy) || scoreW.itemLocation.ContainsKey(ItemID.PlanteraMask))
                 quickBulbs += System.Environment.NewLine + "(small values can be a little longer in game (+/- 5s), high values are shorter (90%+/-1min))" + System.Environment.NewLine;
@@ -10866,6 +10922,13 @@ namespace TheTerrariaSeedProject
                         DrawItemImage(ref rgbValues, ItemID.TeleportationPotion, point, scale);
 
                     }
+                if (score.itemLocation.ContainsKey(ItemID.Blinkroot))
+                    foreach (var point in score.itemLocation[ItemID.Blinkroot])
+                    {
+                        //2 builder potions in chest
+                        DrawItemImage(ref rgbValues, ItemID.BuilderPotion, point, scale);
+
+                    }
                 if (score.itemLocation.ContainsKey(ItemID.CobaltBar))
                     foreach (var point in score.itemLocation[ItemID.CobaltBar])
                     {
@@ -10885,14 +10948,14 @@ namespace TheTerrariaSeedProject
                     foreach (var bulb in score.itemLocation[ItemID.PlanteraMask])
                     {
                         
-                        DrawItemImage(ref rgbValues, ItemID.PlanteraMask, new Tuple<int, int>(bulb.Item1, -bulb.Item2 / 10000), scale);
+                        DrawItemImage(ref rgbValues, ItemID.PlanteraMask, new Tuple<int, int>(-bulb.Item1/10000, -bulb.Item2 / 10000), scale);
 
                     }
                 if (score.itemLocation.ContainsKey(ItemID.PlanteraTrophy))
                     foreach (var bulb in score.itemLocation[ItemID.PlanteraTrophy])
                     {
 
-                        DrawItemImage(ref rgbValues, ItemID.PlanteraTrophy, new Tuple<int, int>(bulb.Item1, -bulb.Item2 / 10000), scale);
+                        DrawItemImage(ref rgbValues, ItemID.PlanteraTrophy, new Tuple<int, int>(-bulb.Item1/10000, -bulb.Item2 / 10000), scale);
 
                     }
 
@@ -10900,6 +10963,7 @@ namespace TheTerrariaSeedProject
                 {
                     if (itemloclist.Key != ItemID.StoneBlock && itemloclist.Key != ItemID.JungleShirt && itemloclist.Key != ItemID.JunglePants 
                         && itemloclist.Key != ItemID.PaladinsHammer && itemloclist.Key != ItemID.Ectoplasm && itemloclist.Key != ItemID.ChaosFish
+                        && itemloclist.Key != ItemID.Blinkroot
                         && itemloclist.Key != ItemID.CobaltBar && itemloclist.Key != ItemID.MythrilBar && itemloclist.Key != ItemID.PotionStatue
                         && itemloclist.Key != ItemID.PlanteraMask && itemloclist.Key != ItemID.PlanteraTrophy )
                         foreach (var itemloc in itemloclist.Value)
@@ -10962,20 +11026,25 @@ namespace TheTerrariaSeedProject
                     DrawCircle(ref rgbValues, expl, scale, new Color(255, 255, 160), 5);
                 }
 
-                if (score.itemLocation.ContainsKey(ItemID.PlanteraTrophy))
-                    foreach (var bulb in score.itemLocation[ItemID.PlanteraTrophy])
-                    {
-
-                        DrawCircle(ref rgbValues, new Tuple<int, int>(bulb.Item1, -(bulb.Item2 / 10000) - 1), scale, new Color(255, 147, 182), 7);
-                        DrawCircle(ref rgbValues, new Tuple<int, int>(bulb.Item1, -(bulb.Item2 / 10000) - 1), scale, new Color(255, 147, 182), 9);
-
-                    }
+                
                 if (score.itemLocation.ContainsKey(ItemID.PlanteraMask))
                     foreach (var bulb in score.itemLocation[ItemID.PlanteraMask])
                     {
+                        
+                        DrawCircle(ref rgbValues, new Tuple<int, int>(-bulb.Item1 / 10000, -(bulb.Item2/10000)-1), scale, new Color(255, 147, 182), 7);
+                        DrawCircle(ref rgbValues, new Tuple<int, int>(-bulb.Item1 / 10000, -(bulb.Item2/10000)-1), scale, new Color(255, 147, 182), 9);
+                        if (((-bulb.Item1) % 10) >= 6)
+                            DrawCircle(ref rgbValues, new Tuple<int, int>(-bulb.Item1 / 10000, -(bulb.Item2 / 10000) - 1), scale, new Color(208, 57, 125), 5);
 
-                        DrawCircle(ref rgbValues, new Tuple<int, int>(bulb.Item1, -(bulb.Item2/10000)-1), scale, new Color(255, 147, 182), 7);
-                        DrawCircle(ref rgbValues, new Tuple<int, int>(bulb.Item1, -(bulb.Item2/10000)-1), scale, new Color(255, 147, 182), 9);
+                    }
+                if (score.itemLocation.ContainsKey(ItemID.PlanteraTrophy))
+                    foreach (var bulb in score.itemLocation[ItemID.PlanteraTrophy])
+                    {
+                        
+                        DrawCircle(ref rgbValues, new Tuple<int, int>(-bulb.Item1 / 10000, -(bulb.Item2 / 10000) - 1), scale, new Color(255, 147, 182), 7);
+                        DrawCircle(ref rgbValues, new Tuple<int, int>(-bulb.Item1 / 10000, -(bulb.Item2 / 10000) - 1), scale, new Color(255, 147, 182), 9);
+                        if (((-bulb.Item1) % 100) >= 60)
+                            DrawCircle(ref rgbValues, new Tuple<int, int>(-bulb.Item1 / 10000, -(bulb.Item2 / 10000) - 1), scale, new Color(208, 57, 125), 5);
 
                     }
 
