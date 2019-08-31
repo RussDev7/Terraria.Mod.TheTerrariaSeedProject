@@ -6465,7 +6465,7 @@ namespace TheTerrariaSeedProject
                 //ss.Start();
 
                 //at night start you can't trust anymore -> firefly spawns use rand 1/9 chance +1
-                UnifiedRandom genRand = new UnifiedRandom(0);
+                UnifiedRandom genRand = new UnifiedRandom(seed);
 
                 int recm = 11;
                 double[] randrec = new double[recm];
