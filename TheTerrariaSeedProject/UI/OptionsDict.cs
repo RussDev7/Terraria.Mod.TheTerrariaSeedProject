@@ -1014,6 +1014,8 @@ namespace TheTerrariaSeedProject.UI
                 "Temple at height (%)",
                 "Temple at depth (%)",
                 Phase3.openTemple,
+                Phase3.frozenTemple,
+                Phase3.greenPyramid,
                 Phase3.lonelyJungleTree,
                 "Shadow Chest item in normal chest",
                 "Mushroom Biome above surface count",
@@ -1048,6 +1050,7 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Pathlength to Lifeforce Potion",
                 "neg. Pathlength to Recall Potion",
                 "neg. Pathlength to Builder Potion",
+                "neg. Pathlength to 2 Builder Potion Chest",
                 "neg. Pathlength to Rope",
                 "neg. Pathlength to Enchanted Sword",
                 "neg. Pathlength to Altar",
@@ -1131,6 +1134,7 @@ namespace TheTerrariaSeedProject.UI
                 "Floating duplication Glitch structure",
                 "Game breaker",
                 "Quick Plantera bulb prediction (beta)",
+                "Quick Plantera bulb prediction MP only(beta)",
                 "Score",
                 OptionsDict.Tools.conditionConnector,
                 OptionsDict.Tools.dummyPlus
@@ -1186,6 +1190,7 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to Lifeforce Potion",
                 "Pathlength to Recall Potion",
                 "Pathlength to Builder Potion",
+                "Pathlength to 2 Builder Potion Chest",
                 "Pathlength to Rope",
                 "Pathlength to Enchanted Sword",
                 "Pathlength to Altar",
@@ -1320,6 +1325,8 @@ namespace TheTerrariaSeedProject.UI
             Add("Free cavern to deep Jungle", v0to1);
             Add("Jungle cavern not blocked by structure", v0to1);
             Add(OptionsDict.Phase3.openTemple, v0to1);
+            Add(OptionsDict.Phase3.frozenTemple, v0to1);
+            Add(OptionsDict.Phase3.greenPyramid, v0to1);
             Add(OptionsDict.Phase3.lonelyJungleTree, v0to1);
             Add("Shadow Chest item in normal chest", v0to5);
             Add("Mushroom Biome above surface count", vNumTiles);
@@ -1355,6 +1362,7 @@ namespace TheTerrariaSeedProject.UI
             Add("neg. Pathlength to Lifeforce Potion", vPathLengthNeg);
             Add("neg. Pathlength to Recall Potion", vPathLengthNeg);
             Add("neg. Pathlength to Builder Potion", vPathLengthNeg);
+            Add("neg. Pathlength to 2 Builder Potion Chest", vPathLengthNeg);
             Add("neg. Pathlength to Rope", vPathLengthNeg);
 
             Add("neg. Pathlength to Enchanted Sword", vPathLengthNeg);
@@ -1456,6 +1464,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Pathlength to Lifeforce Potion", vPathLength);
             Add("Pathlength to Recall Potion", vPathLength);
             Add("Pathlength to Builder Potion", vPathLength);
+            Add("Pathlength to 2 Builder Potion Chest", vPathLength);
             Add("Pathlength to Rope", vPathLength);
             Add("Pathlength to Enchanted Sword", vPathLength);
             Add("Pathlength to Altar", vPathLength);
@@ -1557,6 +1566,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Floating duplication Glitch structure", v0to5);
             Add("Game breaker", v0to5);
             Add("Quick Plantera bulb prediction (beta)", v0to5);
+            Add("Quick Plantera bulb prediction MP only(beta)", v0to5);
             
 
             Add("Score", vScore);
@@ -2065,12 +2075,12 @@ namespace TheTerrariaSeedProject.UI
             HelpDict.Add("Life Crystal duplication Glitch",        "This allows the player to duplicate a Life Crystal e.g. with a near (trap) door. With door only works at multiplayer. If they are placed directly below a Demon Altar or Chest placing/removing e.g. a torch works as well (this also for single player). Their minimap-picture-icon is a Heart Lantern. It may also not detect all of them, some might also not work. Contact me pls if you have a seed with an undetected Life Crystal.");
             HelpDict.Add("Life Crystal duplication Glitch Single", "This allows the player to duplicate a Life Crystal e.g. with a near torch. Works also for single player. Their minimap-picture-icon is a Heart Lantern. It may also not detect all of them, some might also not work. Contact me pls if you have a seed with an undetected Life Crystal.");
             HelpDict.Add("Enchanted Sword duplication Glitch", "This allows the player to duplicate an Enchanted Sword e.g. with a near (trap) door. Only works at multiplayer (afaik). Their minimap-picture-icon is an Arkhalis. It may also not detect all of them. Contact me pls if you have a seed with an undetected Enchanted Sword.");
-            HelpDict.Add("Floating duplication Glitch structure", "This is looking for a chest or a demon altar with missing tiles below. This allows you to duplicated objects with 1-2 width and 2-3 height (no chests). Not all tested. Have fun trying around. Start testing with e.g. chairs. Crates are tricky (they can break your game), so far known they only work at Linux & Mac. Their minimap-picture-icon is a Glassblock. It may also not detect all of them. Contact me pls if you have a seed with some undetected.");
+            HelpDict.Add("Floating duplication Glitch structure", "A chest or a demon altar with missing tiles below. This allows you to duplicated objects with 1-2 width and 2-3 height (no chests). Not all tested. Have fun trying around. Start testing with e.g. chairs. Crates are tricky (they can break your game), so far known they only work at Linux & Mac. Their minimap-picture-icon is a Glassblock. It may also not detect all of them. Contact me pls if you have a seed with some undetected.");
             HelpDict.Add("Game breaker", "This can break the game if you open the door to the wrong side. Minimap-picture-icon is Avenger Emblem. Rare.");
             HelpDict.Add("Quick Plantera bulb prediction (beta)", "Plantera Bulbs which can spawn in less than "+WorldGenSeedSearch.PlanBulbQuicTime + "sec after entering the world (after all mech bosses) get detected. However the most won't spawn and need some extra work. Besides some values which can't be predicted (rare) or hard to and some internal dependencies the spawn location has a big influence at RNG. Only at single player, after playing other seed or new game!! With other spawn locations or adding/removing tiles/wall you can shift the random numbers. " +
-                "Only stuff with 1 block frame works (e.g. dirt, stone...; Stuff with some bigger structure or unique forms like Stone Slab, tree, platforms does not work). Adding/removing about 160 (small, 360med, 640large) tiles (up to two times) can have a big impact in bulb spawn. But with other number shifting new/less conditions can be true/false which can result in a new shift. That means also adding/removing less/more tiles can have a larger/smaller impact. Some bulbs are also inaccessible. In Beta state! So far only " +
-                "a few tested in single player. About 40% of detected Bulbs generated (with some help). Trophy+pink circle at minimap. If you run analysis at existiong world also bulbs with less than "+((WorldGenSeedSearch.PlanBulbQuicTime*100)/60)+ "min are shown at mini map with Planteramask icon. Times in stats file. New/less Bulbs are possible after some game play.");
-
+                "Only stuff with 1 block frame works (e.g. dirt, stone...; Stuff with some bigger structure or unique forms like Stone Slab, tree, platforms does not work). Adding/removing about 160 (small, 360med, 640large) tiles (up to two times) can have a big impact in bulb spawn. But with other number shifting new/less conditions can be true/false which can result in a new shift. That means also adding/removing less/more tiles can have a larger/smaller impact. Some bulbs are also inaccessible. \nFor multiplayer you can't alter it this way. There a specific bulb spawn is later but also new shorter bulb spawns can exist which are more reliable (if it spawns)." +
+                " Possible bulb spawns have Trophy+pink circle at minimap. If you run analysis at existing world also bulbs with less than "+((WorldGenSeedSearch.PlanBulbQuicTime*100)/60)+ "min are shown at mini map with Planteramask icon. Multiplayer only have a 3rd darker circle inside. Approximated spawn times in stats file. New/less Bulbs are possible after some game play.");
+            HelpDict.Add("Quick Plantera bulb prediction MP only(beta)", "Spawn location in Single Player can disable some plantera bulb spawns. This option allows you to find those bulb spawns which only work in multiplayer. Most times those have a spawn time of less than 5sec. Some can get available in SP if you change spawn location (e.g.air). Detected spawns also count to option which is not limited to MP. Read there for more information. They also share minimap-icon Plantera-Tropy with pink-circle. Those which work only at MP have 3rd darker circle inside. Point and time in stats file. A spot which only works at MP is less random and so more reliable (if it spawns) but also rare. Some sort of 'working' chance also in stats file.");
 
 
 
