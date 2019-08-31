@@ -4334,7 +4334,7 @@ namespace TheTerrariaSeedProject
                                 }
                                 if (pathl < hasOBjectOrParam["Pathlength to 2 Builder Potion Chest"] && item.stack > 1)
                                 {
-                                    hasOBjectOrParam["PathlengthPathlength to 2 Builder Potion Chest"] = pathl;
+                                    hasOBjectOrParam["Pathlength to 2 Builder Potion Chest"] = pathl;
                                     if (score.itemLocation.ContainsKey(ItemID.Blinkroot))
                                         score.itemLocation[ItemID.Blinkroot] = new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) };
                                     else
