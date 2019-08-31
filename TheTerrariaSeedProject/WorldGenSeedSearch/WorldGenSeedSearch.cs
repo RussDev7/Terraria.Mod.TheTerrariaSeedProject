@@ -6530,7 +6530,7 @@ namespace TheTerrariaSeedProject
                 
                 int w = 0;
                 int nc = Main.numClouds;
-                int o = (int)(1.05*timesPerUpdate +3+1000); //600  to be above for sure
+                int o = (int)(1.05*timesPerUpdate +3+1000); //1000  to be above for sure
                 //134,000 possible (tested for large worlds), 44k for small
                 for (int c = 0; c < (rvc + rvcw + rvcu+nc+o); c++)
                 {
@@ -6541,7 +6541,7 @@ namespace TheTerrariaSeedProject
 
 
                 //for (int f = recm; f < 1e9; f++)//start from recm to avoid negative index in randrec
-                //somehow ~36133 rands happen after 0th update.
+                
                 for (int f = recm; f < timesPerUpdate*60*PlanBulbQuicTime * (doBulbExtra?100:1); f++)//strat from recm to avoid negative index in randrec
                 {
                     randrec[f%recm]=genRand.NextDouble();
@@ -9304,7 +9304,7 @@ namespace TheTerrariaSeedProject
             if (hasOBjectOrParam["Chest duplication Glitch"] > 0)
             {
                 score += hasOBjectOrParam["Chest duplication Glitch"] > 0 ? 80 * hasOBjectOrParam["Chest duplication Glitch"] : 0;
-                score += hasOBjectOrParam["Pathlength to Chest duplication Glitch"] < 1000 ? (1000 - hasOBjectOrParam["PathlengthPathlength to Chest duplication Glitch"]) / 20 : 0;
+                score += hasOBjectOrParam["Pathlength to Chest duplication Glitch"] < 1000 ? (1000 - hasOBjectOrParam["Pathlength to Chest duplication Glitch"]) / 20 : 0;
                 allScoreText += System.Environment.NewLine + "Score Chest duplication Glitch " + (int)score;
             }
             if (hasOBjectOrParam["Pot duplication Glitch"] > 0)
