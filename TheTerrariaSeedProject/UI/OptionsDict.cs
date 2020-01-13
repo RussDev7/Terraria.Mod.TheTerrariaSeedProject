@@ -66,11 +66,15 @@ namespace TheTerrariaSeedProject.UI
             public const string boostSpawnRockSeedOffsetMin = "Boost spawn rock layer offset min >=";//np          
             public const string boostSpawnRockSeedOffsetMax = "Boost spawn rock layer offset max <=";//np          
             public const string boostMidTree = "Boost tree might be mid (exper.) >=";//np
-            public const string boostMidPyramid = "Boost pyramid might be mid (exper.) >=";//np
+            public const string boostMidPyramid = "Boost pyramid might be mid (exper.) >=";
+            public const string boostMidPyramidTwoDistance = "Boost 2 pyramids might be in mid dist. (exper.) <=";//np
             public const string boostMidCloud = "pred. Clouds in mid dist <="; //np
             public const string boostMidCloudInner2 = "pred. Clouds in mid mean dist inner 2 <="; //np
             public const string boostMidCloudNum = "pred. Clouds in mid num >="; //np
             public const string boostMidCloud1stLake = "pred. Clouds in mid contain 1st lake right ="; //np
+            public const string caveBG1 = "cave background 1 ="; //np
+            public const string caveBG2 = "cave background 2 ="; //np
+
         }
 
         public static class Phase2
@@ -257,11 +261,14 @@ namespace TheTerrariaSeedProject.UI
 
 
         public static readonly List<string> v0to6 = getPatern(0, 6);
+        public static readonly List<string> v1to4neg = getPatern(-1, 4,-1);
+        
         public static readonly List<string> v0to9 = getPatern(0, 10);
         public static readonly List<string> v0to10 = getPatern(0, 11);
         public static readonly List<string> v0to15 = getPatern(0, 16);
         public static readonly List<string> v0to20 = getPatern(0, 21);
         public static readonly List<string> v0to50 = getPatern(0, 51);
+        public static readonly List<string> v0to50neg = getPatern(0, 51,-1);
         public static readonly List<string> v0to80 = getPatern(0, 81);
 
         public static readonly List<string> v0to100 = getPatern(0, 101);
@@ -275,6 +282,7 @@ namespace TheTerrariaSeedProject.UI
         public static readonly List<string> v0to1 = getPatern(0, 2);
         public static readonly List<string> v0to2 = getPatern(0, 3);
         public static readonly List<string> vboost = new string[] { "-1" }.Concat(getPatern(10, 40).Concat(getPatern(50, 11, 5).Concat(new string[] {"110","134","150","190","200","300","400" }.ToList()))).ToList();
+        public static readonly List<string> vBackgroundWalls = getPatern(-1, 8);
         public static readonly List<string> vDungeonWalls = getPatern(10000, 19, 5000);
         public static readonly List<string> vDungeonALLWalls = getPatern(0, 3, 50, 1 , 2).Concat(getPatern(250, 3, 250).Concat(getPatern(1000, 9, 1000)).Concat(getPatern(10000, 21, 2000))).ToList();
         public static readonly List<string> vNearEvilOcean = getPatern(0, 8, 25).Concat(getPatern(400, 5, 100)).Concat(getPatern(1000, 10, 200).Concat(getPatern(3000, 22, 250))).ToList();
@@ -289,6 +297,7 @@ namespace TheTerrariaSeedProject.UI
         public static readonly List<string> vDistanceShort = getPatern(0, 5, 5).Concat(getPatern(25, 9, 25).Concat(getPatern(250, 4, 50)).Concat(getPatern(500, 16, 100))).ToList();
         public static readonly List<string> vDistanceShortNeg = getPatern(0, 5, -5).Concat(getPatern(-25, 9, -25).Concat(getPatern(-250, 4, -50)).Concat(getPatern(-500, 16, -100))).ToList();
                 
+        public static readonly List<string> vEvilBiomeRangeNeg = getPatern(-150, 9, -10).Concat(getPatern(-250, 9, -25)).Concat(getPatern(-500, 16, -50)).ToList();
         public static readonly List<string> vDistanceShortNegTree = getPatern(-100, 6, -5).Concat(getPatern(-130, 2, -10).Concat(getPatern(-150, 3, -25).Concat(getPatern(-250, 4, -50)).Concat(getPatern(-500, 16, -100)))).ToList();
         public static readonly List<string> vDistanceLong = getPatern(200, 8, 100).Concat(getPatern(1000, 17, 200)).ToList();
         public static readonly List<string> vDistanceLongNeg = getPatern(-200, 8, -100).Concat(getPatern(-1000, 17, -200)).ToList();
@@ -577,6 +586,9 @@ namespace TheTerrariaSeedProject.UI
             Add(Phase1.hallowSide, new List<string> { "Random", "Jungle side", "Snow/Dungeon side"});
             Add(Phase1.dungeonWallColor, new List<string> { "Random", "Blue", "Green", "Pink"});
             Add(Phase1.dungeonSide, new List<string> { "Random", "Left", "Right"});
+            Add(Phase1.caveBG1, vBackgroundWalls);
+            Add(Phase1.caveBG2, vBackgroundWalls);
+
             Add(Phase1.boost, vboost);
             Add(Phase1.boostMax, vboost);
             Add(Phase1.boostPyr, v0to10);            
@@ -594,6 +606,7 @@ namespace TheTerrariaSeedProject.UI
             Add(Phase1.boostSpawnRockSeedOffsetMax, vSpawnRockOff);
             Add(Phase1.boostMidTree, v0to1);
             Add(Phase1.boostMidPyramid, v0to1);
+            Add(Phase1.boostMidPyramidTwoDistance, vDistanceLong);
             Add(Phase1.boostMidCloud, vCloudsMidDist);
             Add(Phase1.boostMidCloudInner2, vCloudsMidDist);
             Add(Phase1.boostMidCloudNum, v0to9);
@@ -602,6 +615,8 @@ namespace TheTerrariaSeedProject.UI
             if (WorldGenSeedSearch.isPubRel)
             {
                 this.Remove(Phase1.boostMax);
+                this.Remove(Phase1.caveBG1);
+                this.Remove(Phase1.caveBG2);
             }
 
 
@@ -685,6 +700,9 @@ namespace TheTerrariaSeedProject.UI
                 "MarbleGranite at surf dist. to mid",
                 "Top MarbleGranite dist. to spawn (guess)",
                 "UG MarbleGranite dist. to spawn (guess)",
+                "Demonite/Crimtane ore above UG near mid",
+                "Ruby near mid close to surface",
+                "Diamond near mid close to surface",
                 "Evil biome distance to mid",
                 "Surface average height (aprox.)",
                 "Surface height (sqrt) variance",
@@ -711,6 +729,8 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Evil Tiles for Jungle Grass",
                 "neg. Evil Tiles for Sand",
                 "neg. Evil Tiles for Ice",
+                "neg. Evil biome spots",
+                "neg. Evil biome range",
                 "Ice surface more than half not evil",
                 "Enchanted Sword mid may possible (guess)",
                 "Enchanted Sword mid granite may possible (guess)",
@@ -858,6 +878,9 @@ namespace TheTerrariaSeedProject.UI
             Add("MarbleGranite at surf dist. to mid", vDistance);
             Add("Top MarbleGranite dist. to spawn (guess)", vDistance);
             Add("UG MarbleGranite dist. to spawn (guess)", vDistance);
+            Add("Demonite/Crimtane ore above UG near mid", v0to10);
+            Add("Ruby near mid close to surface", v0to20);
+            Add("Diamond near mid close to surface", v0to20);
             Add("Evil biome distance to mid", vDistance);
             Add("Surface average height (aprox.)", vMeanHeight);
             Add("Surface height (sqrt) variance", v0to120);
@@ -904,6 +927,8 @@ namespace TheTerrariaSeedProject.UI
             Add("neg. Evil Tiles for Jungle Grass", vEvilTilesNeg);
             Add("neg. Evil Tiles for Sand", vEvilTilesNeg);
             Add("neg. Evil Tiles for Ice", vEvilTilesNeg);
+            Add("neg. Evil biome spots", v1to4neg);
+            Add("neg. Evil biome range", vDistanceShortNegTree);
             
 
             Add("Has evil Ocean", v0to2);
@@ -1005,6 +1030,7 @@ namespace TheTerrariaSeedProject.UI
                 "Temple door horizontal distance",
                 "Temple Tile horizontal distance",
                 "Temple Tile vertical distance",
+                "neg. blocks below Temple Altar",
                 "neg. Temple door distance",
                 "neg. Temple door horizontal distance",
                 "neg. Temple Tile horizontal distance",
@@ -1049,8 +1075,9 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Pathlength to Battle Potion",
                 "neg. Pathlength to Lifeforce Potion",
                 "neg. Pathlength to Recall Potion",
-                "neg. Pathlength to Builder Potion",
+                "neg. Pathlength to Builder Potion",                
                 "neg. Pathlength to 2 Builder Potion Chest",
+                "neg. Pathlength to Hunter Potion",
                 "neg. Pathlength to Rope",
                 "neg. Pathlength to Enchanted Sword",
                 "neg. Pathlength to Altar",
@@ -1064,6 +1091,7 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Pathlength to Anvil",
                 "neg. Pathlength to Ruby",
                 "neg. Pathlength to Diamond",
+                "neg. Pathlength to Demonite/Crimtane ore",
                 "neg. Pathlength to Cloud in a Bottle",
                 "neg. Pathlength to 2 Herb Bag Chest",
                 "neg. Pathlength to Grenades",
@@ -1108,6 +1136,7 @@ namespace TheTerrariaSeedProject.UI
                 "Floating Island without chest",
                 "Nearest Altar Dungeon beach",
                 "Nearest Altar Jungle beach",
+                "Spawn at edge of Snow/Forest biome",
                 "Spawn in Snow biome",
                 "Spawn in Jungle biome",
                 "Spawn in Sky",
@@ -1189,8 +1218,9 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to Battle Potion",
                 "Pathlength to Lifeforce Potion",
                 "Pathlength to Recall Potion",
-                "Pathlength to Builder Potion",
+                "Pathlength to Builder Potion",                
                 "Pathlength to 2 Builder Potion Chest",
+                "Pathlength to Hunter Potion",
                 "Pathlength to Rope",
                 "Pathlength to Enchanted Sword",
                 "Pathlength to Altar",
@@ -1204,6 +1234,7 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to Anvil",
                 "Pathlength to Ruby",
                 "Pathlength to Diamond",
+                "Pathlength to Demonite/Crimtane ore",
                 "Pathlength to Cloud in a Bottle",
                 "Pathlength to 2 Herb Bag Chest",
                 "Pathlength to Grenades",
@@ -1253,7 +1284,7 @@ namespace TheTerrariaSeedProject.UI
                 OptionsDict.Tools.dummyNeg
             });
 
-            Add("Enchanted Sword Shrine", v0to5);
+            Add("Enchanted Sword Shrine", v0to4);
             Add("Enchanted Sword", v0to10);
             Add("Near Enchanted Sword", v0to5);
             Add("Enchanted Sword near Pyramid or Tree", v0to5);
@@ -1361,8 +1392,9 @@ namespace TheTerrariaSeedProject.UI
             Add("neg. Pathlength to Battle Potion", vPathLengthNeg);
             Add("neg. Pathlength to Lifeforce Potion", vPathLengthNeg);
             Add("neg. Pathlength to Recall Potion", vPathLengthNeg);
-            Add("neg. Pathlength to Builder Potion", vPathLengthNeg);
+            Add("neg. Pathlength to Builder Potion", vPathLengthNeg);            
             Add("neg. Pathlength to 2 Builder Potion Chest", vPathLengthNeg);
+            Add("neg. Pathlength to Hunter Potion", vPathLengthNeg);
             Add("neg. Pathlength to Rope", vPathLengthNeg);
 
             Add("neg. Pathlength to Enchanted Sword", vPathLengthNeg);
@@ -1378,6 +1410,7 @@ namespace TheTerrariaSeedProject.UI
             Add("neg. Pathlength to Anvil", vPathLengthNeg);
             Add("neg. Pathlength to Ruby", vPathLengthNeg);
             Add("neg. Pathlength to Diamond", vPathLengthNeg);
+            Add("neg. Pathlength to Demonite/Crimtane ore", vPathLengthNeg);
             Add("neg. Pathlength to Cloud in a Bottle", vPathLengthNeg);
             Add("neg. Pathlength to 2 Herb Bag Chest", vPathLengthNeg);
             Add("neg. Pathlength to Grenades", vPathLengthNeg);
@@ -1463,8 +1496,9 @@ namespace TheTerrariaSeedProject.UI
             Add("Pathlength to Battle Potion", vPathLength);
             Add("Pathlength to Lifeforce Potion", vPathLength);
             Add("Pathlength to Recall Potion", vPathLength);
-            Add("Pathlength to Builder Potion", vPathLength);
+            Add("Pathlength to Builder Potion", vPathLength);            
             Add("Pathlength to 2 Builder Potion Chest", vPathLength);
+            Add("Pathlength to Hunter Potion", vPathLength);
             Add("Pathlength to Rope", vPathLength);
             Add("Pathlength to Enchanted Sword", vPathLength);
             Add("Pathlength to Altar", vPathLength);
@@ -1478,6 +1512,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Pathlength to Anvil", vPathLength);
             Add("Pathlength to Ruby", vPathLength);
             Add("Pathlength to Diamond", vPathLength);
+            Add("Pathlength to Demonite/Crimtane ore", vPathLength);
             Add("Pathlength to Cloud in a Bottle", vPathLength);
             Add("Pathlength to 2 Herb Bag Chest", vPathLength);
             Add("Pathlength to Grenades", vPathLength);
@@ -1529,6 +1564,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Temple door horizontal distance", vDistanceLong);
             Add("Temple Tile horizontal distance", vDistanceLong);
             Add("Temple Tile vertical distance", vDistanceShort);
+            Add("neg. blocks below Temple Altar", v0to50neg);
             Add("neg. Temple door distance", vDistanceLongNeg);
             Add("neg. Temple door horizontal distance", vDistanceLongNeg);
             Add("neg. Temple Tile horizontal distance", vDistanceLongNeg);
@@ -1539,6 +1575,7 @@ namespace TheTerrariaSeedProject.UI
             Add("Temple at height (%)", v0to100);
             Add("Temple at depth (%)", v0to100);
 
+            Add("Spawn at edge of Snow/Forest biome", v0to1);
             Add("Spawn in Snow biome", v0to1);
             Add("Spawn in Jungle biome", v0to1);            
             Add("Spawn in Sky", v0to1);
@@ -1789,6 +1826,9 @@ namespace TheTerrariaSeedProject.UI
             HelpDict.Add(Phase1.boostMidPyramid, "This increases the chance of having a pyramid very close to mid. It is neigther correct all the time nor finding all seeds which have such a pyramid. " +
                 "Later world gen can overwrite it, so another check in phase 2 is needed.");
 
+            HelpDict.Add(Phase1.boostMidPyramidTwoDistance, "This increases the chance of having two pyramid very close to mid with distance less than selected. It is neigther correct all the time nor finding all seeds which have such pyramids. " +
+                "Later world gen can overwrite it, so another check in phase 2 is needed.");
+
             HelpDict.Add(Phase1.boostHeightMin, "In early world gen. it tries to predict the amount of blocks between (unknown) character spawn location and (known) start of underground layer. " +
                 " World gen. only contine if height is between "+ Phase1.boostHeightMin + " and " + Phase1.boostHeightMax);
             HelpDict.Add(Phase1.boostHeightMax, "In early world gen. it tries to predict the amount of blocks between (unknown) character spawn location and (known) start of underground layer. " +
@@ -1819,6 +1859,13 @@ namespace TheTerrariaSeedProject.UI
             HelpDict.Add(Phase1.dungeonSide, wtext);
             HelpDict.Add(Phase1.dungeonWallColor, wtext);
             HelpDict.Add(Phase1.hallowSide, wtext);
+
+            string bgtext = "Currently only for small worlds. They have 2 versions. At one horizontal point they change into the other. Style 1 is the style of the left background wall. Style 2 the style of the right version.";
+
+            HelpDict.Add(Phase1.caveBG1, "Background cave style 1. " +bgtext);
+            HelpDict.Add(Phase1.caveBG2, "Background cave style 2. " + bgtext);
+
+
 
             
             //phase 2
@@ -1914,6 +1961,9 @@ namespace TheTerrariaSeedProject.UI
             HelpDict.Add("Evil Tiles for Sand", "How many evil biome tiles exists which can convert a Sand tile to evil biome tile");
             HelpDict.Add("Evil Tiles for Ice", "How many evil biome tiles exists which can convert a Ice tile to evil biome tile");
 
+            HelpDict.Add("neg. Evil biome spots", "Counts unique evil biome spots. Small has 2, medium 3, large 4. This number is reduced if they are merged.");
+            HelpDict.Add("neg. Evil biome range", "Counts the evil biome horizontal range. The count is limited to the main evil biome structure wihch has a biome related wall. Crimson has higher chance to be narrower.");
+
 
             HelpDict.Add("Ice surface more than half evil", "True if more than half of the ice tiles above surface are evil ice tiles or can get converted to.");
             HelpDict.Add("Ice surface more than half not evil", "Opposite of 'Ice surface more than half evil'");
@@ -1933,6 +1983,10 @@ namespace TheTerrariaSeedProject.UI
                 "the approximated spawn location (top of blocks in mid, slightly (4) below also counts ). " +
                 "Can be used to detect Marble and Granite biome close to spawn location.");
 
+             HelpDict.Add("Diamond near mid close to surface", "Count's diamonds which are located in 50 blocks or less to mid of world and above surface or less than 5 blocks below it. Can only count gem in stones.");
+             HelpDict.Add("Ruby near mid close to surface", "Count's rubies which are located in 50 blocks or less to mid of world and above surface or less than 5 blocks below it. Can only count gem in stones.");
+             HelpDict.Add("Demonite/Crimtane ore above UG near mid", "Count's Demonite/Crimtane ore which is located in 50 blocks or less to mid of world and above surface. This can be mined by any pickaxe.");
+
 
 
             HelpDict.Add("Jungle biome surface overlap mid", "Number of Jungle biome tiles which are at the wrong side of the world");
@@ -1951,6 +2005,7 @@ namespace TheTerrariaSeedProject.UI
 
             HelpDict.Add(Phase3.greenPyramid, "A pyramid with green interiority.");
             HelpDict.Add(Phase3.frozenTemple, "A Jungle Temple which has snow biome around.");
+            HelpDict.Add("neg. blocks below Temple Altar", "Number of temple tiles below Lihzahrd Altar (height). Values below 6 are rare.");
 
             
 
@@ -2079,7 +2134,7 @@ namespace TheTerrariaSeedProject.UI
             HelpDict.Add("Game breaker", "This can break the game if you open the door to the wrong side. Minimap-picture-icon is Avenger Emblem. Rare.");
             HelpDict.Add("Quick Plantera bulb prediction (beta)", "Plantera Bulbs which can spawn in less than "+WorldGenSeedSearch.PlanBulbQuicTime + "sec after entering the world (after all mech bosses) get detected. However the most won't spawn and need some extra work. Besides some values which can't be predicted (rare) or hard to and some internal dependencies the spawn location has a big influence at RNG. Only at single player, after playing other seed or new game!! With other spawn locations or adding/removing tiles/wall you can shift the random numbers. " +
                 "Only stuff with 1 block frame works (e.g. dirt, stone...; Stuff with some bigger structure or unique forms like Stone Slab, tree, platforms does not work). Adding/removing about 160 (small, 360med, 640large) tiles (up to two times) can have a big impact in bulb spawn. But with other number shifting new/less conditions can be true/false which can result in a new shift. That means also adding/removing less/more tiles can have a larger/smaller impact. Some bulbs are also inaccessible. \nFor multiplayer you can't alter it this way. There a specific bulb spawn is later but also new shorter bulb spawns can exist which are more reliable (if it spawns)." +
-                " Possible bulb spawns have Trophy+pink circle at minimap. If you run analysis at existing world also bulbs with less than "+((WorldGenSeedSearch.PlanBulbQuicTime*100)/60)+ "min are shown at mini map with Planteramask icon. Multiplayer only have a 3rd darker circle inside. Approximated spawn times in stats file. New/less Bulbs are possible after some game play.");
+                " Possible bulb spawns have Trophy+pink circle at minimap. If you run analysis at existing world also bulbs with less than "+((WorldGenSeedSearch.PlanBulbQuicTime*100)/60)+ "min are shown at mini map with Planteramask icon. Multiplayer-only have a 3rd darker circle inside. Approximated spawn times in stats file. New/less Bulbs are possible after some game play.");
             HelpDict.Add("Quick Plantera bulb prediction MP only(beta)", "Spawn location in Single Player can disable some plantera bulb spawns. This option allows you to find those bulb spawns which only work in multiplayer. Most times those have a spawn time of less than 5sec. Some can get available in SP if you change spawn location (e.g.air). Detected spawns also count to option which is not limited to MP. Read there for more information. They also share minimap-icon Plantera-Tropy with pink-circle. Those which work only at MP have 3rd darker circle inside. Point and time in stats file. A spot which only works at MP is less random and so more reliable (if it spawns) but also rare. Some sort of 'working' chance also in stats file.");
 
 
