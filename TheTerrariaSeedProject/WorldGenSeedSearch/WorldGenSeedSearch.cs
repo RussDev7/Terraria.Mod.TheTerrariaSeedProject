@@ -129,6 +129,9 @@ namespace TheTerrariaSeedProject
         string looking4dungeonWallColor = "";
         string looking4dungeonSide = "";
 
+        int looking4caveBG1 = -1;
+        int looking4caveBG2 = -1;
+
         bool randomInverse = false;
 
         string mapSize = "0";
@@ -167,7 +170,8 @@ namespace TheTerrariaSeedProject
         int boostSpawnRockSeedOffsetSeed = 0;
         int boostMidTreeValue = 0;
         int boostMidTreeValueSeed = 0;
-        int boostPyramidMidValue = 0;       
+        int boostPyramidMidValue = 0;
+        int boostPyramidTwoMidDistance = 10000;
         bool doApproxRun = false;
         bool inApproxRun = false;
 
@@ -299,6 +303,8 @@ namespace TheTerrariaSeedProject
                 genProg = new GenerationProgress();
                 uiss = new UISearchSettings(genProg, mod, this); //also inits config
 
+                int doBulbGenHM = 0;
+
                 if (quickStart && quickStartConf.Length > 0)
                 {
                     
@@ -395,6 +401,29 @@ namespace TheTerrariaSeedProject
                             
                             StoreMapAsPNG(true);
                             StoreLastStats(true);
+
+                            //dont work first trial
+                            /*
+                            if (!isPubRel)
+                            {
+                                createMapName(score, false, currentConfiguration, worldName);
+                                Main.rand = new UnifiedRandom(seed);
+                                WorldGen._genRand = new UnifiedRandom(seed);
+                                if(Main.rand.Next(42)+ WorldGen.genRand.Next(42) >= 0)
+                                {
+                                    Main.rand = new UnifiedRandom(seed);
+                                    WorldGen._genRand = new UnifiedRandom(seed);
+                                }
+
+                                WorldGen.StartHardmode();
+                                Thread.Sleep(3000);
+                                StoreMapAsPNG(true);
+                            }
+                            */
+
+
+
+
                             stage = 0;
                         }
                     }
@@ -491,6 +520,16 @@ namespace TheTerrariaSeedProject
                             looking4hallowSide = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.hallowSide, 1);
                             looking4dungeonWallColor = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.dungeonWallColor, 1);
                             looking4dungeonSide = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.dungeonSide, 1);
+
+                            looking4caveBG1 = -1;
+                            string caveBGString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.caveBG1, 1);
+                            if (caveBGString.Length > 0)
+                                if (!Int32.TryParse(caveBGString, out looking4caveBG1)) looking4caveBG1 = -1;
+                            looking4caveBG2 = -1;
+                            caveBGString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.caveBG2, 1);
+                            if (caveBGString.Length > 0)
+                                if (!Int32.TryParse(caveBGString, out looking4caveBG2)) looking4caveBG2 = -1;
+
 
                             int boostValueInt = 10;
                             string boostString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boost, 1);
@@ -624,6 +663,15 @@ namespace TheTerrariaSeedProject
                             if (boostPyramidMidString.Length > 0)
                                 if (!Int32.TryParse(boostPyramidMidString, out boostPyramidMidValue)) boostPyramidMidValue = 0;
 
+                            boostPyramidTwoMidDistance = 10000;
+                            string boostPyramidTwoMidDistString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boostMidPyramidTwoDistance, 1);
+                            if (boostPyramidTwoMidDistString.Length > 0)
+                                if (!Int32.TryParse(boostPyramidTwoMidDistString, out boostPyramidTwoMidDistance)) boostPyramidTwoMidDistance = 10000;
+
+
+                            //test if hardmode picture and world shoudl be stored
+                            doBulbGenHM = (currentConfiguration.FindConfigItemValue("Quick Plantera bulb prediction (beta)", 3).Length > 0?1:0)  +
+                                (currentConfiguration.FindConfigItemValue("Quick Plantera bulb prediction MP only(beta)", 3).Length > 0?2:0) ;
 
 
                             search4MoonOres = true;
@@ -632,6 +680,8 @@ namespace TheTerrariaSeedProject
                                 && looking4dungeonSide.Equals("Random") && looking4dungeonWallColor.Equals("Random"))
                                 search4MoonOres = false;
 
+
+                            
                             //avoid cureent vanilla bug
                             BugAvoidCloudChest();
 
@@ -709,6 +759,8 @@ namespace TheTerrariaSeedProject
                                     dungColTrue = true;
 
                             }
+
+
 
                             bool midtree = true;
                             const int treeDist = 105;
@@ -795,6 +847,7 @@ namespace TheTerrariaSeedProject
                                 numPyramidChanceAdv = red.Item1;
                                 numPyramidChanceAdvUber = red.Item2;
                                 int minDist = red.Item3;
+                                int minDist2nd = red.Item4;
 
 
                                 localnumPyr = numPyramidChanceAdvUber;
@@ -833,7 +886,12 @@ namespace TheTerrariaSeedProject
                                 }
                                                                 
                                 if (boostPyramidMidValue!=0 && minDist > 0.1 * Main.maxTilesX+1)
-                                    condsTrue = 0;                                                               
+                                    condsTrue = 0;  
+                                if (boostPyramidTwoMidDistance < minDist2nd && boostPyramidTwoMidDistance<(Main.maxTilesX/2))
+                                    condsTrue = 0;
+
+                                if ((looking4caveBG1 != -1 && looking4caveBG1 != Main.caveBackStyle[0]) || (looking4caveBG2 != -1 && looking4caveBG2 != Main.caveBackStyle[1]))
+                                    condsTrue = 0;
 
                             }
                             else
@@ -1044,10 +1102,48 @@ namespace TheTerrariaSeedProject
                                     //foreach (var elem in score.hasOBjectOrParam)
                                     //    wrtei += elem.Key + ": " + elem.Value + Environment.NewLine;
                                     if (storeMMImg >= 0) StoreMapAsPNG(storeMMImg % 2 > 0);
+                                 
 
                                     if (storeStats >= 0) StoreLastStats(true);
 
                                     writeToDescList(GenerateStatsText(), -2);
+
+                                    if (storeMMImg >= 0 && doBulbGenHM>0 && 
+                                        ((score.hasOBjectOrParam["Quick Plantera bulb prediction (beta)"] > 0 && doBulbGenHM%2==1) || 
+                                        (score.hasOBjectOrParam["Quick Plantera bulb prediction MP only(beta)"] > 0 && doBulbGenHM>1)))
+                                    {
+                                        
+                                        Main.worldName = Main.worldName + "_HM";
+                                        string cseed = Main.ActiveWorldFileData.SeedText.PadLeft(10, '0');
+                                        Main.ActiveWorldFileData = WorldFile.CreateMetadata(Main.worldName, false, Main.expertMode);
+                                        Main.ActiveWorldFileData.SetSeed(cseed);
+                                                                                
+                                        Main.rand = new UnifiedRandom(seed);
+                                        WorldGen._genRand = new UnifiedRandom(seed);
+                                        
+                                        WorldGen.StartHardmode();
+                                        int maxWait = 20;
+                                        while (!WorldGen.IsGeneratingHardMode)
+                                        {
+                                            Thread.Sleep(100);
+                                            if (maxWait-- < 0) break;
+                                        }
+                                        maxWait = 200;
+                                        while (WorldGen.IsGeneratingHardMode)
+                                        {
+                                            Thread.Sleep(100);
+                                            if (maxWait-- < 0) break;
+                                        }                                        
+                                        StoreMapAsPNG(storeMMImg % 2 > 0);
+
+                                        NPC.downedMechBoss1 = true;
+                                        NPC.downedMechBoss2 = true;
+                                        NPC.downedMechBoss3 = true;                                        
+                                        WorldFile.saveWorld(false, true);
+
+                                    }
+
+
                                 }
                             }
 
@@ -3071,6 +3167,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Temple door horizontal distance", 0);
             hasOBjectOrParam.Add("Temple Tile horizontal distance", 0);
             hasOBjectOrParam.Add("Temple Tile vertical distance", 0);
+            hasOBjectOrParam.Add("neg. blocks below Temple Altar", 0);
             hasOBjectOrParam.Add("neg. Temple door distance", 0);
             hasOBjectOrParam.Add("neg. Temple door horizontal distance", 0);
             hasOBjectOrParam.Add("neg. Temple Tile horizontal distance", 0);
@@ -3108,8 +3205,9 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Pathlength to Battle Potion", 1000000);
             hasOBjectOrParam.Add("Pathlength to Lifeforce Potion", 1000000);
             hasOBjectOrParam.Add("Pathlength to Recall Potion", 1000000);
-            hasOBjectOrParam.Add("Pathlength to Builder Potion", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Builder Potion", 1000000);            
             hasOBjectOrParam.Add("Pathlength to 2 Builder Potion Chest", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Hunter Potion", 1000000);
             hasOBjectOrParam.Add("Pathlength to Rope", 1000000);
             hasOBjectOrParam.Add("Pathlength to Copper/Tin Bar", 1000000);
             hasOBjectOrParam.Add("Pathlength to Iron/Lead Bar", 1000000);
@@ -3151,6 +3249,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Pathlength to Anvil", 1000000);
             hasOBjectOrParam.Add("Pathlength to Ruby", 1000000);
             hasOBjectOrParam.Add("Pathlength to Diamond", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Demonite/Crimtane ore", 1000000);
             hasOBjectOrParam.Add("Pathlength to Cloud in a Bottle", 1000000);
             hasOBjectOrParam.Add("Pathlength to 2 Herb Bag Chest", 1000000);
             hasOBjectOrParam.Add("Pathlength to Grenades", 1000000);
@@ -3211,6 +3310,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("neg. Pathlength to Recall Potion", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Builder Potion", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to 2 Builder Potion Chest", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Hunter Potion", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Rope", -1000000);
 
             hasOBjectOrParam.Add("neg. Pathlength to Copper/Tin Bar", -1000000);
@@ -3253,6 +3353,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("neg. Pathlength to Anvil", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Ruby", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Diamond", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Demonite/Crimtane ore", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Cloud in a Bottle", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to 2 Herb Bag Chest", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Grenades", -1000000);
@@ -3332,12 +3433,14 @@ namespace TheTerrariaSeedProject
 
             hasOBjectOrParam.Add(OptionsDict.Phase3.openTemple, 0);
             hasOBjectOrParam.Add("Mushroom Biome above surface count", 0);
-            
 
+
+            hasOBjectOrParam.Add("neg. Evil biome spots", 0);
+            hasOBjectOrParam.Add("neg. Evil biome range", 0);
             hasOBjectOrParam.Add("Evil Tiles for Mud", 0);
             hasOBjectOrParam.Add("Evil Tiles for Jungle Grass", 0);
             hasOBjectOrParam.Add("Evil Tiles for Sand", 0);
-            hasOBjectOrParam.Add("Evil Tiles for Ice", 0);
+            hasOBjectOrParam.Add("Evil Tiles for Ice", 0);            
 
             hasOBjectOrParam.Add("Ice surface evil", 0);
             hasOBjectOrParam.Add("Ice Surface", 0);
@@ -3349,6 +3452,9 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("MarbleGranite at surf dist. to mid", 100000);
             hasOBjectOrParam.Add("Top MarbleGranite dist. to spawn (guess)", 100000* 10000);
             hasOBjectOrParam.Add("UG MarbleGranite dist. to spawn (guess)", 100000* 10000);
+            hasOBjectOrParam.Add("Demonite/Crimtane ore above UG near mid", 0);
+            hasOBjectOrParam.Add("Ruby near mid close to surface", 0);
+            hasOBjectOrParam.Add("Diamond near mid close to surface", 0);
 
 
 
@@ -4340,10 +4446,22 @@ namespace TheTerrariaSeedProject
                                     else
                                         score.itemLocation.Add(ItemID.Blinkroot, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
                                 }
-
-
-
                             }
+                            else if (item.type == ItemID.HunterPotion)
+                            {
+                                if (pathl < hasOBjectOrParam["Pathlength to Hunter Potion"])
+                                {
+                                    hasOBjectOrParam["Pathlength to Hunter Potion"] = pathl;
+                                    if (score.itemLocation.ContainsKey(item.type))
+                                        score.itemLocation[item.type] = new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) };
+                                    else
+                                        score.itemLocation.Add(item.type, new List<Tuple<int, int>> { new Tuple<int, int>(cx, cy) });
+                                }                               
+                            }
+
+
+
+
 
                             else if (item.type == ItemID.LifeforcePotion && Main.tile[cx, cy].frameX != 144 )
                             {
@@ -4512,7 +4630,8 @@ namespace TheTerrariaSeedProject
             int liqt = 0;
 
             int[] waterDuckSpawn = new int[601];
-                        
+            List<Tuple<int, int>> evilBiomesLoc = new List<Tuple<int, int>>();
+            int lastEvilX = 0;
 
             //todo: no border
             for (int x = 10; x < Main.maxTilesX - 10; x++)
@@ -4752,6 +4871,18 @@ namespace TheTerrariaSeedProject
                             }
                         }
 
+                        //evil spots
+                        if ((tile.wall == WallID.EbonstoneUnsafe || tile.wall == WallID.CrimstoneUnsafe) && x > lastEvilX)
+                        {
+                            const int mergedelay = 15;
+                            if (evilBiomesLoc.Count == 0)
+                                evilBiomesLoc.Add(new Tuple<int, int>(x, x));
+                            else if (x > lastEvilX + mergedelay)
+                                evilBiomesLoc.Add(new Tuple<int, int>(x, x));
+                            else
+                                evilBiomesLoc[evilBiomesLoc.Count - 1] = new Tuple<int, int>(evilBiomesLoc[evilBiomesLoc.Count - 1].Item1, x);
+                            lastEvilX = x;
+                        }
                     }
 
                     if (!tile.active())
@@ -5000,6 +5131,9 @@ namespace TheTerrariaSeedProject
                             }
 
                         }
+
+                     
+
                         //new if
                         //corruption2 crimson2 sandCor sandCrim iceCor iceCrim 
                         if (tile.type == TileID.Ebonstone || tile.type == TileID.CorruptGrass || tile.type == TileID.Crimstone || tile.type == TileID.FleshGrass
@@ -5100,10 +5234,20 @@ namespace TheTerrariaSeedProject
                                     Math.Abs(Main.maxTilesX/2-x));
                                                        
                         }
+                        else if ((tile.type == TileID.Demonite || tile.type == TileID.Crimtane) && y<Main.worldSurface && Math.Abs(x-Main.maxTilesX/2)<50  )
+                        {
+                            hasOBjectOrParam["Demonite/Crimtane ore above UG near mid"]++;
+                        }
+                        else if ((tile.type == TileID.Ruby) && y < (Main.worldSurface+5) && Math.Abs(x - Main.maxTilesX / 2) < 50)
+                        {
+                            hasOBjectOrParam["Ruby near mid close to surface"]++;
+                        }
+                        else if ((tile.type == TileID.Diamond) && y < (Main.worldSurface + 5) && Math.Abs(x - Main.maxTilesX / 2) < 50)
+                        {
+                            hasOBjectOrParam["Diamond near mid close to surface"]++;
+                        }
 
 
-                        
-                       
 
 
 
@@ -5561,6 +5705,19 @@ namespace TheTerrariaSeedProject
                                 {
                                     hasOBjectOrParam[OptionsDict.Phase3.openTemple] = 1;
                                 }
+                                int xt = x + 1;
+                                int yt = y + 1;
+                                int c = 10;
+                                int bc = 0;
+                                while (c > 0)
+                                {
+                                    yt++;
+                                    if ((Main.tile[xt, yt].active() && Main.tile[xt, yt].type == TileID.LihzahrdBrick))
+                                        bc++;
+                                    if ( !(Main.tile[xt, yt].wall == WallID.LihzahrdBrickUnsafe || (Main.tile[xt, yt].active() && Main.tile[xt, yt].type == TileID.LihzahrdBrick)  ))
+                                        c--;
+                                }
+                                hasOBjectOrParam["neg. blocks below Temple Altar"] = -bc;
 
                             }
 
@@ -6056,6 +6213,20 @@ namespace TheTerrariaSeedProject
                                 }
 
                             }
+                            else if (Main.tile[x, y].active() && (Main.tile[x, y].type == TileID.Demonite || Main.tile[x, y].type == TileID.Crimtane) )
+                            {
+                                int pathl = FindShortestPathInRange(ref pathLength, x, y, 2, 2, 2, 2);
+
+                                if (pathl < hasOBjectOrParam["Pathlength to Demonite/Crimtane ore"])
+                                {
+                                    hasOBjectOrParam["Pathlength to Demonite/Crimtane ore"] = pathl;
+                                    if (score.itemLocation.ContainsKey(ItemID.DemoniteOre))
+                                        score.itemLocation[ItemID.DemoniteOre] = new List<Tuple<int, int>> { new Tuple<int, int>(x, y) };
+                                    else
+                                        score.itemLocation.Add(ItemID.DemoniteOre, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
+                                }
+
+                            }
 
 
                             else if (Main.tile[x, y].type == TileID.Extractinator && Main.tile[x, y].frameX == 0 && Main.tile[x, y].frameY == 0)
@@ -6131,9 +6302,19 @@ namespace TheTerrariaSeedProject
             foreach (var pic in paintingsCount) totalP += pic.Value / 72;
             hasOBjectOrParam["Number Paintings"] = totalP;
 
-            //open hive
-            
-            List<Tuple<int, int>> openHivesBelowLava = new List<Tuple<int, int>>();
+            //evil biome spots
+            hasOBjectOrParam["neg. Evil biome spots"] = -evilBiomesLoc.Count;
+
+            {
+                int evil = 0;
+                for (int i = 0; i < evilBiomesLoc.Count; i++)
+                    evil += evilBiomesLoc[i].Item2 - evilBiomesLoc[i].Item1;
+                hasOBjectOrParam["neg. Evil biome range"] = -evil;
+            }
+
+
+            //open hive            
+            List <Tuple<int, int>> openHivesBelowLava = new List<Tuple<int, int>>();
             if (openHives.Count > 0)
             {
                 
@@ -7070,11 +7251,14 @@ namespace TheTerrariaSeedProject
                 int numS = 0;
                 int numE = 0;
                 int numGM = 0;
+                int numF = 0;
                 for (int xi = Main.spawnTileX - 6; xi < Main.spawnTileX + 7; xi++)
                     for (int yi = Main.spawnTileY - 6; yi < Main.spawnTileY + 7; yi++)
                     {
                         if (Main.tile[xi, yi].active())
                         {
+                            if (Main.tile[xi, yi].type == TileID.Stone || Main.tile[xi, yi].type == TileID.Dirt)
+                                numF++;
 
                             if (Main.tile[xi, yi].type == TileID.SnowBlock || Main.tile[xi, yi].type == TileID.IceBlock || Main.tile[xi, yi].type == TileID.FleshIce || Main.tile[xi, yi].type == TileID.CorruptIce)
                                 numS++;
@@ -7091,6 +7275,8 @@ namespace TheTerrariaSeedProject
                                 numGM++;
                         }
                     }
+                hasOBjectOrParam.Add("Spawn at edge of Snow/Forest biome", numS > 1 && numF > 1 ? 1 : 0);
+                
                 hasOBjectOrParam.Add("Spawn in Snow biome", numS > 10 ? 1 : 0);
                 hasOBjectOrParam.Add("Spawn in Jungle biome", numJ > 10 ? 1 : 0);
                 hasOBjectOrParam.Add("Spawn in Evil biome", numE > 10 ? 1 : 0);
@@ -7226,6 +7412,8 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["neg. Pathlength to Recall Potion"] = -hasOBjectOrParam["Pathlength to Recall Potion"];
                 hasOBjectOrParam["neg. Pathlength to Builder Potion"] = -hasOBjectOrParam["Pathlength to Builder Potion"];
                 hasOBjectOrParam["neg. Pathlength to 2 Builder Potion Chest"] = -hasOBjectOrParam["Pathlength to 2 Builder Potion Chest"];
+                hasOBjectOrParam["neg. Pathlength to Hunter Potion"] = -hasOBjectOrParam["Pathlength to Hunter Potion"];
+                
                 hasOBjectOrParam["neg. Pathlength to Rope"] = -hasOBjectOrParam["Pathlength to Rope"];
 
                 
@@ -7243,6 +7431,7 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["neg. Pathlength to Anvil"] = -hasOBjectOrParam["Pathlength to Anvil"];
                 hasOBjectOrParam["neg. Pathlength to Ruby"] = -hasOBjectOrParam["Pathlength to Ruby"];
                 hasOBjectOrParam["neg. Pathlength to Diamond"] = -hasOBjectOrParam["Pathlength to Diamond"];
+                hasOBjectOrParam["neg. Pathlength to Demonite/Crimtane ore"] = -hasOBjectOrParam["Pathlength to Demonite/Crimtane ore"];
                 hasOBjectOrParam["neg. Pathlength to Cloud in a Bottle"] = -hasOBjectOrParam["Pathlength to Cloud in a Bottle"];
                 hasOBjectOrParam["neg. Pathlength to 2 Herb Bag Chest"] = -hasOBjectOrParam["Pathlength to 2 Herb Bag Chest"];
                 hasOBjectOrParam["neg. Pathlength to Grenades"] = -hasOBjectOrParam["Pathlength to Grenades"];
@@ -8073,7 +8262,7 @@ namespace TheTerrariaSeedProject
             return inSand;
         }
 
-        private Tuple<int,int,int> removeInvalidPyrPos()
+        private Tuple<int,int,int,int> removeInvalidPyrPos()
         {
             int numPyramidChanceAdv;
             int numPyramidChanceAdvUber;
@@ -8100,9 +8289,17 @@ namespace TheTerrariaSeedProject
             List<int> conflict = new List<int>();
             int subp = 0;
             int minDist = Main.maxTilesX;
+            int minDist2nd = Main.maxTilesX;
             for (int pi = 0; pi < pyrPosX.Count; pi++)
             {
-                minDist = Math.Min(minDist, Math.Abs(pyrPosX[pi] - Main.maxTilesX / 2));
+                int mdist = Math.Abs(pyrPosX[pi] - Main.maxTilesX / 2);
+                if (mdist < minDist)
+                {
+                    minDist2nd = minDist;
+                    minDist = mdist;
+                }
+                else if (mdist < minDist2nd)
+                    minDist2nd = mdist;
 
                 if (pyrPosX[pi] - lastx < 250)
                 {
@@ -8180,7 +8377,7 @@ namespace TheTerrariaSeedProject
             }
             numPyramidChanceAdvUber = numPyramidChanceAdv - subp;
 
-            return new Tuple<int, int, int>(numPyramidChanceAdv, numPyramidChanceAdvUber, minDist);
+            return new Tuple<int, int, int, int>(numPyramidChanceAdv, numPyramidChanceAdvUber, minDist, minDist2nd);
         }
 
         private static bool isPosValid(int xheadLeft, int yheadLeft, int xsize = 1, int ysize = 1, bool checkWallAsWell = false)
@@ -10813,6 +11010,7 @@ namespace TheTerrariaSeedProject
             List<Tuple<int, int>> rubies = new List<Tuple<int, int>>();
             List<Tuple<int, int>> diamonds = new List<Tuple<int, int>>();
             List<Tuple<int, int>> explosive = new List<Tuple<int, int>>();
+            List<Tuple<int, int>> evilOre = new List<Tuple<int, int>>();
 
 
             int indx = 0;
@@ -10837,6 +11035,8 @@ namespace TheTerrariaSeedProject
                             diamonds.Add(new Tuple<int, int>(x, y));
                         else if (Main.tile[x, y].active() && Main.tile[x, y].type == TileID.Explosives)
                             explosive.Add(new Tuple<int, int>(x, y));
+                        else if (Main.tile[x, y].active() && y<Main.worldSurface && (Main.tile[x, y].type == TileID.Demonite || Main.tile[x, y].type == TileID.Crimtane )  )
+                            evilOre.Add(new Tuple<int, int>(x, y));
                     }
 
                     rgbValues[indx++] = cc.B;
@@ -11025,8 +11225,12 @@ namespace TheTerrariaSeedProject
                     DrawCircle(ref rgbValues, expl, scale, new Color(255, 240, 0), 3);
                     DrawCircle(ref rgbValues, expl, scale, new Color(255, 255, 160), 5);
                 }
+                foreach (var evilo in evilOre)
+                {
+                    DrawCircle(ref rgbValues, evilo, scale, new Color(255, 80, 30), 3);
+                    DrawCircle(ref rgbValues, evilo, scale, new Color(255, 127, 39), 5);
+                }
 
-                
                 if (score.itemLocation.ContainsKey(ItemID.PlanteraMask))
                     foreach (var bulb in score.itemLocation[ItemID.PlanteraMask])
                     {
