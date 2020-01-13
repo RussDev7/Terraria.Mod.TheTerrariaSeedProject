@@ -36,6 +36,7 @@ If you found some bugs, have some ideas, want to help coding or found some nice 
 Good luck!
 
 Last Update(s):
+-evil biome count (merged) and range, ruby/diamond/evil or near mid, edge snow biome, blocks below temple altar
 -pathlength to builder potion, improv. multiple near trees perform., Plantera bulb prediction, some tweaks, bugfixes
 -Pot/Life Crystal/ES duplication Glitch, closest Ruby/Diamond at minimap picture, ..
 -12iron chest, copper, gold; pathl. to wooden, water, gold chest, rope, recall; cloud lake near mid
