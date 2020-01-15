@@ -3172,6 +3172,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("neg. Temple door horizontal distance", 0);
             hasOBjectOrParam.Add("neg. Temple Tile horizontal distance", 0);
             hasOBjectOrParam.Add("neg. Temple Tile vertical distance", 0);
+            hasOBjectOrParam.Add("neg. Temple Altar quick Bulb distance", -1000000);
             
 
             hasOBjectOrParam.Add("Temple at player side of jungle (%)", 0);
@@ -3242,10 +3243,11 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Pathlength to Suspicious Looking Eye", 1000000);
             hasOBjectOrParam.Add("Pathlength to Snowball Cannon", 1000000);
 
-            hasOBjectOrParam.Add("Pathlength to Slime Staute", 1000000);
-            hasOBjectOrParam.Add("Pathlength to Shark Staute", 1000000);
-            hasOBjectOrParam.Add("Pathlength to Heart Staute", 1000000);
-            hasOBjectOrParam.Add("Pathlength to Star Staute", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Slime Statue", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Shark Statue", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Heart Statue", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Star Statue", 1000000);
+            hasOBjectOrParam.Add("Pathlength to Unicorn Statue", 1000000);
             hasOBjectOrParam.Add("Pathlength to Anvil", 1000000);
             hasOBjectOrParam.Add("Pathlength to Ruby", 1000000);
             hasOBjectOrParam.Add("Pathlength to Diamond", 1000000);
@@ -3346,10 +3348,11 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("neg. Pathlength to Suspicious Looking Eye", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Snowball Cannon", -1000000);
 
-            hasOBjectOrParam.Add("neg. Pathlength to Slime Staute", -1000000);
-            hasOBjectOrParam.Add("neg. Pathlength to Shark Staute", -1000000);
-            hasOBjectOrParam.Add("neg. Pathlength to Heart Staute", -1000000);
-            hasOBjectOrParam.Add("neg. Pathlength to Star Staute", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Slime Statue", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Shark Statue", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Heart Statue", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Star Statue", -1000000);
+            hasOBjectOrParam.Add("neg. Pathlength to Unicorn Statue", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Anvil", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Ruby", -1000000);
             hasOBjectOrParam.Add("neg. Pathlength to Diamond", -1000000);
@@ -4624,6 +4627,8 @@ namespace TheTerrariaSeedProject
 
             List<Tuple<int, int, int, int>> dungeonFarmSpotCandidates = new List<Tuple<int, int, int, int>>(); // xmin xmax of inner wall, ymin ymax of detection
 
+            Tuple<int, int> lihAltarBreakThroughLoc = new Tuple<int, int>(-1,-1);
+
             bool treeToUGDung = false;
 
             int liqf = 0;
@@ -5709,15 +5714,29 @@ namespace TheTerrariaSeedProject
                                 int yt = y + 1;
                                 int c = 10;
                                 int bc = 0;
+                                int ly = yt;
                                 while (c > 0)
                                 {
                                     yt++;
                                     if ((Main.tile[xt, yt].active() && Main.tile[xt, yt].type == TileID.LihzahrdBrick))
+                                    {
                                         bc++;
+                                        ly = yt;
+                                    }
                                     if ( !(Main.tile[xt, yt].wall == WallID.LihzahrdBrickUnsafe || (Main.tile[xt, yt].active() && Main.tile[xt, yt].type == TileID.LihzahrdBrick)  ))
                                         c--;
                                 }
                                 hasOBjectOrParam["neg. blocks below Temple Altar"] = -bc;
+                                lihAltarBreakThroughLoc = new Tuple<int, int>(x+1,ly);
+
+                                xt = x;
+                                yt = y + 2;
+                                c = 0;
+                                for (int i = 0; i < 3; i++)
+                                    if (Main.tile[xt + i, yt].active() && Main.tile[xt + i, yt].type == TileID.LihzahrdBrick)
+                                        c++;
+                                if (c != 3 && bc < 4)
+                                    hasOBjectOrParam["neg. blocks below Temple Altar"] = 0;
 
                             }
 
@@ -5831,37 +5850,45 @@ namespace TheTerrariaSeedProject
                                 //writeDebugFile("pos:" + x + " " + y + " is statue " + statIdent);
 
                                 //extra check bc good for speed run
-                                if (fx == 144 && fy == 0 && pathLength[sx, sy] < hasOBjectOrParam["Pathlength to Slime Staute"])
+                                if (fx == 144 && fy == 0 && pathLength[sx, sy] < hasOBjectOrParam["Pathlength to Slime Statue"])
                                 {
-                                    hasOBjectOrParam["Pathlength to Slime Staute"] = pathLength[sx, sy];
+                                    hasOBjectOrParam["Pathlength to Slime Statue"] = pathLength[sx, sy];
                                     if (score.itemLocation.ContainsKey(ItemID.SlimeStatue))
                                         score.itemLocation[ItemID.SlimeStatue] = new List<Tuple<int, int>> { new Tuple<int, int>(x, y) };
                                     else
                                         score.itemLocation.Add(ItemID.SlimeStatue, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
                                 }
-                                else if (fx == 1800 && fy == 0 && pathLength[sx, sy] < hasOBjectOrParam["Pathlength to Shark Staute"])
+                                else if (fx == 1800 && fy == 0 && pathLength[sx, sy] < hasOBjectOrParam["Pathlength to Shark Statue"])
                                 {
-                                    hasOBjectOrParam["Pathlength to Shark Staute"] = pathLength[sx, sy];
+                                    hasOBjectOrParam["Pathlength to Shark Statue"] = pathLength[sx, sy];
                                     if (score.itemLocation.ContainsKey(ItemID.SharkStatue))
                                         score.itemLocation[ItemID.SharkStatue] = new List<Tuple<int, int>> { new Tuple<int, int>(x, y) };
                                     else
                                         score.itemLocation.Add(ItemID.SharkStatue, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
                                 }
-                                else if (fx == 1332 && fy == 0 && pathLength[sx, sy] < hasOBjectOrParam["Pathlength to Heart Staute"])
+                                else if (fx == 1332 && fy == 0 && pathLength[sx, sy] < hasOBjectOrParam["Pathlength to Heart Statue"])
                                 {
-                                    hasOBjectOrParam["Pathlength to Heart Staute"] = pathLength[sx, sy];
+                                    hasOBjectOrParam["Pathlength to Heart Statue"] = pathLength[sx, sy];
                                     if (score.itemLocation.ContainsKey(ItemID.HeartStatue))
                                         score.itemLocation[ItemID.HeartStatue].Add(new Tuple<int, int>(x, y) );
                                     else
                                         score.itemLocation.Add(ItemID.HeartStatue, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
                                 }
-                                else if (fx == 72 && fy == 0 && pathLength[sx, sy] < hasOBjectOrParam["Pathlength to Star Staute"])
+                                else if (fx == 72 && fy == 0 && pathLength[sx, sy] < hasOBjectOrParam["Pathlength to Star Statue"])
                                 {
-                                    hasOBjectOrParam["Pathlength to Star Staute"] = pathLength[sx, sy];
+                                    hasOBjectOrParam["Pathlength to Star Statue"] = pathLength[sx, sy];
                                     if (score.itemLocation.ContainsKey(ItemID.StarStatue))
                                         score.itemLocation[ItemID.StarStatue].Add(new Tuple<int, int>(x, y));
                                     else
                                         score.itemLocation.Add(ItemID.StarStatue, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
+                                }
+                                else if (fx == 324 && fy == 0 && pathLength[sx, sy] < hasOBjectOrParam["Pathlength to Unicorn Statue"])
+                                {
+                                    hasOBjectOrParam["Pathlength to Unicorn Statue"] = pathLength[sx, sy];
+                                    if (score.itemLocation.ContainsKey(ItemID.UnicornStatue))
+                                        score.itemLocation[ItemID.UnicornStatue].Add(new Tuple<int, int>(x, y));
+                                    else
+                                        score.itemLocation.Add(ItemID.UnicornStatue, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
                                 }
 
 
@@ -6888,6 +6915,32 @@ namespace TheTerrariaSeedProject
 
                     }
                 }
+
+
+                
+                
+                if(lihAltarBreakThroughLoc.Item1 > 0 && score.itemLocation.ContainsKey(ItemID.PlanteraTrophy) && score.itemLocation[ItemID.PlanteraTrophy].Count>0)
+                {
+                    
+                    int minDist = Int32.MaxValue-3;
+                    for(int i= 0; i < score.itemLocation[ItemID.PlanteraTrophy].Count; i++)
+                    {
+                     
+                        Tuple<int,int> bulb = score.itemLocation[ItemID.PlanteraTrophy][i];
+                        int x = -bulb.Item1 / 10000;
+                        int y = -bulb.Item2 / 10000;
+                        writeDebugFile("  " + x  + "  " + y );
+                        int diag = (lihAltarBreakThroughLoc.Item1 - x) * (lihAltarBreakThroughLoc.Item1 - x) + (lihAltarBreakThroughLoc.Item2 -y ) * (lihAltarBreakThroughLoc.Item2 - y);
+                        if (diag < minDist)
+                            minDist = diag;
+                    }
+                    minDist = (int)Math.Sqrt((float)minDist);
+                    hasOBjectOrParam["neg. Temple Altar quick Bulb distance"] = -minDist;
+
+                }
+                
+                
+                
                 //ss.Stop();
                 //writeDebugFile("quick bulb took "+ss.ElapsedMilliseconds);
             }
@@ -7424,10 +7477,11 @@ namespace TheTerrariaSeedProject
                 hasOBjectOrParam["neg. Pathlength to Boomstick"] = -hasOBjectOrParam["Pathlength to Boomstick"];
                 hasOBjectOrParam["neg. Pathlength to Flower Boots"] = -hasOBjectOrParam["Pathlength to Flower Boots"];
 
-                hasOBjectOrParam["neg. Pathlength to Slime Staute"] = -hasOBjectOrParam["Pathlength to Slime Staute"];
-                hasOBjectOrParam["neg. Pathlength to Shark Staute"] = -hasOBjectOrParam["Pathlength to Shark Staute"];
-                hasOBjectOrParam["neg. Pathlength to Heart Staute"] = -hasOBjectOrParam["Pathlength to Heart Staute"];
-                hasOBjectOrParam["neg. Pathlength to Star Staute"] = -hasOBjectOrParam["Pathlength to Star Staute"];
+                hasOBjectOrParam["neg. Pathlength to Slime Statue"] = -hasOBjectOrParam["Pathlength to Slime Statue"];
+                hasOBjectOrParam["neg. Pathlength to Shark Statue"] = -hasOBjectOrParam["Pathlength to Shark Statue"];
+                hasOBjectOrParam["neg. Pathlength to Heart Statue"] = -hasOBjectOrParam["Pathlength to Heart Statue"];
+                hasOBjectOrParam["neg. Pathlength to Star Statue"] = -hasOBjectOrParam["Pathlength to Star Statue"];
+                hasOBjectOrParam["neg. Pathlength to Unicorn Statue"] = -hasOBjectOrParam["Pathlength to Unicorn Statue"];
                 hasOBjectOrParam["neg. Pathlength to Anvil"] = -hasOBjectOrParam["Pathlength to Anvil"];
                 hasOBjectOrParam["neg. Pathlength to Ruby"] = -hasOBjectOrParam["Pathlength to Ruby"];
                 hasOBjectOrParam["neg. Pathlength to Diamond"] = -hasOBjectOrParam["Pathlength to Diamond"];
