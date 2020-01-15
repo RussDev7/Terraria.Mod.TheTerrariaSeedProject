@@ -1,5 +1,5 @@
 author = Unftf
-version = 0.4.4.0
+version = 0.4.4.1
 displayName = The Terraria Seed Project (seed search engine)
 homepage = https://forums.terraria.org/index.php?threads/tool-the-terraria-seed-project.69351
 hideCode = true
