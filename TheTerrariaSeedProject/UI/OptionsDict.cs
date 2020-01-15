@@ -1035,6 +1035,7 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Temple door horizontal distance",
                 "neg. Temple Tile horizontal distance",
                 "neg. Temple Tile vertical distance",
+                "neg. Temple Altar quick Bulb distance",
                 "Temple at player side of jungle (%)",
                 "Temple at ocean side of jungle (%)",
                 "Temple at height (%)",
@@ -1084,10 +1085,11 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Pathlength to Bee Hive",
                 "neg. Pathlength to Boomstick",
                 "neg. Pathlength to Flower Boots",
-                "neg. Pathlength to Slime Staute",
-                "neg. Pathlength to Shark Staute",
-                "neg. Pathlength to Heart Staute",
-                "neg. Pathlength to Star Staute",
+                "neg. Pathlength to Slime Statue",
+                "neg. Pathlength to Shark Statue",
+                "neg. Pathlength to Heart Statue",
+                "neg. Pathlength to Star Statue",
+                "neg. Pathlength to Unicorn Statue",
                 "neg. Pathlength to Anvil",
                 "neg. Pathlength to Ruby",
                 "neg. Pathlength to Diamond",
@@ -1183,7 +1185,7 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Temple door distance",
                 "neg. Temple door horizontal distance",
                 "neg. Temple Tile horizontal distance",
-                "neg. Temple Tile vertical distance",
+                "neg. Temple Tile vertical distance",                
                 "Temple at player side of jungle (%)",
                 "Temple at ocean side of jungle (%)",
                 "Temple at height (%)",
@@ -1227,10 +1229,11 @@ namespace TheTerrariaSeedProject.UI
                 "Pathlength to Bee Hive",
                 "Pathlength to Boomstick",
                 "Pathlength to Flower Boots",
-                "Pathlength to Slime Staute",
-                "Pathlength to Shark Staute",
-                "Pathlength to Heart Staute",
-                "Pathlength to Star Staute",
+                "Pathlength to Slime Statue",
+                "Pathlength to Shark Statue",
+                "Pathlength to Heart Statue",
+                "Pathlength to Star Statue",
+                "Pathlength to Unicorn Statue",
                 "Pathlength to Anvil",
                 "Pathlength to Ruby",
                 "Pathlength to Diamond",
@@ -1403,10 +1406,11 @@ namespace TheTerrariaSeedProject.UI
             Add("neg. Pathlength to Boomstick", vPathLengthNeg);
             Add("neg. Pathlength to Flower Boots", vPathLengthNeg);
 
-            Add("neg. Pathlength to Slime Staute", vPathLengthNeg);
-            Add("neg. Pathlength to Shark Staute", vPathLengthNeg);
-            Add("neg. Pathlength to Heart Staute", vPathLengthNeg);
-            Add("neg. Pathlength to Star Staute", vPathLengthNeg);
+            Add("neg. Pathlength to Slime Statue", vPathLengthNeg);
+            Add("neg. Pathlength to Shark Statue", vPathLengthNeg);
+            Add("neg. Pathlength to Heart Statue", vPathLengthNeg);
+            Add("neg. Pathlength to Star Statue", vPathLengthNeg);
+            Add("neg. Pathlength to Unicorn Statue", vPathLengthNeg);
             Add("neg. Pathlength to Anvil", vPathLengthNeg);
             Add("neg. Pathlength to Ruby", vPathLengthNeg);
             Add("neg. Pathlength to Diamond", vPathLengthNeg);
@@ -1505,10 +1509,11 @@ namespace TheTerrariaSeedProject.UI
             Add("Pathlength to Bee Hive", vPathLength);
             Add("Pathlength to Boomstick", vPathLength);
             Add("Pathlength to Flower Boots", vPathLength);
-            Add("Pathlength to Slime Staute", vPathLength);
-            Add("Pathlength to Shark Staute", vPathLength);
-            Add("Pathlength to Heart Staute", vPathLength);
-            Add("Pathlength to Star Staute", vPathLength);
+            Add("Pathlength to Slime Statue", vPathLength);
+            Add("Pathlength to Shark Statue", vPathLength);
+            Add("Pathlength to Heart Statue", vPathLength);
+            Add("Pathlength to Star Statue", vPathLength);
+            Add("Pathlength to Unicorn Statue", vPathLength);
             Add("Pathlength to Anvil", vPathLength);
             Add("Pathlength to Ruby", vPathLength);
             Add("Pathlength to Diamond", vPathLength);
@@ -1569,6 +1574,7 @@ namespace TheTerrariaSeedProject.UI
             Add("neg. Temple door horizontal distance", vDistanceLongNeg);
             Add("neg. Temple Tile horizontal distance", vDistanceLongNeg);
             Add("neg. Temple Tile vertical distance", vDistanceShortNeg);
+            Add("neg. Temple Altar quick Bulb distance", vDistanceShortNeg);
 
             Add("Temple at player side of jungle (%)", v0to100);
             Add("Temple at ocean side of jungle (%)", v0to100);
@@ -2054,6 +2060,11 @@ namespace TheTerrariaSeedProject.UI
 
             HelpDict.Add("Temple Tile vertical distance", "Distance between spawn and closest Jungle Temple tile in vertical direction. Means how many tiles you need to go down from spawn location to " +
                 "be the same height as the top of the Jungle Temple.");
+
+            HelpDict.Add("neg. Temple Altar quick Bulb distance", "Distance between a potential fast spawning Plantera bulb (see 'Quick Plantera bulb prediction (beta)') and the breakthrough point below the Temple Altar. " +
+                "The value is stored as negative value to apply the greater or equal condition of the positive list.");
+
+
 
             HelpDict.Add("Temple at player side of jungle (%)", "With this you can filter the location of the jungle regarded to the (cavern) jungle biome. 100% means the mid of jungle temple is at" +
                 " the same horizontal coordinate (x) as the most inner jungle tile (in cavern layer). 0% if temple is at the same as the most ocean side jungle biome tile. Other way around is" +

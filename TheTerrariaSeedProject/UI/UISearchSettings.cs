@@ -1100,8 +1100,8 @@ namespace TheTerrariaSeedProject.UI
                     currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Pathlength to Iron/Lead Bar", "1000");
                     currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Pathlength to Gold/Platinum", "1000");
 
-                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Pathlength to Slime Staute", "1500");
-                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Pathlength to Shark Staute", "1500");
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Pathlength to Slime Statue", "1500");
+                    currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Pathlength to Shark Statue", "1500");
                     currentConfig.InsertSelectableText(3, Configuration.ConfigItemType.SelectableListNegative, "Pathlength to Anvil", "1500");
                     
 
