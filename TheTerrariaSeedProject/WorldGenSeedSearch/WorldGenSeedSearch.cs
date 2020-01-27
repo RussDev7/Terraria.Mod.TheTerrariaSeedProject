@@ -138,6 +138,7 @@ namespace TheTerrariaSeedProject
 
         double boostValue = 0;
         double boostValueSeed = 0;        
+        double boostRNGV2Seed = 0;        
         int boostPyramidValue = 0;
         int boostCloudValue = 0;
         int boostCloudInner2Value = 0;
@@ -154,9 +155,15 @@ namespace TheTerrariaSeedProject
 
         int boostHeightValueMin = 0;
         int boostHeightValueMax = 300;
+        int boostSurfHeightValueMin = 0;
+        int boostSurfHeightValueMax = 0;
+        int boostSurfHeightVarValueMin = 0;
+        int boostSurfHeightVarValueMax = 400;
         int boostUGHeightValueMin = 0;
         int boostUGHeightValueMax = 1000;
-        int boostUGHeightValueSeed = 0;
+        int boostSurfHeightValueSeed = -1;
+        int boostSurfHeightVarValueSeed = -1;
+        int boostUGHeightValueSeed = 0;        
         int boostCavernLayeroffsetMin = 0;
         int boostCavernLayeroffsetMax = 300;
         int boostCavernLayeroffsetSeed = 0;
@@ -279,6 +286,9 @@ namespace TheTerrariaSeedProject
 
                 double boostValueMin=0;
                 double boostValueMax=0;
+
+                double boostRNGV2Min = 0;
+                double boostRNGV2Max = 1;
 
                 Tuple<List<int>,bool, string> conf= readConfigFile();
                 itemIDdoNotWant = conf.Item1;
@@ -541,6 +551,19 @@ namespace TheTerrariaSeedProject
                             if (boostStringMax.Length > 0)
                                 if (!Int32.TryParse(boostStringMax, out boostValueIntMax)) boostValueIntMax = 10;
 
+                            int boostRNGV2IntMin = 0;
+                            string boostRNGV2StringMin = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boostRNGV2Min, 1);
+                            if (boostRNGV2StringMin.Length > 0)
+                                if (!Int32.TryParse(boostRNGV2StringMin, out boostRNGV2IntMin)) boostRNGV2IntMin = 0;
+
+                            int boostRNGV2IntMax = 1000;
+                            string boostRNGV2StringMax = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boostRNGV2Max, 1);
+                            if (boostRNGV2StringMax.Length > 0)
+                                if (!Int32.TryParse(boostRNGV2StringMax, out boostRNGV2IntMax)) boostRNGV2IntMax = 1000;
+
+                            boostRNGV2Min = 0.001* boostRNGV2IntMin;
+                            boostRNGV2Max = 0.001* boostRNGV2IntMax;
+
 
                             if (boostValueInt == -1)
                             {
@@ -560,7 +583,22 @@ namespace TheTerrariaSeedProject
                                 boostValueMin = boostValue;
                                 boostValueMax = (1.0 / (0.1 * ((double)boostValueIntMax)));
                             }
-                                                     
+
+                            //for skyler, remove again                            
+                            if (boostValueInt < -1 || boostValueIntMax < -1)
+                            {
+                                //special case value                               
+                                boostValue = -1 - (boostValueInt < -1 ? 1 : 0) - (boostValueIntMax < -1 ? 1 : 0);
+                                //boostValueMin = 0.5 + 175.0 / ((double)Main.maxTilesX);//140
+                                //boostValueMax = 0.5 + 325.0 / ((double)Main.maxTilesX*0.8);//260   
+
+                                //boostValueMin = 0.5 + (200.0+ (boostValueInt<-1? boostValueInt: boostValueIntMax)) / (((double)Main.maxTilesX)*0.8);                                
+                                //boostValueMax = 0.5 + (200.0- (boostValueIntMax < -1 ? boostValueIntMax : boostValueInt)) / (((double)Main.maxTilesX)*0.8);
+
+                                boostValueMin = 0.5 + (200.0 + boostValueInt ) / (((double)Main.maxTilesX) * 0.8);
+                                boostValueMax = 0.5 + (200.0 - boostValueIntMax) / (((double)Main.maxTilesX) * 0.8);
+                            }
+                            
 
                             boostPyramidValue = 0;
                             string boostPyramidString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boostPyr, 1);
@@ -607,6 +645,26 @@ namespace TheTerrariaSeedProject
                             boostHeightString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boostHeightMax, 1);
                             if (boostHeightString.Length > 0)
                                 if (!Int32.TryParse(boostHeightString, out boostHeightValueMax)) boostHeightValueMax = 300;
+
+                            boostSurfHeightValueMin = 0;
+                            string boostSurfHeightString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boostSurfheightMin, 1);
+                            if (boostSurfHeightString.Length > 0)
+                                if (!Int32.TryParse(boostSurfHeightString, out boostSurfHeightValueMin)) boostSurfHeightValueMin = 0;
+                            boostSurfHeightValueMax = 100;
+                            boostSurfHeightString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boostSurfheightMax, 1);
+                            if (boostSurfHeightString.Length > 0)
+                                if (!Int32.TryParse(boostSurfHeightString, out boostSurfHeightValueMax)) boostSurfHeightValueMax = 100;
+
+
+                            boostSurfHeightVarValueMin = 0;
+                            string boostSurfHeightValString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boostSurfHeightVarMin, 1);
+                            if (boostSurfHeightValString.Length > 0)
+                                if (!Int32.TryParse(boostSurfHeightValString, out boostSurfHeightVarValueMin)) boostSurfHeightVarValueMin = 0;
+                            boostSurfHeightVarValueMax = 400;
+                            boostSurfHeightValString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boostSurfHeightVarMax, 1);
+                            if (boostSurfHeightValString.Length > 0)
+                                if (!Int32.TryParse(boostSurfHeightValString, out boostSurfHeightVarValueMax)) boostSurfHeightVarValueMax = 400;
+
 
                             boostUGHeightValueMin = 0;
                             string boostUGHeightString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boostUGheightMin, 1);
@@ -735,7 +793,9 @@ namespace TheTerrariaSeedProject
                             boostSurfRockLayerOffsetSeed = -1;
                             boostSpawnRockSeedOffsetSeed = -10000;
                             boostHeightValueSeed = -1;
-                            boostUGHeightValueSeed = -1;
+                            boostSurfHeightValueSeed = -1;
+                            boostSurfHeightVarValueSeed = -1;
+                            boostUGHeightValueSeed = -1;                            
                             pyramidPruning = false;
                             cloudPruning = false;
                             midESspots = null;
@@ -785,30 +845,37 @@ namespace TheTerrariaSeedProject
                             //if (randVals.Item1 > 1e9-50)    
                             bool doit = false;
 
+                            //for skyler, remove again
+                            double val = 81.0 / (4200 * 0.8) ;
+                            bool skyler = boostValue==-3 && (randVals.Item1 >= 0.5 - val && randVals.Item1 <= 0.5 + val && randVals.Item2 >= 0.5 - val && randVals.Item2 <= Math.Max(boostValueMax,0.5+val) );
+                            //skyler end
 
-                           
+                            bool rngv2_OK = boostRNGV2Seed >= boostRNGV2Min && boostRNGV2Seed <= boostRNGV2Max;
 
-                            if (((boostValue>=0 && boostValueSeed >= boostValueMin && boostValueSeed <= boostValueMax) ||  
-                                (boostValue < 0 && boostValueSeed > boostValueMin && boostValueSeed < boostValueMax) ||
-                                (boostValue < 0 && boostValueSeed < 1.0-boostValueMin && boostValueSeed > 1.0-boostValueMax) ) //1st cloud in mid
-                                && midtree) //the inverted boostValue can be a little smaller than original value >= --> > ?
-                                if (!look4dungCol || dungColTrue)
+                            if(rngv2_OK)
+                            if ((
+                            (boostValue<-1 && ((boostValueSeed >= boostValueMin && boostValueSeed <= boostValueMax) || (skyler))   ) ||
+                            (boostValue>=0 && boostValueSeed >= boostValueMin && boostValueSeed <= boostValueMax) ||  
+                            (boostValue == -1 && boostValueSeed > boostValueMin && boostValueSeed < boostValueMax) ||
+                            (boostValue == -1 && boostValueSeed < 1.0-boostValueMin && boostValueSeed > 1.0-boostValueMax) ) //1st cloud in mid
+                            && midtree) //the inverted boostValue can be a little smaller than original value >= --> > ?
+                            if (!look4dungCol || dungColTrue)
+                            {
+                                doit = true;
+                                if (boostESValue != 0 || boostESGraniteValue != 0)
                                 {
-                                    doit = true;
-                                    if (boostESValue != 0 || boostESGraniteValue != 0)
-                                    {
-                                        var res = checkAndSetIfESmidPossible(stage != 1);
-                                        //writeDebugFile("" + seed + " " + res.Item1 + " " + res.Item2 +" " + res.Item4);
-                                        if (boostESValue != 0 && res.Item1 < boostESValue ||
-                                            boostESGraniteValue != 0 && res.Item2 < boostESGraniteValue)
-                                            doit = false;
+                                    var res = checkAndSetIfESmidPossible(stage != 1);
+                                    //writeDebugFile("" + seed + " " + res.Item1 + " " + res.Item2 +" " + res.Item4);
+                                    if (boostESValue != 0 && res.Item1 < boostESValue ||
+                                        boostESGraniteValue != 0 && res.Item2 < boostESGraniteValue)
+                                        doit = false;
 
-                                        //writeDebugFile(""+res.Item4);
-                                        //if(res.Item4<8)
-                                        //    doit = false;
-                                    }
-
+                                    //writeDebugFile(""+res.Item4);
+                                    //if(res.Item4<8)
+                                    //    doit = false;
                                 }
+
+                            }
                                     
 
                             if(doit)
@@ -2147,16 +2214,16 @@ namespace TheTerrariaSeedProject
             //jungel distance
             double a = dummy.NextDouble(); //dummy
             //int a = dummy.Next(0, 100); //dummy
+            boostRNGV2Seed = a;
 
             //3rd rand
             //dungeon color
             //jungle chest count small 5 (7 to 12) , large 10
             //maybe jungle depth
-            double randVar = dummy.NextDouble();
+            double randVar = dummy.NextDouble();            
             evilHMIsLeft = (int)(randVar * (double)2) == 0 && a > -1.0;
             dungeonColor = (int)(randVar * (double)3); // 0: blue, 1:green, 2: pink ===> evil hm side and dcolor correlated 
-
-
+            
             boostValueSeed = sandSpotDensity;
             boostMidTreeValueSeed = 300 + (int)(a * (Main.maxTilesX - 600));
 
@@ -2220,10 +2287,13 @@ namespace TheTerrariaSeedProject
         public void setHights(bool reduce)
         {
             boostHeightValueSeed = guessSpawnHight(reduce);
+            boostSurfHeightValueSeed = (int) (((double)Main.worldSurface*100.0)/((double)Main.maxTilesY)+0.5);
             boostUGHeightValueSeed = (int)(Main.rockLayer - Main.worldSurface);
 
-            boostRockLayerOffsetSeed = (int)(Main.rockLayer - WorldGen.rockLayer);
+            boostRockLayerOffsetSeed = loadWorld ? -100000 : (int)(Main.rockLayer - WorldGen.rockLayer);
             boostSurfRockLayerOffsetSeed = loadWorld ? -100000 :(int)(Main.worldSurface - WorldGen.rockLayer);
+            //boostSurfHeightVarValueSeed = loadWorld ? -100000 : (int)(WorldGen.worldSurfaceHigh - WorldGen.worldSurfaceLow);//bugged in vanilla
+            boostSurfHeightVarValueSeed = loadWorld ? -100000 : (int)(WorldGen.worldSurfaceHigh - Math.Max(WorldGen.worldSurfaceLow,Main.maxTilesY*0.17));
 
             boostSpawnRockSeedOffsetSeed = boostSurfRockLayerOffsetSeed - boostHeightValueSeed;
 
@@ -2360,8 +2430,13 @@ namespace TheTerrariaSeedProject
 
                         tasks.Insert(terrind + 2, new PassLegacy("Continue or not ", delegate (GenerationProgress progress)
                         {
+
                             if ((boostHeightValueMax != 300 && boostHeightValueSeed > boostHeightValueMax) ||
                                 (boostHeightValueMin != 0 && boostHeightValueSeed < boostHeightValueMin) ||
+                                (boostSurfHeightValueMin != 0 && boostSurfHeightValueSeed < boostSurfHeightValueMin) ||                                
+                                (boostSurfHeightValueMax != 100 && boostSurfHeightValueSeed > boostSurfHeightValueMax) ||                                
+                                (boostSurfHeightVarValueMin != 0 && boostSurfHeightVarValueSeed < boostSurfHeightVarValueMin) ||                                
+                                (boostSurfHeightVarValueMax != 400 && boostSurfHeightVarValueSeed > boostSurfHeightVarValueMax) ||                                
                                 (boostUGHeightValueMax != 1000 && boostUGHeightValueSeed > boostUGHeightValueMax) ||
                                 (boostUGHeightValueMin != 0 && boostUGHeightValueSeed < boostUGHeightValueMin) ||
                                 (boostCavernLayeroffsetMin != 0 && boostCavernLayeroffsetSeed < boostCavernLayeroffsetMin) ||
@@ -2369,7 +2444,7 @@ namespace TheTerrariaSeedProject
                                 (boostRockLayerOffset != 0 && boostRockLayerOffsetSeed < boostRockLayerOffset) ||
                                 (boostSurfRockLayerOffset != 0 && boostSurfRockLayerOffsetSeed < boostSurfRockLayerOffset) ||
                                 (boostSpawnRockSeedOffsetMin != -1000 && boostSpawnRockSeedOffsetSeed < boostSpawnRockSeedOffsetMin) ||
-                                (boostSpawnRockSeedOffsetMax != 100 && boostSpawnRockSeedOffsetSeed > boostSpawnRockSeedOffsetMax)
+                                (boostSpawnRockSeedOffsetMax != 100 && boostSpawnRockSeedOffsetSeed > boostSpawnRockSeedOffsetMax)                                
                                 )
                             {
                                 condsTrue = 0;
@@ -3635,13 +3710,13 @@ namespace TheTerrariaSeedProject
                 }
             } 
 
-            hasOBjectOrParam.Add("Boost height value seed", boostHeightValueSeed);
+            hasOBjectOrParam.Add("Boost spawn height value seed (guess)", boostHeightValueSeed);
             hasOBjectOrParam.Add("Boost rock layer offset", boostRockLayerOffsetSeed);
             hasOBjectOrParam.Add("Boost cavern layer offset (%)", boostCavernLayeroffsetSeed);
             hasOBjectOrParam.Add("Boost surfRock layer offset", boostSurfRockLayerOffsetSeed);
             hasOBjectOrParam.Add("Spawn rock layer offset (guess)", boostSpawnRockSeedOffsetSeed);
             hasOBjectOrParam.Add("neg. Spawn rock layer offset (guess)", boostSpawnRockSeedOffsetSeed);
-
+            
             hasOBjectOrParam.Add("random value seed *10000", (int)(10000.0 * boostValueSeed));
             hasOBjectOrParam.Add("Boost random value seed", (int)(10.0/(1.0-boostValueSeed)));
             hasOBjectOrParam.Add("Boost pyramid value seed", boostPyramidValueSeed);
@@ -5882,7 +5957,7 @@ namespace TheTerrariaSeedProject
                                     else
                                         score.itemLocation.Add(ItemID.StarStatue, new List<Tuple<int, int>> { new Tuple<int, int>(x, y) });
                                 }
-                                else if (fx == 324 && fy == 0 && pathLength[sx, sy] < hasOBjectOrParam["Pathlength to Unicorn Statue"])
+                                else if (fx == 324 && fy == 54 && pathLength[sx, sy] < hasOBjectOrParam["Pathlength to Unicorn Statue"])
                                 {
                                     hasOBjectOrParam["Pathlength to Unicorn Statue"] = pathLength[sx, sy];
                                     if (score.itemLocation.ContainsKey(ItemID.UnicornStatue))
@@ -11097,9 +11172,10 @@ namespace TheTerrariaSeedProject
                     rgbValues[indx++] = cc.G; 
                     rgbValues[indx++] = cc.R; 
                     rgbValues[indx++] = cc.A;
-                }
 
-            
+                }
+         
+
             //draw Spawm
             int aw = 0;
 
