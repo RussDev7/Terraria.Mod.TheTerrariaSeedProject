@@ -370,12 +370,21 @@ namespace TheTerrariaSeedProject.UI
             addDictToInfo(OptionsDict.Phase1.dungeonSide).SetValue("Random");
             if (!WorldGenSeedSearch.isPubRel)
             {
-                addDictToInfo(OptionsDict.Phase1.caveBG1).SetValue("-1");
-                addDictToInfo(OptionsDict.Phase1.caveBG2).SetValue("-1");
+                //addDictToInfo(OptionsDict.Phase1.caveBG1).SetValue("-1");
+                //addDictToInfo(OptionsDict.Phase1.caveBG2).SetValue("-1");
             }
             addDictToInfo(OptionsDict.Phase1.boost).SetValue("10");
             if (!WorldGenSeedSearch.isPubRel)
+            {
                 addDictToInfo(OptionsDict.Phase1.boostMax).SetValue("10");
+                addDictToInfo(OptionsDict.Phase1.boostRNGV2Min).SetValue("0");
+                addDictToInfo(OptionsDict.Phase1.boostRNGV2Max).SetValue("1000");
+                addDictToInfo(OptionsDict.Phase1.boostSurfheightMin).SetValue("0");
+                addDictToInfo(OptionsDict.Phase1.boostSurfheightMax).SetValue("100");
+                addDictToInfo(OptionsDict.Phase1.boostSurfHeightVarMin).SetValue("0");
+                addDictToInfo(OptionsDict.Phase1.boostSurfHeightVarMax).SetValue("400");
+            }
+
             addDictToInfo(OptionsDict.Phase1.boostUGheightMin).SetValue("0");
             addDictToInfo(OptionsDict.Phase1.boostUGheightMax).SetValue("1000");
             addDictToInfo(OptionsDict.Phase1.boostHeightMin).SetValue("0");

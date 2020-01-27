@@ -51,12 +51,18 @@ namespace TheTerrariaSeedProject.UI
             public const string dungeonWallColor = "Dungeon wall color";
             public const string dungeonSide = "Dungeon side";
             public const string boost = "Boost (experimental) >=";
-            public const string boostMax = "Boost max (experimental) <=";
+            public const string boostMax = "Boost max (experimental) <=";//np
+            public const string boostRNGV2Min = "Boost RNGV2 min >=";//np
+            public const string boostRNGV2Max = "Boost RNGV2 max <=";//np
             public const string boostPyr = "pred. Pyramid count >=";            
             public const string boostES = "Boost ES mid Tree (experimental) >="; //np
             public const string boostESgran = "Boost ES mid Granite (experimental) >=";//np
             public const string boostHeightMin = "pred. spawn height min >=";
             public const string boostHeightMax = "pred. spawn height max <=";
+            public const string boostSurfheightMin = "Surface layer height min(%) >="; //np
+            public const string boostSurfheightMax = "Surface layer height max(%) <="; //np
+            public const string boostSurfHeightVarMin = "Surface height variation min >="; //np
+            public const string boostSurfHeightVarMax = "Surface height variation max <="; //np
             public const string boostUGheightMin = "Underground layer height min >=";
             public const string boostUGheightMax = "Underground layer height max <=";            
             public const string boostRockLayerOffset = "Boost rock layer offset >=";//np
@@ -267,14 +273,19 @@ namespace TheTerrariaSeedProject.UI
         public static readonly List<string> v0to10 = getPatern(0, 11);
         public static readonly List<string> v0to15 = getPatern(0, 16);
         public static readonly List<string> v0to20 = getPatern(0, 21);
+        public static readonly List<string> v15to35_0_100 = ((new string[] { "0" }).Concat(getPatern(15, 21)).Concat((new string[] { "100" }))).ToList();
         public static readonly List<string> v0to50 = getPatern(0, 51);
         public static readonly List<string> v0to50neg = getPatern(0, 51,-1);
         public static readonly List<string> v0to80 = getPatern(0, 81);
+        public static readonly List<string> v50to200 = getPatern(50, 151);
+        public static readonly List<string> v0to400_by2 = getPatern(0, 201,2);
+
 
         public static readonly List<string> v0to100 = getPatern(0, 101);
         public static readonly List<string> v0to120 = getPatern(0, 121);
         public static readonly List<string> v0to300_5 = getPatern(0, 61, 5);
         public static readonly List<string> v0to500_5 = getPatern(0, 101, 5);
+        public static readonly List<string> v0to1000_5 = getPatern(0, 201, 5);
         public static readonly List<string> v0to500_5_700_10 = getPatern(0, 100, 5).Concat(getPatern(500, 21, 10)).ToList();
         public static readonly List<string> v0to200_2 = getPatern(0, 101, 2);        
         public static readonly List<string> v0to5 = getPatern(0, 6);
@@ -282,6 +293,8 @@ namespace TheTerrariaSeedProject.UI
         public static readonly List<string> v0to1 = getPatern(0, 2);
         public static readonly List<string> v0to2 = getPatern(0, 3);
         public static readonly List<string> vboost = new string[] { "-1" }.Concat(getPatern(10, 40).Concat(getPatern(50, 11, 5).Concat(new string[] {"110","134","150","190","200","300","400" }.ToList()))).ToList();
+        //skyler
+        //public static readonly List<string> vboost = getPatern(-120, 116).Concat( (new string[]  { "-1" }).Concat(getPatern(10, 40).Concat(getPatern(50, 11, 5).Concat(new string[] {"110","134","150","190","200","300","400" }.ToList())))).ToList();
         public static readonly List<string> vBackgroundWalls = getPatern(-1, 8);
         public static readonly List<string> vDungeonWalls = getPatern(10000, 19, 5000);
         public static readonly List<string> vDungeonALLWalls = getPatern(0, 3, 50, 1 , 2).Concat(getPatern(250, 3, 250).Concat(getPatern(1000, 9, 1000)).Concat(getPatern(10000, 21, 2000))).ToList();
@@ -409,16 +422,16 @@ namespace TheTerrariaSeedProject.UI
                 "impossible. \n \n" +
                 "For advanced users: If you want to tune it even more you can use the option '"+Phase1.boost+"' and '"+Phase1.boostPyr+"'. With first you can higher the chance to get a high number of possible pyramid spots and so also higher the" +
                 "chance to get more pyramids. The 2nd can be used for guessing the (max) amount of pyramids the seed actually has. \n " +
-                "Furthermore the (seed) value of '"+Phase1.boost+"' also has a direct impact at the number of living wood trees, Bee Hives, Granite and Marble biomes, 1st sky lake (except its mid). It also has some minor influence " +
-                "at lakes, dungeon position, sand generation and some more. This sand generation higher the chance for possible pyramid spots and so also for pyramids. A higher value will result in a " +
-                "higher count of those mentioned above but too high value will limit the variation and can have negative impact as well. E.g. it seem to increase the chance of a dungeon placed in ocean (more testing needed). " +
+                "Furthermore the (seed) value of '"+Phase1.boost+"' also has a direct impact at the number of living wood trees, Bee Hives, Granite and Marble biomes, 1st sky lake (except its mid), dungeon position. It also has some minor influence " +
+                "at lakes, sand generation and some more. This sand generation higher the chance for possible pyramid spots and so also for pyramids. A higher value will result in a " +
+                "higher count of those mentioned above but too high value will limit the variation and can have negative impact as well. E.g. a dungeon to the right placed in ocean. " +
                 "Also the first sky lake is placed very far in east, far away from spawn for high values (seed value of about 20 would be mid, in that case it gets a new location)." +
                 "Depending at world size and condition you are looking for there is some maximal value. Going higher than this will have no influence in this count. It is the internal amount of " +
                 "possible values for that structure. For convenience it is multiplied by 10. E.g. a small world can have 0, 1 or 2 living trees, so 3 possibilities, times 10 = 30. If you select this value " +
                 "the mod will divide 10 by this value and subtract it from one, e.g.: 1-(10:30) = ratio (about 0.6667). For each seed with a value higher (or equal) than this ratio it is guaranteed that the small world which is" +
-                "generates has two living trees. Or to be correct, at least world gen tries it. Sometimes it can't find a valid place. If you are also OK with one living tree, so you are OK with 2 out of those " +
+                "generates has two living trees. If you are also OK with one living tree, so you are OK with 2 out of those " +
                 "3 possibilities divide 30 by this (30:2=15, ratio would be about 0.333). Each seed with" +
-                "a value higher (or equal) than this will generate a small world with 1 or 2 living trees (or at least tries). \n" +
+                "a value higher (or equal) than this will generate a small world with 1 or 2 living trees. \n" +
                 "Here are those known possibilities counts (the real value may differ if e.g. multiplied by a value): \n \n" +
                 "living trees : small 3, medium 3, large 6 \n" +
                 "bee hives: small 3, medium 3, large 6 \n" +
@@ -591,9 +604,15 @@ namespace TheTerrariaSeedProject.UI
 
             Add(Phase1.boost, vboost);
             Add(Phase1.boostMax, vboost);
+            Add(Phase1.boostRNGV2Min, v0to1000_5);
+            Add(Phase1.boostRNGV2Max, v0to1000_5);
             Add(Phase1.boostPyr, v0to10);            
             Add(Phase1.boostES, v0to10);
             Add(Phase1.boostESgran, v0to10);
+            Add(Phase1.boostSurfheightMin, v15to35_0_100);
+            Add(Phase1.boostSurfheightMax, v15to35_0_100);
+            Add(Phase1.boostSurfHeightVarMin, v0to400_by2);
+            Add(Phase1.boostSurfHeightVarMax, v0to400_by2);
             Add(Phase1.boostUGheightMin, vUnderground);
             Add(Phase1.boostUGheightMax, vUnderground);
             Add(Phase1.boostHeightMax, vHeight);
@@ -612,12 +631,15 @@ namespace TheTerrariaSeedProject.UI
             Add(Phase1.boostMidCloudNum, v0to9);
             Add(Phase1.boostMidCloud1stLake, v0to2);
 
+            /*
             if (WorldGenSeedSearch.isPubRel)
             {
                 this.Remove(Phase1.boostMax);
+                this.Remove(Phase1.boostRNGV2Min);
+                this.Remove(Phase1.boostRNGV2Max);
                 this.Remove(Phase1.caveBG1);
                 this.Remove(Phase1.caveBG2);
-            }
+            }*/
 
 
             //phase 2 content
@@ -1810,11 +1832,22 @@ namespace TheTerrariaSeedProject.UI
 
 
             HelpDict.Add(Phase1.boost, "An advanced feature which gives you some control about a very important value during world gen. This has (known) direct impact at the number of living trees," +
-                " Bee Hives, Granite, Marble biomes, sky lake position. Some minor influence at lakes, dungeon position, sand generation and some more. This sand generation again has some influence at the value for " +
+                " Bee Hives, Granite, Marble biomes, 1st sky lake position, dungeon position. Some minor influence at lakes, sand generation and some more. This sand generation again has some influence at the value for " +
                 "option '"+Phase1.pyramidsPossible+ "' which has again some influence at the number of pyramids. \n" +
                 " Most times a higher values gives you a beter world. The seed need to have a higher (or equal) value than you selected here to pass that initial very fast test. Too high values can also have " +
                 "some negative effect (e.g. chance for dungeon in ocean seems to be higher, 1st sky lake cloud very far to the right). For more details left click at header '"+ Phase1.title +"'.\n" +
                 " Or in short: you are doing good in most cases with value 60 or if you hunt for pyramids 70 for small worlds, 110 for medium, 150 for large, -1 if you want a floating island lake near mid");
+
+            HelpDict.Add(Phase1.boostMax, "Upper bound of 1st RNG-value. Total range is from 1-10/boostMinValue to 10/boostMaxValue. Care for valid range!");
+
+
+            HelpDict.Add(Phase1.boostRNGV2Min, "Gives control about the 2nd random variable used in world gen. It has impact at the first living tree location (need to be valid position), the location of the hardmode biome " +
+                "spread at dungeon side and some more. The higher the value the closer it will be to the right (tree) or mid (hardmode spread: (1-)(0.2_+rngValue_0.3)*WorldWidth)");
+
+            HelpDict.Add(Phase1.boostRNGV2Max, "Gives control about the 2nd random variable used in world gen. It has impact at the first living tree location (need to be valid position), the location of the hardmode biome " +
+                "spread at dungeon side and some more. The higher the value the closer it will be to the right (tree) or mid (hardmode spread: (1-)(0.2_+rngValue_0.3)*WorldWidth)");
+
+
 
             HelpDict.Add(Phase1.boostPyr, "This condition is only needed if you are" +
                 " looking for pyramids. If a value other than 0 is selected it introduces an additional world generation cycle which is limited to the crucial steps for guessing an upper bound" +
@@ -1844,6 +1877,19 @@ namespace TheTerrariaSeedProject.UI
 
             HelpDict.Add("Underground Distance to spawn (guess)", "Amount of blocks between (unknown) character spawn location and (known) start of underground layer. ");
             
+
+            HelpDict.Add(Phase1.boostSurfheightMin, "Early world gen. steps can check the height of surface layer. " +
+                " World gen. only contine if height is between " + Phase1.boostSurfheightMin + " and " + Phase1.boostSurfheightMax + "% of the world height");
+            HelpDict.Add(Phase1.boostSurfheightMax, "Early world gen. steps can check the height of surface layer. " +
+                " World gen. only contine if height is between " + Phase1.boostSurfheightMin + " and " + Phase1.boostSurfheightMax + "% of the world height");
+
+            HelpDict.Add(Phase1.boostSurfHeightVarMin, "Early world gen. steps can check the height variation of surface layer. It is the difference between highest and lowest block " +
+                " in early world generation. Hills or valleys still possible. Max values: small: 156(bug: 198), medium: 234(bug:297), large: 312(bug: 396). Vanilla bug removed. Initial value correlated with boost value." +
+                " World gen. only contine if difference is between " + Phase1.boostSurfHeightVarMin + " and " + Phase1.boostSurfHeightVarMax );
+            HelpDict.Add(Phase1.boostSurfHeightVarMax, "Early world gen. steps can check the height variation of surface layer. It is the difference between highest and lowest block " +
+                " in early world generation. Hills or valleys still possible. Max values: small: 156(bug: 198), medium: 234(bug:297), large: 312(bug: 396). Vanilla bug removed. Initial value correlated with boost value." +
+                " World gen. only contine if difference is between " + Phase1.boostSurfHeightVarMin + " and " + Phase1.boostSurfHeightVarMax );
+
 
             HelpDict.Add(Phase1.boostUGheightMin, "Early world gen. steps can check the height of underground layer. " +
                 " World gen. only contine if height is between " + Phase1.boostUGheightMin + " and " + Phase1.boostUGheightMax + "");
