@@ -13,6 +13,7 @@ using Terraria.ID;
 using Terraria.IO;
 using System.Reflection;
 using System.Threading;
+using Terraria.GameContent.Events;
 
 using Terraria.GameContent.UI.States;
 using TheTerrariaSeedProject.UI;
@@ -1205,7 +1206,12 @@ namespace TheTerrariaSeedProject
 
                                         NPC.downedMechBoss1 = true;
                                         NPC.downedMechBoss2 = true;
-                                        NPC.downedMechBoss3 = true;                                        
+                                        NPC.downedMechBoss3 = true;
+                                        //CultistRitual.delay = 1337;
+                                        //CultistRitual.recheck = 42;
+                                        //NPC.downedGolemBoss = true;
+                                        //NPC.downedPlantBoss = true;
+                                        
                                         WorldFile.saveWorld(false, true);
 
                                     }
@@ -2207,11 +2213,12 @@ namespace TheTerrariaSeedProject
             //int sandSpotDensity = dummy.Next(0, 100);
 
             //2nd random
-            //first tree
+            //first tree trial
+            //location of  hardmode spread at dungeon side bigger-> more to mid
             //maybe 
             //+cavern depth 20 ( cavern low to get small underground layer)
             //first trial temple distance
-            //jungel distance
+            //jungel distance            
             double a = dummy.NextDouble(); //dummy
             //int a = dummy.Next(0, 100); //dummy
             boostRNGV2Seed = a;
@@ -11141,7 +11148,10 @@ namespace TheTerrariaSeedProject
             List<Tuple<int, int>> explosive = new List<Tuple<int, int>>();
             List<Tuple<int, int>> evilOre = new List<Tuple<int, int>>();
 
-
+            int spawnbl = ((Main.maxTilesX / 5)-100)/scale;
+            int spawnbr = spawnbl + 200;
+            int hbt = (int)Main.worldSurface - ((90*Main.maxTilesY)/1200)/scale;
+            int hbb = (int)Main.worldSurface - ((40 * Main.maxTilesY) / 1200) / scale;
             int indx = 0;
             for (int y = 0; y < Main.maxTilesY; y += scale)
                 for (int x = 0; x < Main.maxTilesX; x += scale)
@@ -11173,6 +11183,12 @@ namespace TheTerrariaSeedProject
                     rgbValues[indx++] = cc.R; 
                     rgbValues[indx++] = cc.A;
 
+                    if ((x == spawnbl || x == spawnbr) && y < hbb && y > hbt)
+                    {
+                        rgbValues[indx - 4] = (byte)(128+(rgbValues[indx - 4] >> 1));
+                        rgbValues[indx - 3] = (byte)(128+(rgbValues[indx - 3] >> 1));
+                        rgbValues[indx - 2] = (byte)(128+(rgbValues[indx - 2] >> 1));
+                    }
                 }
          
 
