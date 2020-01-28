@@ -1907,7 +1907,7 @@ namespace TheTerrariaSeedProject.UI
             
 
 
-            string wtext = "Be careful setting dungeon side together with dungeon color and hardmode evil spread side. In current version hardmode evil spread is always at the left side on worlds with blue dungeons and always to the right on worlds with pink dungeon";
+            string wtext = "Be careful setting dungeon side together with dungeon color and hardmode evil spread side. In current version hardmode evil spread is always at the left side at worlds with blue dungeons and always to the right on worlds with pink dungeon";
             HelpDict.Add(Phase1.dungeonSide, wtext);
             HelpDict.Add(Phase1.dungeonWallColor, wtext);
             HelpDict.Add(Phase1.hallowSide, wtext);
