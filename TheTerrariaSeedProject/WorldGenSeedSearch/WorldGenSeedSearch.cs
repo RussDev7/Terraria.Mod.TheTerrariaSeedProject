@@ -546,11 +546,15 @@ namespace TheTerrariaSeedProject
                             string boostString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boost, 1);
                             if (boostString.Length > 0)
                                 if(!Int32.TryParse(boostString, out boostValueInt)) boostValueInt = 10;
+                            double boostFloat = -1;
+                            if (boostString.Contains("0,") || boostString.Contains("0.")) { if (!Double.TryParse(boostString, out boostFloat)) boostFloat=-1; }
 
                             int boostValueIntMax = 10;
                             string boostStringMax = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boostMax, 1);
                             if (boostStringMax.Length > 0)
                                 if (!Int32.TryParse(boostStringMax, out boostValueIntMax)) boostValueIntMax = 10;
+                            double boostFloatMax = -1;
+                            if (boostStringMax.Contains("0,") || boostStringMax.Contains("0.")) { if (!Double.TryParse(boostStringMax, out boostFloatMax)) boostFloatMax = -1; }
 
                             int boostRNGV2IntMin = 0;
                             string boostRNGV2StringMin = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boostRNGV2Min, 1);
@@ -599,8 +603,9 @@ namespace TheTerrariaSeedProject
                                 boostValueMin = 0.5 + (200.0 + boostValueInt ) / (((double)Main.maxTilesX) * 0.8);
                                 boostValueMax = 0.5 + (200.0 - boostValueIntMax) / (((double)Main.maxTilesX) * 0.8);
                             }
+                            if (boostFloat >= 0) boostValueMin = boostFloat;
+                            if (boostFloatMax >= 0) boostValueMax = boostFloatMax;
                             
-
                             boostPyramidValue = 0;
                             string boostPyramidString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.boostPyr, 1);
                             if (boostPyramidString.Length > 0)
@@ -853,6 +858,7 @@ namespace TheTerrariaSeedProject
 
                             bool rngv2_OK = boostRNGV2Seed >= boostRNGV2Min && boostRNGV2Seed <= boostRNGV2Max;
 
+                            //if(randVals.Item4>0.37 && randVals.Item4<0.45 )//can be used to spawn snow, combined with prior rng values need to be min or max ((1-) <0.3 or >0.45)
                             if(rngv2_OK)
                             if ((
                             (boostValue<-1 && ((boostValueSeed >= boostValueMin && boostValueSeed <= boostValueMax) || (skyler))   ) ||
@@ -2201,20 +2207,22 @@ namespace TheTerrariaSeedProject
             //+thin ice biome 3 (..)
             //+marble count 5
             //+granite count 6
-            //position of first floating istland lake, except if it is mid
+            //position of first floating istland lake, except if it is mid 0.1-0.9
+            //dungeon initial position 0.05-0.2 or 0.8 to 0.95
+            //first trial evil biome d<- 600 to maxX-320, d-> 320 to maxX-600 (=for crim above mid of entry)
+            //location of hardmode spread not at dungeon side 0.2-0.3 or 1-0.2to0.3
 
-            //maybe
-            //dungeon distance something (only inital)
+            //maybe            
             //+surface 20
             //+jungel distance + rand2 value
             //+full desert biome distance, first trial
-            //frist trial temple depth
+            //frist trial temple dept
             double sandSpotDensity = dummy.NextDouble();
             //int sandSpotDensity = dummy.Next(0, 100);
-
+            
             //2nd random
             //first tree trial
-            //location of  hardmode spread at dungeon side bigger-> more to mid
+            //location of  hardmode spread at dungeon side bigger-> more to mid 0.2-0.3 or 1-0.2to0.3
             //maybe 
             //+cavern depth 20 ( cavern low to get small underground layer)
             //first trial temple distance
@@ -7011,7 +7019,7 @@ namespace TheTerrariaSeedProject
                         Tuple<int,int> bulb = score.itemLocation[ItemID.PlanteraTrophy][i];
                         int x = -bulb.Item1 / 10000;
                         int y = -bulb.Item2 / 10000;
-                        writeDebugFile("  " + x  + "  " + y );
+                        
                         int diag = (lihAltarBreakThroughLoc.Item1 - x) * (lihAltarBreakThroughLoc.Item1 - x) + (lihAltarBreakThroughLoc.Item2 -y ) * (lihAltarBreakThroughLoc.Item2 - y);
                         if (diag < minDist)
                             minDist = diag;
@@ -11339,7 +11347,7 @@ namespace TheTerrariaSeedProject
                 }                
                 for (int ci = 0; ci < Main.maxChests; ci++)
                 {
-                    if(Main.chest[ci] != null && Main.chest[ci].x > Main.offLimitBorderTiles && Main.chest[ci].y > Main.offLimitBorderTiles && Main.chest[ci].x < Main.maxTilesX-Main.offLimitBorderTiles)
+                    if(Main.chest[ci] != null && Main.chest[ci].x > Main.offLimitBorderTiles && Main.chest[ci].y > Main.offLimitBorderTiles && Main.chest[ci].x < Main.maxTilesX-Main.offLimitBorderTiles && Main.chest[ci].item.Length>0 && Main.chest[ci].item[0] != null && Main.chest[ci].item[0].active && Main.chest[ci].item[0].stack>0)
                         DrawCircle(ref rgbValues, new Tuple<int,int>(Main.chest[ci].x, Main.chest[ci].y), scale, new Color(245, 228, 24));
                 }
                 foreach (var diamond in diamonds)
