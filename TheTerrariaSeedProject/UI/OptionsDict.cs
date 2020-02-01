@@ -335,6 +335,7 @@ namespace TheTerrariaSeedProject.UI
         public static readonly List<string> vdummy = getPatern(0, 21).Concat(new string[] { "50","100","200","500","1000"}).ToList();
         public static readonly List<string> vdummyNegEnhancer = (new string[] { "100", "50"}).Concat(getPatern(25, 31, -1).Concat(new string[] { "-10", "-15","-30" })).ToList();
 
+        public static readonly List<string> vCliffScore = getPatern(0, 20, 5).Concat(getPatern(100, 16, 25).Concat(getPatern(500, 10, 50)).Concat(getPatern(1000, 20, 100)).Concat(getPatern(3000, 9, 250))).ToList();
         public static readonly List<string> vMaxDist = getPatern(0, 20, 10).Concat(getPatern(200, 17, 25)).ToList();
         public static readonly List<string> vMeanHeight = getPatern(0, 51, 5);
         public static readonly List<string> vTreePyrExistCavernDist = getPatern(-300, 61, 10);
@@ -719,6 +720,8 @@ namespace TheTerrariaSeedProject.UI
                 "Jungle biome surface overlap mid",
                 "Jungle biome distance to mid",
                 "Snow biome distance to mid",
+                "UG desert biome distance to mid",
+                "Sand tiles distance to mid",
                 "MarbleGranite at surf dist. to mid",
                 "Top MarbleGranite dist. to spawn (guess)",
                 "UG MarbleGranite dist. to spawn (guess)",
@@ -729,6 +732,8 @@ namespace TheTerrariaSeedProject.UI
                 "Surface average height (aprox.)",
                 "Surface height (sqrt) variance",
                 "Surface max-min height",
+                "Straight cliff count",
+                "Cliff score",
                 "Underground layer height",
                 "Underground Distance to spawn (guess)",
                 "Spawn rock layer offset (guess)",
@@ -744,6 +749,8 @@ namespace TheTerrariaSeedProject.UI
                 "neg. Distance Lake to mid (guess)",
                 "neg. Jungle biome distance to mid",
                 "neg. Snow biome distance to mid",
+                "neg. UG desert biome distance to mid",
+                "neg. Sand tiles distance to mid",
                 "neg. MarbleGranite at surf dist. to mid",
                 "neg. Top MarbleGranite dist. to spawn (guess)",
                 "neg. UG MarbleGranite dist. to spawn (guess)",
@@ -799,6 +806,8 @@ namespace TheTerrariaSeedProject.UI
                 "Jungle biome surface overlap mid",
                 "Jungle biome distance to mid",
                 "Snow biome distance to mid",
+                "UG desert biome distance to mid",
+                "Sand tiles distance to mid",
                 "MarbleGranite at surf dist. to mid",
                 "Top MarbleGranite dist. to spawn (guess)",
                 "UG MarbleGranite dist. to spawn (guess)",
@@ -806,6 +815,8 @@ namespace TheTerrariaSeedProject.UI
                 "Surface average height (aprox.)",
                 "Surface height (sqrt) variance",
                 "Surface max-min height",
+                "Straight cliff count",
+                "Cliff score",
                 "Max Living Tree Size",
                 "Min Living Tree Size",
                 Phase2.maxTreeExitCavDist,
@@ -897,6 +908,8 @@ namespace TheTerrariaSeedProject.UI
             Add("Jungle biome surface overlap mid", vNumTiles);
             Add("Jungle biome distance to mid", vDistanceOverlap);
             Add("Snow biome distance to mid", vDistanceOverlap);
+            Add("UG desert biome distance to mid", vDistance);
+            Add("Sand tiles distance to mid", vDistance);
             Add("MarbleGranite at surf dist. to mid", vDistance);
             Add("Top MarbleGranite dist. to spawn (guess)", vDistance);
             Add("UG MarbleGranite dist. to spawn (guess)", vDistance);
@@ -907,6 +920,9 @@ namespace TheTerrariaSeedProject.UI
             Add("Surface average height (aprox.)", vMeanHeight);
             Add("Surface height (sqrt) variance", v0to120);
             Add("Surface max-min height", vMaxDist);
+            Add("Straight cliff count", v0to20);
+            Add("Cliff score", vCliffScore);
+            
             Add("Enchanted Sword mid may possible (guess)", v0to5);
             Add("Enchanted Sword mid granite may possible (guess)", v0to5);
             Add("Enchanted Sword mid good may possible (guess)", v0to5);
@@ -940,6 +956,8 @@ namespace TheTerrariaSeedProject.UI
 
             Add("neg. Jungle biome distance to mid", vDistanceOverlapNeg);
             Add("neg. Snow biome distance to mid", vDistanceOverlapNeg);
+            Add("neg. UG desert biome distance to mid", vDistanceNeg);
+            Add("neg. Sand tiles distance to mid", vDistanceNeg);
             Add("neg. MarbleGranite at surf dist. to mid", vDistanceNeg);
             Add("neg. Top MarbleGranite dist. to spawn (guess)", vDistanceNeg);
             Add("neg. UG MarbleGranite dist. to spawn (guess)", vDistanceNeg);
@@ -1999,6 +2017,10 @@ namespace TheTerrariaSeedProject.UI
             HelpDict.Add("Tree to cavern layer near mid", "A tree located near mid (<300 blocks) with deep roots which leads you beyond cavern layer entrance.");
 
 
+            HelpDict.Add("UG desert biome distance to mid", "Distnace from mid to entrance of underground desert biome");
+            HelpDict.Add("Sand tiles distance to mid", "Distance from mid to first occurrence of sand block tiles above surface. It will ignore very small spots of less than 5 tiles.");
+
+
             HelpDict.Add("Lake near mid (guess)", "Checks if there is a lake with at least 200 block size in less than 250 blocks distance from mid. It is marked with 'guess' because " +
                 " world gen does some small changes on liquids after Phase 2. It can happen that this value is different in phase 3.");
 
@@ -2049,6 +2071,9 @@ namespace TheTerrariaSeedProject.UI
             HelpDict.Add("Surface height (sqrt) variance", "The square root of the variance (or standard deviation) from computing the values for 'Surface average height (aprox.)'");
             HelpDict.Add("Surface max-min height", "Difference between max an min value from computing the values for 'Surface average height (aprox.)'. So the amount of blocks of the" +
                 "deepest hole to the biggest mountain.");
+            HelpDict.Add("Straight cliff count", "Counts big straight cliffs. Not 100% accurate all the time.");
+            HelpDict.Add("Cliff score", "Some made up score for cliffs. The higher the value the more and/or the higher straight cliffs the world has. Height has quadratic impact. Test around to find some good values.");
+             
 
             
 
