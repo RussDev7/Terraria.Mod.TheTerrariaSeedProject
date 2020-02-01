@@ -3510,6 +3510,10 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("neg. Jungle biome distance to mid", -1000000);
             hasOBjectOrParam.Add("neg. Snow biome distance to mid", -1000000);
             hasOBjectOrParam.Add("neg. Evil biome distance to mid", -1000000);
+            hasOBjectOrParam.Add("neg. UG desert biome distance to mid", -Math.Abs(WorldGen.UndergroundDesertLocation.X-Main.maxTilesX/2+ WorldGen.UndergroundDesertLocation.Width/2));
+            hasOBjectOrParam.Add("neg. Sand tiles distance to mid", -1000000);
+
+
             hasOBjectOrParam.Add("neg. MarbleGranite at surf dist. to mid", -1000000);
             
             hasOBjectOrParam.Add("neg. Top MarbleGranite dist. to spawn (guess)", -1000000);
@@ -3542,6 +3546,10 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Jungle biome distance to mid", 100000);
             hasOBjectOrParam.Add("Snow biome distance to mid", 100000);
             hasOBjectOrParam.Add("Evil biome distance to mid", 100000);
+            hasOBjectOrParam.Add("UG desert biome distance to mid", Math.Abs(WorldGen.UndergroundDesertLocation.X-Main.maxTilesX/2+ WorldGen.UndergroundDesertLocation.Width/2));
+            hasOBjectOrParam.Add("Sand tiles distance to mid", 100000);
+            
+            
             hasOBjectOrParam.Add("MarbleGranite at surf dist. to mid", 100000);
             hasOBjectOrParam.Add("Top MarbleGranite dist. to spawn (guess)", 100000* 10000);
             hasOBjectOrParam.Add("UG MarbleGranite dist. to spawn (guess)", 100000* 10000);
@@ -3578,6 +3586,9 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Surface average height (aprox.)", 0);
             hasOBjectOrParam.Add("Surface height (sqrt) variance", 0);
             hasOBjectOrParam.Add("Surface max-min height", 0);
+            hasOBjectOrParam.Add("Straight cliff count", 0);
+            hasOBjectOrParam.Add("Cliff score", 0);
+            
             hasOBjectOrParam.Add("Underground layer height", (int)Math.Abs(Main.rockLayer - Main.worldSurface));
             hasOBjectOrParam.Add("neg. Underground layer height", (int)-Math.Abs(Main.rockLayer - Main.worldSurface ));
 
@@ -3790,11 +3801,14 @@ namespace TheTerrariaSeedProject
 
 
             //TODO ext function
-            Tuple<int, int, int> mheiStdDiff = CheckSurface(blsY, hasOBjectOrParam["Beach left"], hasOBjectOrParam["Beach right"]);
+            Tuple<int, int, int,int, int> mheiStdDiff = CheckSurface(blsY, hasOBjectOrParam["Beach left"], hasOBjectOrParam["Beach right"]);
 
             hasOBjectOrParam["Surface average height (aprox.)"] = mheiStdDiff.Item1;
             hasOBjectOrParam["Surface height (sqrt) variance"] = mheiStdDiff.Item2;
             hasOBjectOrParam["Surface max-min height"] = mheiStdDiff.Item3;
+            hasOBjectOrParam["Straight cliff count"] = mheiStdDiff.Item4;
+            hasOBjectOrParam["Cliff score"] = mheiStdDiff.Item5;
+
 
             ts = stopWatch.Elapsed;
             elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
@@ -4725,6 +4739,7 @@ namespace TheTerrariaSeedProject
             int liqt = 0;
 
             int[] waterDuckSpawn = new int[601];
+            int[] desertTiles = new int[Main.maxTilesX];
             List<Tuple<int, int>> evilBiomesLoc = new List<Tuple<int, int>>();
             int lastEvilX = 0;
 
@@ -5213,10 +5228,13 @@ namespace TheTerrariaSeedProject
                         else if (tile.type == TileID.SharpeningStation && tile.frameX == 0 && tile.frameY == 0)
                         {
                             hasOBjectOrParam["Sharpening Station"]++;
-                        }
-
+                        }                        
                         else if (y < Main.worldSurface)
                         {
+                            if (desertTiles[x]==0 && tile.wall==WallID.None && (tile.type == TileID.Sand || tile.type == TileID.Crimsand || tile.type == TileID.Ebonsand) && (!Main.tile[x,y-1].active() || !Main.tileSolid[(int)Main.tile[x, y-1].type] ) && Main.tile[x, y - 1].wall==WallID.None )
+                            {
+                                desertTiles[x]=1;
+                            }
 
                             if (((x > Main.maxTilesX / 2 && dungSide == 1) || (x < Main.maxTilesX / 2 && dungSide == 0)) &&
                             (Main.tile[x, y].type == TileID.JungleGrass || Main.tile[x, y].type == TileID.JunglePlants || Main.tile[x, y].type == TileID.JunglePlants2 || Main.tile[x, y].type == TileID.JungleThorns || Main.tile[x, y].type == TileID.JungleVines))
@@ -6623,6 +6641,25 @@ namespace TheTerrariaSeedProject
             //tallest tree finder TODO ext fun
             CheckAndSetTreeSizes(ref hasOBjectOrParam, treesPos, stage);
 
+            //nearest dessert tile
+            {
+                int x = Main.maxTilesX / 2;
+                int d = -1;
+                int fl = 0; int cl = 0;
+                int fr = 0; int cr = 0;
+                while (++d < Main.maxTilesX)
+                {
+                    if (desertTiles[x - d] > 0) fl = cl++==0?x-d:fl; else cl = Math.Max(0, cl - 1); 
+                    if (desertTiles[x + d] > 0) fr = cr++==0?x+d:fr; else cr = Math.Max(0, cr - 1); 
+
+                    if (cl > 5 || cr > 5) break;
+                }
+                int distl = cl > 5 ? (x - fl):x;
+                int distr = cr > 5 ? (fr - x):x;
+                hasOBjectOrParam["Sand tiles distance to mid"] = Math.Min(distl, distr);
+
+            }
+
 
             //pyramid surface
             foreach (var pyrm in genInfo.pyramidPos)
@@ -7145,6 +7182,7 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam["neg. Jungle biome distance to mid"] = -hasOBjectOrParam["Jungle biome distance to mid"];
             hasOBjectOrParam["neg. Snow biome distance to mid"] = -hasOBjectOrParam["Snow biome distance to mid"];
             hasOBjectOrParam["neg. Evil biome distance to mid"] = -hasOBjectOrParam["Evil biome distance to mid"];
+            hasOBjectOrParam["neg. Sand tiles distance to mid"] = -hasOBjectOrParam["Sand tiles distance to mid"];            
             hasOBjectOrParam["neg. MarbleGranite at surf dist. to mid"] = -hasOBjectOrParam["MarbleGranite at surf dist. to mid"];
             hasOBjectOrParam["neg. Top MarbleGranite dist. to spawn (guess)"] = -hasOBjectOrParam["Top MarbleGranite dist. to spawn (guess)"];
             hasOBjectOrParam["neg. UG MarbleGranite dist. to spawn (guess)"] = -hasOBjectOrParam["UG MarbleGranite dist. to spawn (guess)"];
@@ -7683,7 +7721,7 @@ namespace TheTerrariaSeedProject
                 return FindCaveEntrance(ref pathlength, x, y, minv, deep);
         }*/
 
-        private Tuple<int, int, int> CheckSurface(int startY, int beachLx, int beachRx)
+        private Tuple<int, int, int, int, int> CheckSurface(int startY, int beachLx, int beachRx)
         {
             int cury = startY;
             int size = beachRx - beachLx;
@@ -7797,50 +7835,121 @@ namespace TheTerrariaSeedProject
             mean /= (double)size;
             meanSq /= (double)size;
 
-            Tuple<int, int, int> mheiStdDiff = new Tuple<int, int, int>((int)Math.Round(mean), (int)Math.Round(Math.Sqrt(meanSq - mean * mean)), (max - min));
-
-
-            //smoothing //not done yet, needed? hill detection?
-            int siMax = 0;
-            for (int si = 0; si < siMax; si++)
+            //cliff detection
+            //dont work that well many false postive TODO
+            int cliffs = 0;
+            const int CLIFF = 17;
+            const int CLIFF2 = 31;
+            const int CLIFF3 = 44;
+            int last = 0;
+            int cliffsScore = 0;
+            for (int i = 3; i < size-3; i++)
             {
+                last = cliffs;
+                if (diff[i] - diff[i + 1] > CLIFF || diff[i - 1] - diff[i] > CLIFF) cliffs++;
+                else if (diff[i] - diff[i + 2] > CLIFF2 || diff[i - 2] - diff[i] > CLIFF2) cliffs++;
+                else if (diff[i] - diff[i + 3] > CLIFF3 || diff[i - 3] - diff[i] > CLIFF3) cliffs++;
 
-                //writeDebugFile(seed + " mean " + mean + " meanSq " + meanSq + " msqd " + ((int)Math.Round(Math.Sqrt(meanSq - mean * mean))) + " min " + min + " max " + max);
+                if (last != cliffs)
+                {
+                    int c = 0;
+                    int cn = 0;
+                    int x = beachLx + i + 1;
+                    int y = (int)Main.worldSurface - diff[i];
 
-                mean = 0;
-                meanSq = 0;
-                min = 9000;
-                max = 0;
-                for (int i = si + 1; i < size - si - 1; i++)
+                    const int off = 3;
+                    for (int yi = y; yi < y + 400; yi++)
+                        if (Main.tile[x, yi].active() && Main.tileSolid[(int)Main.tile[x, yi].type] &&
+                                (!Main.tile[x - off, yi].active() || !Main.tileSolid[(int)Main.tile[x - off, yi].type] ||
+                                !Main.tile[x + off, yi].active() || !Main.tileSolid[(int)Main.tile[x + off, yi].type] ||
+                                !Main.tile[x - off - 1, yi].active() || !Main.tileSolid[(int)Main.tile[x - off - 1, yi].type] ||
+                                !Main.tile[x + off + 1, yi].active() || !Main.tileSolid[(int)Main.tile[x + off + 1, yi].type] ||
+                                (c > 15 && (!Main.tile[x - off - 2, yi].active() || !Main.tileSolid[(int)Main.tile[x - off - 2, yi].type] ||
+                                !Main.tile[x + off + 2, yi].active() || !Main.tileSolid[(int)Main.tile[x + off + 2, yi].type])
+                                )) && Main.tile[x + off + 2, yi].liquid == 0
+                            )
+                        {
+                        c++;
+                    }
+                    else if(cn++>4) break;
+
+                    if (c > 12 )
+                    {
+                        int maxr = diff[i+3];
+                        for (int xi = i + 3; xi < i+ 60 && xi<size; xi++) maxr = Math.Max(maxr, diff[xi]);
+                        int maxl = diff[i - 3];
+                        for (int xi = i - 3; xi > i - 60 && xi>0; xi--) maxl = Math.Max(maxl, diff[xi]);
+
+                        if (maxl < diff[i] - CLIFF || maxr < diff[i] - CLIFF)
+                        {
+                            
+                            i += 7;
+                            cliffsScore += (int)((0.5+((c-6) * (c-6)))/5);
+                            //writeDebugFile(seed + " cliff at " + x + " "+y +"  cc"+  c);
+                        }
+                        else
+                        {
+                            cliffs--;                            
+                        }
+                    }
+                    else
+                    {
+                        cliffs--;                        
+                    }
+
+                }
+            }
+
+
+
+                Tuple<int, int, int, int, int> mheiStdDiff = new Tuple<int, int, int, int, int>((int)Math.Round(mean), (int)Math.Round(Math.Sqrt(meanSq - mean * mean)), (max - min), cliffs,cliffsScore);
+
+
+            //smoothing //not done yet, needed? hill detection? outdated, remove?
+            {
+                /*int siMax = 0;
+                for (int si = 0; si < siMax; si++)
                 {
 
+                    //writeDebugFile(seed + " mean " + mean + " meanSq " + meanSq + " msqd " + ((int)Math.Round(Math.Sqrt(meanSq - mean * mean))) + " min " + min + " max " + max);
 
-                    diff[i] = (diff[i - 1] + +diff[i + 1]) / 2;
-
-                    if (diff[i] > max) max = diff[i];
-                    if (diff[i] < min) min = diff[i];
-
-                    mean += diff[i];
-                    meanSq += diff[i] * diff[i];
-
-                    //debug
-                    if (si == siMax - 1)
+                    mean = 0;
+                    meanSq = 0;
+                    min = 9000;
+                    max = 0;
+                    for (int i = si + 1; i < size - si - 1; i++)
                     {
-                        //Main.tile[beachLx + i, (int)Main.worldSurface - diff[i]].active(true);
-                        //Main.tile[beachLx + i, (int)Main.worldSurface - diff[i]].type = (ushort)(196 + (trueval[i] == true ? 1 : 0) + (trueval2[i] == true ? 1 : 0));
+
+
+                        diff[i] = (diff[i - 1] + diff[i + 1]) / 2;
+
+                        if (diff[i] > max) max = diff[i];
+                        if (diff[i] < min) min = diff[i];
+
+                        mean += diff[i];
+                        meanSq += diff[i] * diff[i];
+
+                        //debug
+                        if (si == siMax - 1)
+                        {
+                            //Main.tile[beachLx + i, (int)Main.worldSurface - diff[i]].active(true);
+                            //Main.tile[beachLx + i, (int)Main.worldSurface - diff[i]].type = (ushort)(196 + (trueval[i] == true ? 1 : 0) + (trueval2[i] == true ? 1 : 0));
+                        }
                     }
-                }
 
 
 
-                mean /= (double)size;
-                meanSq /= (double)size;
+                    mean /= (double)size;
+                    meanSq /= (double)size;
 
-                mheiStdDiff = new Tuple<int, int, int>((int)Math.Round(mean), (int)Math.Round(Math.Sqrt(meanSq - mean * mean)), (max - min));
+                    mheiStdDiff = new Tuple<int, int, int>((int)Math.Round(mean), (int)Math.Round(Math.Sqrt(meanSq - mean * mean)), (max - min));
 
-                //writeDebugFile(seed + " mean " + mean + " meanSq " + meanSq + " msqd " + ((int)Math.Round(Math.Sqrt(meanSq - mean * mean))) + " min " + min + " max " + max);
+                    //writeDebugFile(seed + " mean " + mean + " meanSq " + meanSq + " msqd " + ((int)Math.Round(Math.Sqrt(meanSq - mean * mean))) + " min " + min + " max " + max);
 
+                }*/
             }
+            
+
 
 
             diff = null;
