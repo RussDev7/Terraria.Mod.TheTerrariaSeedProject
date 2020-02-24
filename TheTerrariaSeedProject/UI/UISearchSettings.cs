@@ -353,6 +353,9 @@ namespace TheTerrariaSeedProject.UI
 
             addDictToInfo(OptionsDict.Configuration.storeMMPic).SetValue("Off");
             addDictToInfo(OptionsDict.Configuration.storeStats).SetValue("Off");
+
+            if (!WorldGenSeedSearch.isPubRel) addDictToInfo(OptionsDict.Configuration.genPostMech).SetValue("0");
+
             //addDictToInfo(OptionsDict.GeneralOptions.searchRare).SetValue(opdict[OptionsDict.GeneralOptions.searchRare][opdict[OptionsDict.GeneralOptions.searchRare].Count - 1]);
             addSelectListToInfo(OptionsDict.GeneralOptions.omitRare, InfoPanel.listKindOmitRare);
             addSelectListToInfo(OptionsDict.GeneralOptions.naming, InfoPanel.listKindNaming);
@@ -414,6 +417,29 @@ namespace TheTerrariaSeedProject.UI
             addDictToInfo(OptionsDict.Phase1.boostMidTree).SetValue("0");
             addDictToInfo(OptionsDict.Phase1.pyramidsPossible).SetValue("0");
             addDictToInfo(OptionsDict.Phase1.boostPyr).SetValue("0");
+
+            addDictToInfo(OptionsDict.Phase1.noSnowDung).SetValue("0");
+            addDictToInfo(OptionsDict.Phase1.noSnowJung).SetValue("0");
+
+            if (!WorldGenSeedSearch.isPubRel)
+            {
+                addDictToInfo(OptionsDict.Phase1.hallow1stEvilOffsetMin).SetValue("-1000");
+                addDictToInfo(OptionsDict.Phase1.hallow1stEvilOffsetMax).SetValue("1000");
+
+                addDictToInfo(OptionsDict.Phase1.hallowToSnowMin).SetValue("-1000");
+                addDictToInfo(OptionsDict.Phase1.hallowToSnowMax).SetValue("1000");
+
+                addFreeLine();                                
+                addDictToInfo(OptionsDict.Phase1.quickBulb).SetValue("0");
+                addDictToInfo(OptionsDict.Phase1.quickBulbNearMid).SetValue("0");
+                addDictToInfo(OptionsDict.Phase1.quickBulbNearJungle).SetValue("0");
+                addDictToInfo(OptionsDict.Phase1.quickCrystalShard).SetValue("0");
+                addDictToInfo(OptionsDict.Phase1.quickChlorophyteOre).SetValue("0");
+                addDictToInfo(OptionsDict.Phase1.quickTripple).SetValue("0");
+                addDictToInfo(OptionsDict.Phase1.onlyShowUpperHalf).SetValue("0");
+            }
+
+
 
             addFreeLine();
             addDictToInfo(OptionsDict.Phase2.title).setCustomColor(Color.Orange);
@@ -1048,6 +1074,8 @@ namespace TheTerrariaSeedProject.UI
                     currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Surface average height (aprox.)", "100");
                     currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Surface height (sqrt) variance", "30");
                     currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Surface max-min height", "135");
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Cliff score", "500");
+                    currentConfig.InsertSelectableText(2, Configuration.ConfigItemType.SelectableListNegative, "Straight cliff count", "2");
                 }
                 else if (currentPositive == 6)
                 {
@@ -1115,6 +1143,7 @@ namespace TheTerrariaSeedProject.UI
                     
 
                 }
+               
 
 
 
@@ -1339,7 +1368,7 @@ namespace TheTerrariaSeedProject.UI
                     descText = newTitle;
                 if (containsPathlength)
                     descText += (descText.Length != 0 ? " \n" : "") + uiss.opdict.HelpDict[OptionsDict.Phase3.pathlength];
-                else if (containsDistance)
+                else if (containsDistance && !descText.Contains('%'))
                     descText += (descText.Length != 0 ? " \n" : "") + uiss.opdict.HelpDict[OptionsDict.GeneralOptions.distance];
                 if (containsNeg)
                     descText += (descText.Length != 0 ? " \n" : "") + uiss.opdict.HelpDict["neg. "];

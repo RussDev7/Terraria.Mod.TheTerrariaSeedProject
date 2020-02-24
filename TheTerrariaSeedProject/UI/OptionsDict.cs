@@ -34,6 +34,7 @@ namespace TheTerrariaSeedProject.UI
             public const string stepSize = "Seed cycle step size";
             public const string storeMMPic = "Store mini map as picture";
             public const string storeStats = "Store stats for each seed";
+            public const string genPostMech = "Generate hardmode post mech as well";
         }
 
         public static class Phase1
@@ -80,6 +81,21 @@ namespace TheTerrariaSeedProject.UI
             public const string boostMidCloud1stLake = "pred. Clouds in mid contain 1st lake right ="; //np
             public const string caveBG1 = "cave background 1 ="; //np
             public const string caveBG2 = "cave background 2 ="; //np
+            public const string noSnowDung = "Dungeon side no snow size (%)(approx.) >="; 
+            public const string noSnowJung = "Jungle side no snow size (%)(approx.) >=";
+
+            public const string hallow1stEvilOffsetMin = "Hallow first evil biome offset (%)(approx.) >=";
+            public const string hallow1stEvilOffsetMax = "Hallow first evil biome offset (%)(approx.) <=";
+            public const string hallowToSnowMin = "Hallow to Snow distance (%)(approx.) >=";
+            public const string hallowToSnowMax = "Hallow to Snow distance (%)(approx.) <=";
+
+            public const string quickBulb = "Quick Plantera Bulb location >=";
+            public const string quickBulbNearMid = "Quick Plantera Bulb location near mid >=";
+            public const string quickBulbNearJungle = "Quick Plantera Bulb location near Jungle >=";
+            public const string quickCrystalShard = "Quick Crystal Shard location >=";
+            public const string quickChlorophyteOre = "Quick Chlorophyte Ore location >=";
+            public const string quickTripple = "Quick location for Crystal Ore Bulb >=";
+            public const string onlyShowUpperHalf = "Only use Crystals, Chlor.Ore, mid Bulbs in upper half =";
 
         }
 
@@ -348,6 +364,12 @@ namespace TheTerrariaSeedProject.UI
         public static readonly List<string> vSpawnRockOff = getPatern(-1000, 5, 100).Concat(getPatern(-500, 16, 25).Concat(getPatern(-100, 10, 5).Concat(getPatern(-50, 151, 1)))).ToList();
         public static readonly List<string> vSpawnRockOffNeg = getPatern(1000, 5, -100).Concat(getPatern(500, 16, -25).Concat(getPatern(100, 10, -5).Concat(getPatern(50, 151, -1)))).ToList();
 
+        public static readonly List<string> vSnowDungeon = (new string[] { "0" }).Concat(getPatern(25, 21)).Concat((new string[] { "100" })).ToList();
+        public static readonly List<string> vSnowJungle = (new string[] { "0" }).Concat(getPatern(45, 26)).Concat((new string[] { "100" })).ToList();
+        public static readonly List<string> vHallow1stEOffMinMax = (new string[] { "-1000" }).Concat(getPatern(-100, 201)).Concat((new string[] { "1000" })).ToList();
+        public static readonly List<string> vHallowToSnow = (new string[] { "-1000" }).Concat(getPatern(-100, 201)).Concat((new string[] { "1000" })).ToList();
+        
+
         public static readonly List<string> vForUnknown = getPatern(0, 10).Concat(getPatern(10, 9, 10)).Concat(getPatern(100, 9, 100)).Concat(getPatern(1000, 9, 1000)).Concat(getPatern(10000, 10, 10000)).ToList();
 
         public static readonly List<string> vCloudsMidDist = (new string[] { "-1" }).Concat(getPatern(85, 48, 5).Concat(getPatern(275, 45, 5).Concat(getPatern(500, 20, 25).Concat(getPatern(1000, 20, 50).Concat(getPatern(2000, 13, 250)))))).ToList();
@@ -395,6 +417,8 @@ namespace TheTerrariaSeedProject.UI
 
             Add(Configuration.storeMMPic, new List<string>() { "Off", "For each in phase 3", "For each in phase 3 + item info", "only for stored worlds", "only for stored worlds + item info" });
             Add(Configuration.storeStats, new List<string>() { "Off", "For each in phase 3", "only for stored worlds"});
+
+            Add(Configuration.genPostMech, v0to1);
 
 
             //phase 1
@@ -631,6 +655,26 @@ namespace TheTerrariaSeedProject.UI
             Add(Phase1.boostMidCloudInner2, vCloudsMidDist);
             Add(Phase1.boostMidCloudNum, v0to9);
             Add(Phase1.boostMidCloud1stLake, v0to2);
+
+
+
+
+            Add(Phase1.noSnowDung, vSnowDungeon);
+            Add(Phase1.noSnowJung, vSnowJungle);
+            Add(Phase1.hallow1stEvilOffsetMin, vHallow1stEOffMinMax);
+            Add(Phase1.hallow1stEvilOffsetMax, vHallow1stEOffMinMax);
+            Add(Phase1.hallowToSnowMin, vHallowToSnow);
+            Add(Phase1.hallowToSnowMax, vHallowToSnow);
+
+            Add(Phase1.quickBulb, v0to10);
+            Add(Phase1.quickBulbNearMid, v0to5);
+            Add(Phase1.quickBulbNearJungle, v0to10);
+            Add(Phase1.quickCrystalShard, v0to10);
+            Add(Phase1.quickChlorophyteOre, v0to10);
+            Add(Phase1.quickTripple, v0to5);
+            Add(Phase1.onlyShowUpperHalf, v0to1);
+            
+
 
             /*
             if (WorldGenSeedSearch.isPubRel)
@@ -1776,6 +1820,7 @@ namespace TheTerrariaSeedProject.UI
             HelpDict.Add(Configuration.searchSeedNum, "Search ends after this amount of seed unless it found the value selected in '"+Configuration.stopSearchNum+ "' with all conditions you set up.");
             HelpDict.Add(Configuration.stopSearchNum, "If search found that many seeds which fulfill the conditions you set up the search will end. If you have rare search active, those seeds which" +
                 " contain rares but fulfill not your conditions will not count.");
+            HelpDict.Add(Configuration.genPostMech, "If active (=1) then also a hardmode version of the world is stored (and image if enabled). All mech bosses marked as already be killed.");
 
             HelpDict.Add("neg. ", "neg. means negative value. Same as positive but different sign. With this e.g. pathlength or distance can also be used in positive list. If you are looking for "+
                 "a distance less than 100 you can insert the positive value in negative list or the negative value in positive list. If seed has value 42, negative would be -42 which is greater than -100.");
@@ -1935,9 +1980,39 @@ namespace TheTerrariaSeedProject.UI
             HelpDict.Add(Phase1.caveBG1, "Background cave style 1. " +bgtext);
             HelpDict.Add(Phase1.caveBG2, "Background cave style 2. " + bgtext);
 
+            HelpDict.Add(Phase1.noSnowDung, "Space between end of world at Dungeon side  to snow biome. The distance is measured in % of world size. It's only an approximated value but very fast to compute. Don't be too strict!");
+            HelpDict.Add(Phase1.noSnowJung, "Space between end of world at Jungle side  to snow biome. The distance is measured in % of world size. It's only an approximated value but very fast to compute. Don't be too strict!");
+
+            HelpDict.Add(Phase1.hallow1stEvilOffsetMin, "Minimal space between predicted first evil biome (center) and start of approximated hardmode hallow biome. The distance is measured in % of world size divided by 10. " +
+                "Negative value means the evil biome overlapping the outer side of the hallow biome. Positive value means the evil biom has this distance to the inner side of the hallow biome. It's only an approximated value but very fast to compute." +
+                " Don't be too strict! Also sometimes the evil biome prediction is not correct (e.g. if desert, jungle there). It was made for crimson. The position taken into account is the top of the biome head. Evil biome position is in direct " +
+                "correlation with boot value (bootst >20 -> pred. evil is right). Care about impossible combinations. Currently distance is measured at predicted spawn height.");
+            HelpDict.Add(Phase1.hallow1stEvilOffsetMax, "Maximal space between predicted first evil biome (center) and start of approximated hardmode hallow biome. The distance is measured in % of world size divided by 10. " +
+                "Positive value means the evil biome overlapping the outer side of the hallow biome. Negative value means the evil biom has this distance to the inner side of the hallow biome. It's only an approximated value but very fast to compute. " +
+                "Don't be too strict! Also sometimes the evil biome prediction is not correct (e.g. if desert, jungle there). It was made for crimson. The position taken into account is the top of the biome head. Evil biome position is in direct " +
+                "correlation with boot value (bootst >20 -> pred. evil is right). Care about impossible combinations. Currently distance is measured at predicted spawn height.");
+
+            HelpDict.Add(Phase1.hallowToSnowMin, "Minimal distance between approximated Hallow and Snow bimome location. Negative value means overlapping (or hallow closer to mid than snow). The distance is measured between the approximated inner hallow side end and the outer Snow biome end. It is measured in % of world size divided by 10.  ");
+            HelpDict.Add(Phase1.hallowToSnowMax, "Maximal distance between approximated Hallow and Snow bimome location. Negative value means overlapping (or hallow closer to mid than snow). The distance is measured between the approximated inner hallow side end and the outer Snow biome end. It is measured in % of world size divided by 10.  ");
 
 
+            HelpDict.Add(Phase1.quickBulb, "This checks the first update of world update for a possible Plantera Bulb spawn. In almost all cases this postion is not valid but you can make it valid. " +
+                "Store an minimap image of the world as well. It will contain a Plantera treasure bag icon and above a smal arrow which ends in two pixel. Those two pixels directly above that arrow may spawn a bulb very fast after " +
+                "you entered this world in multiplayer. However those spots have only a ~50% chance to work but if they worked once they should nearly always work again. The right block need to be a Mud Block of green color (e.g. with jungle grass seeds) " +
+                "The left block need to be a Mud Block (dont need but can als be green). Some of those locations only work if a Jungle plant is on top some only without. In most cases a plant grows first if needed (rejoin the world two times for this). ");
+            HelpDict.Add(Phase1.quickBulbNearJungle, "Same as '"+ Phase1.quickBulb+"' but the location is near the lower part of the Jungle.");
+            HelpDict.Add(Phase1.quickBulbNearMid, "Same as '" + Phase1.quickBulb + "' but the location is near surface and mid of world.");            
+            HelpDict.Add(Phase1.quickCrystalShard, "Same as '"+ Phase1.quickBulb+ "' but it spawns a Crystal Shard. The block above the arrow of the Crystal Shard map icon need to be Pearlstone Block or Pink Ice Block.");
+            HelpDict.Add(Phase1.quickChlorophyteOre, "Same as '" + Phase1.quickBulb + "' but it spawns a Chlorophyte Ore. The minimap image will show Chlorophyte Ore icon with two arrows above it. On top of the arrow related to the" +
+                "icont you need to build a green Mud Block (e.g. with Jungle grass seeds). At top of other arrow a normal Mud Block is needed.");
+            HelpDict.Add(Phase1.quickTripple, " This is one location which offers a Plantera Bulb, a Crystal Shard and Chlorophyte Ore at the very first update. Check those for more details.");
+            HelpDict.Add(Phase1.onlyShowUpperHalf, "If active (=1) it selects for '" + Phase1.quickCrystalShard + "' and '" + Phase1.quickChlorophyteOre  + "' and with this also '" +
+                Phase1.quickTripple+ "' only occurrences which are above the half underground world size (minus 200 tiles for hell). E.g. for a small world, if underground starts at 300 this is (1200-200-300)/2+300=650 block from top of world or less. " +
+                "In additon to that it also restricts Plantera Bulbs counted as near mid ~(from left right +-350 to 225 -+depth/(1.5 to 1.4). And depth 225 to 150, from below surface to below predicted spawn height.)");
             
+
+
+
             //phase 2
             HelpDict.Add("Number of Clouds", "That includes floating lakes as well. Unless something goes really wrong small world has one floating lake, medium 2, large 3. Total max number is " +
                 "4, 7 and 9.");
