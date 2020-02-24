@@ -180,6 +180,27 @@ namespace TheTerrariaSeedProject
         int boostMidTreeValueSeed = 0;
         int boostPyramidMidValue = 0;
         int boostPyramidTwoMidDistance = 10000;
+
+
+        int noSnowDungeon = 0;
+        int noSnowJungle = 0;
+
+        int hallow1stEvilOffMin = -10000;
+        int hallow1stEvilOffMax = 10000;
+
+        int hallowToSnowMin = -10000;
+        int hallowToSnowMax = 10000;
+
+        int quickBulb = 0;
+        int quickBulbNM = 0;
+        int quickBulbNJ = 0;
+        int quickCrystal = 0;
+        int quickChlore = 0;
+        int quickTripple = 0;
+        int quickOnlyUpper = 0;
+        int genPostMech = 0;
+
+
         bool doApproxRun = false;
         bool inApproxRun = false;
 
@@ -520,17 +541,22 @@ namespace TheTerrariaSeedProject
                             else
                                 storeStats = -1;
 
+                            genPostMech = 0;
+                            string genPostMechString = currentConfiguration.FindConfigItemValue(OptionsDict.Configuration.genPostMech, 0);
+                            if (genPostMechString.Length > 0)
+                                if (!Int32.TryParse(genPostMechString, out genPostMech)) genPostMech = 0;
 
 
-                            looking4copperTin = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.copperTin, 1);
-                            looking4ironLead = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.ironLead, 1);
-                            looking4silverTung = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.silverTungsten, 1);
-                            looking4goldPlation = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.goldPlatin, 1);
-                            looking4moonType = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.moonType, 1);
 
-                            looking4hallowSide = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.hallowSide, 1);
-                            looking4dungeonWallColor = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.dungeonWallColor, 1);
-                            looking4dungeonSide = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.dungeonSide, 1);
+                            looking4copperTin = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.copperTin, 1); if (looking4copperTin.Length == 0) looking4copperTin = "Random";
+                            looking4ironLead = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.ironLead, 1); if (looking4ironLead.Length == 0) looking4ironLead = "Random";
+                            looking4silverTung = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.silverTungsten, 1); if (looking4silverTung.Length == 0) looking4silverTung = "Random";
+                            looking4goldPlation = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.goldPlatin, 1); if (looking4goldPlation.Length == 0) looking4goldPlation = "Random";
+                            looking4moonType = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.moonType, 1); if (looking4moonType.Length == 0) looking4moonType = "Random";
+
+                            looking4hallowSide = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.hallowSide, 1); if (looking4hallowSide.Length == 0) looking4hallowSide = "Random";
+                            looking4dungeonWallColor = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.dungeonWallColor, 1); if (looking4dungeonWallColor.Length == 0) looking4dungeonWallColor = "Random";
+                            looking4dungeonSide = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.dungeonSide, 1); if (looking4dungeonSide.Length == 0) looking4dungeonSide = "Random";
 
                             looking4caveBG1 = -1;
                             string caveBGString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.caveBG1, 1);
@@ -540,6 +566,13 @@ namespace TheTerrariaSeedProject
                             caveBGString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.caveBG2, 1);
                             if (caveBGString.Length > 0)
                                 if (!Int32.TryParse(caveBGString, out looking4caveBG2)) looking4caveBG2 = -1;
+
+
+                            // background TODO
+
+
+
+
 
 
                             int boostValueInt = 10;
@@ -732,10 +765,75 @@ namespace TheTerrariaSeedProject
                             if (boostPyramidTwoMidDistString.Length > 0)
                                 if (!Int32.TryParse(boostPyramidTwoMidDistString, out boostPyramidTwoMidDistance)) boostPyramidTwoMidDistance = 10000;
 
+                            //snow                         
+                                                        
+                            noSnowDungeon = 0;
+                            string snowString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.noSnowDung, 1);
+                            if (snowString.Length > 0)
+                                if (!Int32.TryParse(snowString, out noSnowDungeon)) noSnowDungeon = 0;
+                            noSnowJungle = 0;
+                            snowString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.noSnowJung, 1);
+                            if (snowString.Length > 0)
+                                if (!Int32.TryParse(snowString, out noSnowJungle)) noSnowJungle = 0;
+
+                            hallow1stEvilOffMin = -1000;
+                            string heoString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.hallow1stEvilOffsetMin, 1);
+                            if (heoString.Length > 0)
+                                if (!Int32.TryParse(heoString, out hallow1stEvilOffMin)) hallow1stEvilOffMin = -1000;
+                            hallow1stEvilOffMax = 1000;
+                            heoString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.hallow1stEvilOffsetMax, 1);
+                            if (heoString.Length > 0)
+                                if (!Int32.TryParse(heoString, out hallow1stEvilOffMax)) hallow1stEvilOffMax = 1000;
+
+                            hallowToSnowMin = -1000;
+                            string htoSString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.hallowToSnowMin, 1);
+                            if (htoSString.Length > 0)
+                                if (!Int32.TryParse(htoSString, out hallowToSnowMin)) hallowToSnowMin = -1000;
+                            hallowToSnowMax = 1000;
+                            htoSString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.hallowToSnowMax, 1);
+                            if (htoSString.Length > 0)
+                                if (!Int32.TryParse(htoSString, out hallowToSnowMax)) hallowToSnowMax = 1000;
+
+
+
+                            //quick stuff
+                            quickBulb = 0;                            
+                            string quickString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.quickBulb, 1);
+                            if (quickString.Length > 0)
+                                if (!Int32.TryParse(quickString, out quickBulb)) quickBulb = 0;
+                            quickBulbNJ = 0;
+                            quickString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.quickBulbNearJungle, 1);
+                            if (quickString.Length > 0)
+                                if (!Int32.TryParse(quickString, out quickBulbNJ)) quickBulbNJ = 0;
+                            quickBulbNM = 0;
+                            quickString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.quickBulbNearMid, 1);                            
+                            if (quickString.Length > 0)
+                                if (!Int32.TryParse(quickString, out quickBulbNM)) quickBulbNM = 0;
+                            quickCrystal = 0;
+                            quickString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.quickCrystalShard, 1);
+                            if (quickString.Length > 0)
+                                if (!Int32.TryParse(quickString, out quickCrystal)) quickCrystal = 0;
+                            quickChlore = 0;
+                            quickString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.quickChlorophyteOre, 1);
+                            if (quickString.Length > 0)
+                                if (!Int32.TryParse(quickString, out quickChlore)) quickChlore = 0;
+                            quickTripple = 0;
+                            quickString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.quickTripple, 1);
+                            if (quickString.Length > 0)
+                                if (!Int32.TryParse(quickString, out quickTripple)) quickTripple = 0;
+
+                            quickOnlyUpper = 0;
+                            quickString = currentConfiguration.FindConfigItemValue(OptionsDict.Phase1.onlyShowUpperHalf, 1);
+                            if (quickString.Length > 0)
+                                if (!Int32.TryParse(quickString, out quickOnlyUpper)) quickOnlyUpper = 0;
+                            
+
+
 
                             //test if hardmode picture and world shoudl be stored
                             doBulbGenHM = (currentConfiguration.FindConfigItemValue("Quick Plantera bulb prediction (beta)", 3).Length > 0?1:0)  +
-                                (currentConfiguration.FindConfigItemValue("Quick Plantera bulb prediction MP only(beta)", 3).Length > 0?2:0) ;
+                                (currentConfiguration.FindConfigItemValue("Quick Plantera bulb prediction MP only(beta)", 3).Length > 0?2:0) +
+                                (genPostMech > 0 ? 4 : 0) ;
 
 
                             search4MoonOres = true;
@@ -807,6 +905,7 @@ namespace TheTerrariaSeedProject
                             midESspots = null;
                             midESspotsGood = null;
                             midGraniteESspots = null;
+                            //int looking4dungeonSideNum = looking4dungeonSide.Equals("Left") ? -1 : looking4dungeonSide.Equals("Right") ? 1 : 0;
 
                             double ratio = numPyramidChanceTrue == 0 ? 0 : ((float)numSearched) / ((float)numPyramidChanceTrue);
 
@@ -858,8 +957,12 @@ namespace TheTerrariaSeedProject
 
                             bool rngv2_OK = boostRNGV2Seed >= boostRNGV2Min && boostRNGV2Seed <= boostRNGV2Max;
 
-                            //if(randVals.Item4>0.37 && randVals.Item4<0.45 )//can be used to spawn snow, combined with prior rng values need to be min or max ((1-) <0.3 or >0.45)
-                            if(rngv2_OK)
+                            //var cqb = CheckQuickBulbShardChloreSnow(false, true, looking4dungeonSideNum);
+                            //bool rngBS_OK = !cqb.wasStopped && (looking4dungeonSideNum!=0 || cqb.snowApprSurfL < 1050);
+                            bool rngBS_OK = true;
+                            //if (!cqb.wasStopped) writeDebugFile(seed + " " + cqb.snowApprSurfL+ " " + cqb.snowApprSurfR +" base "+  cqb.snowStartM + " " + cqb.snowStartL+ " " + cqb.snowStartR + " "+ cqb.wasStopped +" " + rngv2_OK + " " + Main.maxTilesX);
+                            
+                            if (rngv2_OK && rngBS_OK)
                             if ((
                             (boostValue<-1 && ((boostValueSeed >= boostValueMin && boostValueSeed <= boostValueMax) || (skyler))   ) ||
                             (boostValue>=0 && boostValueSeed >= boostValueMin && boostValueSeed <= boostValueMax) ||  
@@ -883,13 +986,13 @@ namespace TheTerrariaSeedProject
                                 }
 
                             }
-                                    
 
-                            if(doit)
+                            
+                            if (doit)
                             if (!ended && searchForSeed && !gotoCreation)
                                     if (!TryToGenerate()) continue; //--> genInfo ores
 
-
+                            
                             if (condsTrue > 0)
                             {
                                 //rocklayer explosives min, marble/granite max hight  -> small good
@@ -1182,19 +1285,20 @@ namespace TheTerrariaSeedProject
 
                                     writeToDescList(GenerateStatsText(), -2);
 
-                                    if (storeMMImg >= 0 && doBulbGenHM>0 && 
-                                        ((score.hasOBjectOrParam["Quick Plantera bulb prediction (beta)"] > 0 && doBulbGenHM%2==1) || 
-                                        (score.hasOBjectOrParam["Quick Plantera bulb prediction MP only(beta)"] > 0 && doBulbGenHM>1)))
+                                    if (storeMMImg >= 0 && doBulbGenHM > 0 &&
+                                        ((score.hasOBjectOrParam["Quick Plantera bulb prediction (beta)"] > 0 && doBulbGenHM % 2 == 1) ||
+                                        (score.hasOBjectOrParam["Quick Plantera bulb prediction MP only(beta)"] > 0 && doBulbGenHM > 1) 
+                                        || doBulbGenHM >= 4))
                                     {
-                                        
+
                                         Main.worldName = Main.worldName + "_HM";
                                         string cseed = Main.ActiveWorldFileData.SeedText.PadLeft(10, '0');
                                         Main.ActiveWorldFileData = WorldFile.CreateMetadata(Main.worldName, false, Main.expertMode);
                                         Main.ActiveWorldFileData.SetSeed(cseed);
-                                                                                
+
                                         Main.rand = new UnifiedRandom(seed);
                                         WorldGen._genRand = new UnifiedRandom(seed);
-                                        
+
                                         WorldGen.StartHardmode();
                                         int maxWait = 20;
                                         while (!WorldGen.IsGeneratingHardMode)
@@ -1207,8 +1311,8 @@ namespace TheTerrariaSeedProject
                                         {
                                             Thread.Sleep(100);
                                             if (maxWait-- < 0) break;
-                                        }                                        
-                                        StoreMapAsPNG(storeMMImg % 2 > 0);
+                                        }
+                                        
 
                                         NPC.downedMechBoss1 = true;
                                         NPC.downedMechBoss2 = true;
@@ -1218,7 +1322,12 @@ namespace TheTerrariaSeedProject
                                         //NPC.downedGolemBoss = true;
                                         //NPC.downedPlantBoss = true;
                                         
+                                        StoreMapAsPNG(storeMMImg % 2 > 0);
                                         WorldFile.saveWorld(false, true);
+
+
+
+
 
                                     }
 
@@ -1260,6 +1369,8 @@ namespace TheTerrariaSeedProject
 
 
 
+
+
         private void InitSearch()
         {
 
@@ -1274,6 +1385,7 @@ namespace TheTerrariaSeedProject
             numPyramidChanceTrue = 0;
             numPyramidChanceTrueComputed = 0;
 
+            
 
             startDate = DateTime.Now.ToString(@"yyyy\/MM\/dd HH\:mm\:ss");
 
@@ -2191,7 +2303,7 @@ namespace TheTerrariaSeedProject
 
 
 
-        public Tuple<double, double, double, double > setDirectComputeValues()
+        public Tuple<double, double, double, double> setDirectComputeValues()
         {
             //check hardmode evil biome side and dungeon wall color
             //that might not work in later terraria versions!!!! !!!!!!!
@@ -2219,7 +2331,7 @@ namespace TheTerrariaSeedProject
             //frist trial temple dept
             double sandSpotDensity = dummy.NextDouble();
             //int sandSpotDensity = dummy.Next(0, 100);
-            
+
             //2nd random
             //first tree trial
             //location of  hardmode spread at dungeon side bigger-> more to mid 0.2-0.3 or 1-0.2to0.3
@@ -2235,17 +2347,18 @@ namespace TheTerrariaSeedProject
             //dungeon color
             //jungle chest count small 5 (7 to 12) , large 10
             //maybe jungle depth
-            double randVar = dummy.NextDouble();            
+            double randVar = dummy.NextDouble();
             evilHMIsLeft = (int)(randVar * (double)2) == 0 && a > -1.0;
             dungeonColor = (int)(randVar * (double)3); // 0: blue, 1:green, 2: pink ===> evil hm side and dcolor correlated 
-            
+
             boostValueSeed = sandSpotDensity;
             boostMidTreeValueSeed = 300 + (int)(a * (Main.maxTilesX - 600));
 
+            double val4 = dummy.NextDouble();
 
 
 
-            return new Tuple<double, double, double, double >(sandSpotDensity, a, randVar, dummy.NextDouble());
+            return new Tuple<double, double, double, double >(sandSpotDensity, a, randVar, val4);
         }
 
         public int guessSpawnHight(bool reduce)
@@ -2299,6 +2412,395 @@ namespace TheTerrariaSeedProject
 
         }
 
+        public void addBulb(int bx, int by, int update, bool grass)
+        {
+            //writeDebugFile("" + seed + " at " + bx + " " + by + " at update " + update + (grass?" grass " :" noGrass ") + " surf " + Main.worldSurface + " cavern " + Main.rockLayer + " spawn height about " + boostHeightValueSeed);
+            if (score.itemLocation.ContainsKey(ItemID.PlanteraBossBag))
+                score.itemLocation[ItemID.PlanteraBossBag].Add(new Tuple<int, int>(bx, by));//-3
+            else
+                score.itemLocation.Add(ItemID.PlanteraBossBag, new List<Tuple<int, int>> { new Tuple<int, int>(bx, by) });
+        }
+
+        public struct QuickCheckInfo
+        {
+            public int foundQBulb;
+            public int foundQBulbNLJ;
+            public int foundQBulbNM;
+            public int foundQShard ;
+            public int foundQChlore;
+            public int foundTripple;
+            public int snowStartM;
+            public int snowStartL;
+            public int snowStartR;
+            public int snowApprSurfL;
+            public int snowApprSurfR;
+            public int hallowApprSurfL;
+            public int hallowApprSurfR;
+            public int firstEvilBiomePosPred;
+            public bool wasStopped;
+
+            public QuickCheckInfo(int found, int foundNLJ, int foundNM, int foundShard, int foundChlore, int foundTripp, int snowMid, int snowLeft, int snowRight, int snowApproxSurfL, int snowApproxSurfR, int hallowApproxSurfL, int hallowApproxSurfR, int _firstEvilBiomePosPred, bool stopped)
+                => (foundQBulb, foundQBulbNLJ, foundQBulbNM, foundQShard, foundQChlore, foundTripple, snowStartM, snowStartL, snowStartR, snowApprSurfL, snowApprSurfR, hallowApprSurfL, hallowApprSurfR, firstEvilBiomePosPred,  wasStopped) = 
+                (found, foundNLJ, foundNM, foundShard, foundChlore, foundTripp, snowMid, snowLeft, snowRight, snowApproxSurfL, snowApproxSurfR, hallowApproxSurfL, hallowApproxSurfR, _firstEvilBiomePosPred, stopped);
+            
+        }
+
+        public QuickCheckInfo CheckQuickBulbShardChloreSnow(bool addThem = false, bool initSurfCavDummyAndL4D = false, int looking4dungeonSide = 0)
+        {
+            
+            int foundNM = 0;
+            int foundNLJ = 0;
+            int found = 0;
+            int foundShard = 0;
+            int foundChlore = 0;
+            int foundTripple = 0;
+            int snowSet = -1;
+            int snowMid = Main.maxTilesX / 2;
+            int snowLeft = -1;
+            int snowRight = Main.maxTilesX + 1;            
+            int snowApproxSurfL = 0;
+            int snowApproxSurfR = Main.maxTilesX;
+            int hallowApproxSurfL = 0;
+            int hallowApproxSurfR = Main.maxTilesX;
+            bool stopped = true;
+            int boostHeightValueSeedLocal = boostHeightValueSeed;
+            double worldSurface = Main.worldSurface;
+            double rockLayer = Main.rockLayer;
+            bool evilBiomeTypeCrimson = WorldGen.crimson;
+
+            int localDungeonSideLocal = localDungeonSide;
+            int firstEvilBiomePosPred = 0;
+            if (initSurfCavDummyAndL4D)
+            {
+                localDungeonSideLocal = looking4dungeonSide;
+                worldSurface = 300.0*Main.maxTilesY/1200;
+                rockLayer = 400 * Main.maxTilesY / 1200 ;
+                boostHeightValueSeedLocal = 50 * Main.maxTilesY / 1200;
+            }
+
+            for (int qq = 0; qq == 0; qq++)
+            {
+                const int bulbMin = 320;
+                const int bulbMax = 450;
+
+                /*
+                const double rng1_evilPosMin = 0.110635;
+                const double rng1_evilPosMax = 0.1189387;
+                const double rng2_hallowMax = 10.0 / 12.0;
+                const int rng3_hallowSide = 1;//1 left, 0 right*/
+                const double rng1_evilPosMin = 0.0;
+                const double rng1_evilPosMax = 1.00;
+                const double rng2_hallowMax = 1.0;
+                const int rng3_hallowSide = -1;
+
+
+
+                const int rngOffset = 10;
+                /*const double ymin = 680;
+                const double ymax = 930;
+                const double xmin = 2780;
+                const double xmax = 3750;*/
+                const double ymin = 40;
+                double ymax = quickOnlyUpper > 0 ? ((float)(Main.maxTilesY-200-worldSurface))/ (2.0 + ((float)quickOnlyUpper-1))+ worldSurface :  Main.maxTilesY-100;
+                const double xmin = 40;
+                double xmax = Main.maxTilesX-40;
+
+
+                double yminMid = worldSurface-1;
+                double ymaxMid = worldSurface - 1+(quickOnlyUpper>0? (10.0*(150-boostHeightValueSeedLocal))/(9.0+quickOnlyUpper): 225);
+                double xminMid = Main.maxTilesX / 2 - (quickOnlyUpper>0? 2250.0/(9.0+quickOnlyUpper) : 350);
+                double xmaxMid = Main.maxTilesX/2 + (quickOnlyUpper >0 ? 2250.0/(9.0+quickOnlyUpper) : 350);
+                double reduceFac = (quickOnlyUpper >0 ? 1.4 : 1.5);
+                //TODO check values (for bigger sizes)
+                double yminLJung = (Main.maxTilesY/1200)*400+200;
+                double ymaxLJung = (Main.maxTilesY / 1200) * 730+200;
+                double xminLJung = (Main.maxTilesX / 4200) * 2780;
+                double xmaxLJung = (Main.maxTilesX / 4200) * 3750;
+
+                float snowMin = 0.3f;
+                float snowMax = 0.45f;
+                float factor = (float)(Main.maxTilesX / 4200);
+
+                if (localDungeonSideLocal > 0)
+                {                    
+                    xminLJung = Main.maxTilesX - xmaxLJung;
+                    xmaxLJung = Main.maxTilesX - xminLJung;
+                    snowMin = 0.55f;
+                    snowMax = 0.7f;
+                }
+                
+
+
+                double rngBorder = (worldSurface + rockLayer) / 2.0;
+                const double bclast_LessThan60 = 1.0 / 60.0;
+                const double bclastm1_LessThan25 = 1.0 / 25.0;
+                const double bclastm2_maybe_greater10 = 1.0 / 10;
+                const double bclastm3_notLessThan300 = 1.0 / 300.0;
+                const double crystalShardLessThan110 = 1.0 / 110.0;
+                const double chlOreLessThen300 = 1.0 / 300.0;
+                double bclastm4_y_min = (ymin - worldSurface+1 ) / (Main.maxTilesY - 20.0 - worldSurface + 1);
+                double bclastm4_y_max = (ymax - worldSurface + 1  ) / (Main.maxTilesY - 20.0 - worldSurface + 1);
+                double bclastm5_x_min = (xmin - 10.0) / (Main.maxTilesX-20);
+                double bclastm5_x_max = (xmax - 10.0) / (Main.maxTilesX-20);
+
+
+
+                double[] values = new double[bulbMax - bulbMin + 2 * rngOffset];
+                int[] counter = new int[bulbMax - bulbMin + 2 * rngOffset];
+                double[] baseV = new double[bulbMin];
+                int baseVStart = 5;
+
+                UnifiedRandom genRand = new UnifiedRandom(seed);
+                 
+                
+                int kj = 0;
+                for (; kj < baseVStart; kj++)
+                {
+                    baseV[kj] = genRand.NextDouble();
+                    if(snowSet == -1 && baseV[kj]>snowMin & baseV[kj] < snowMax)
+                    {
+                        snowSet = kj;
+                    }
+                }               
+                if (baseV[0] < rng1_evilPosMin || baseV[0] > rng1_evilPosMax)
+                    continue;                         
+                if (baseV[1] > rng2_hallowMax)
+                    continue;
+                int evilIsRight = (int)(baseV[2] * 2) == 0?0:1;
+                if (evilIsRight != rng3_hallowSide && rng3_hallowSide != -1)
+                    continue;
+
+                float hallowPosX = 0;
+
+                if (localDungeonSideLocal < 0)
+                {
+                    if (evilIsRight == 1) hallowPosX = (int)((float)Main.maxTilesX * (baseV[1]*0.1f+0.2f) );
+                    else if (evilIsRight == 0) hallowPosX = (int)((float)Main.maxTilesX * (1f-(baseV[0]*0.1f+0.3f)));
+                }else if (localDungeonSideLocal > 0)
+                {
+                    if (evilIsRight == 1) hallowPosX = (int)((float)Main.maxTilesX * (baseV[0]*0.1f+0.3f));
+                    else if (evilIsRight == 0) hallowPosX = (int)((float)Main.maxTilesX * (1f-(baseV[1]*0.1f+0.2f)));
+                }
+               
+                if (localDungeonSideLocal != 0)
+                {
+                    double hallowPosOff = ((baseV[0] * 50 + 200) * factor) * 0.5;
+                    double hallowPosXFrom = hallowPosX - hallowPosOff;
+                    double hallowPosXTo = hallowPosX + hallowPosOff;
+                    hallowApproxSurfL = (int)(hallowPosXFrom +(evilIsRight==1?1:-1)* (int)(0.6 * (worldSurface - boostHeightValueSeedLocal)));
+                    hallowApproxSurfR = (int)(hallowPosXTo + (evilIsRight == 1 ? 1 : -1) * (int)(0.6 * (worldSurface - boostHeightValueSeedLocal)));
+
+                    firstEvilBiomePosPred = evilBiomeTypeCrimson? (int)(baseV[0] * (Main.maxTilesX - 920) + (localDungeonSideLocal < 0 ? 600 : 320))
+                        : (int)(baseV[0] * (Main.maxTilesX - 640) + ((int)(baseV[1] * (200)+ (int)(baseV[2] * (200) )))) ;
+                    if (firstEvilBiomePosPred > Main.maxTilesX + 200 && firstEvilBiomePosPred < Main.maxTilesX - 200) firstEvilBiomePosPred = -1;
+                }
+
+                stopped = false;
+                for (; kj < bulbMin - rngOffset; kj++)
+                {
+                    baseV[kj] = genRand.NextDouble();
+                    if (snowSet == -1 && baseV[kj] > snowMin & baseV[kj] < snowMax)
+                    {
+                        snowSet = kj;
+                    }
+                }
+
+                if (localDungeonSideLocal != 0)
+                {
+                    if (snowSet < bulbMin - rngOffset - 7)
+                    {
+                        
+                        snowMid = (int)(baseV[snowSet] * Main.maxTilesX);
+                        snowLeft = 50 + (int)(baseV[snowSet + 1] * 40) + (int)((float)(20 + (int)(baseV[snowSet + 2] * 20)) * factor) + (int)((float)(20 + (int)(baseV[snowSet + 3] * 20)) * factor);
+                        snowLeft = snowMid - snowLeft;
+                        snowRight = 50 + (int)(baseV[snowSet + 4] * 40) + (int)((float)(20 + (int)(baseV[snowSet + 5] * 20)) * factor) + (int)((float)(20 + (int)(baseV[snowSet + 6] * 20)) * factor);
+                        snowRight = snowMid + snowRight;
+
+                    }
+                    else if (snowSet >= 0)
+                    {
+                        snowMid = snowRight = snowLeft = (int)(baseV[snowSet] * Main.maxTilesX);
+                    }
+                    snowApproxSurfL = snowLeft - (int)(0.5 * (worldSurface - boostHeightValueSeedLocal));
+                    snowApproxSurfR = snowRight + (int)(0.5 * (worldSurface - boostHeightValueSeedLocal));
+                }
+
+                int i = 0;
+                while (i < values.Length)
+                {
+                    values[i] = genRand.NextDouble();
+                    counter[i++] = i + bulbMin - rngOffset;
+                }
+
+              
+                int byt = 0;
+                for (int j = rngOffset; j < values.Length- rngOffset; j++)
+                {
+                    //bulb
+                    if (values[j] < bclast_LessThan60 )
+                    {
+                        if (values[j - 1] < bclastm1_LessThan25)
+                        {
+                            if(values[j - 5] < bclastm3_notLessThan300 && values[j - 2] > bclastm2_maybe_greater10)//300 generates 2 rng
+                            {
+                                int by = (int)(values[j - 6] * (Main.maxTilesY - 20 - (int)worldSurface + 1)) + (int)worldSurface - 1;
+                                if (by > rockLayer && by <ymax)
+                                {
+                                    if (addThem)
+                                    {
+                                        int bx = (int)(values[j - 7] * (Main.maxTilesX - 20) + 10);
+                                        if (addThem) addBulb(bx, by, counter[j - 6], true);
+
+                                        if (bx >= xminMid + (by - yminMid) / reduceFac && bx <= xmaxMid - (by - yminMid) / reduceFac && by >= yminMid && by <= ymaxMid) foundNM++;
+                                        if (bx >= xminLJung && bx <= xmaxLJung && by >= yminLJung && by <= ymaxLJung && localDungeonSideLocal != 0) foundNLJ++;
+
+                                        bx += (int)((values[j -5 + 1] * 21 - 10));
+                                        by += (int)((values[j -5 + 2] * 21 - 10));
+
+                                        if (score.itemLocation.ContainsKey(ItemID.MudBlock))
+                                            score.itemLocation[ItemID.MudBlock].Add(new Tuple<int, int>(bx, by));//-3
+                                        else
+                                            score.itemLocation.Add(ItemID.MudBlock, new List<Tuple<int, int>> { new Tuple<int, int>(bx, by) });
+                                        
+                                    }
+                                    foundTripple++;
+                                    found++;
+                                }
+                            }
+                            if (values[j - 4] < bclastm3_notLessThan300)//300 generates 2 rng
+                            {
+                                int by = (int)(values[j - 5] * (Main.maxTilesY - 20 - (int)worldSurface + 1)) + (int)worldSurface - 1;
+                                if (by > rockLayer && by < ymax)
+                                {
+                                    if (addThem)
+                                    {
+                                        int bx = (int)(values[j - 6] * (Main.maxTilesX - 20) + 10);
+                                        if (addThem) addBulb(bx, by, counter[j - 5], true);
+
+                                        if (bx >= xminMid + (by - yminMid) / reduceFac && bx <= xmaxMid - (by - yminMid) / reduceFac && by >= yminMid && by <= ymaxMid) foundNM++;
+                                        if (bx >= xminLJung && bx <= xmaxLJung && by >= yminLJung && by <= ymaxLJung && localDungeonSideLocal != 0) foundNLJ++;
+
+                                        bx += (int)((values[j - 4 + 1] * 21 - 10));
+                                        by += (int)((values[j - 4 + 2] * 21 - 10));
+
+                                        if (score.itemLocation.ContainsKey(ItemID.MudBlock))
+                                            score.itemLocation[ItemID.MudBlock].Add(new Tuple<int, int>(bx, by));//-3
+                                        else
+                                            score.itemLocation.Add(ItemID.MudBlock, new List<Tuple<int, int>> { new Tuple<int, int>(bx, by) });
+                                    }
+                                    foundTripple++;
+                                    found++;
+                                }
+                            }
+
+                            if (values[j - 4] > bclastm4_y_min && values[j - 4] < bclastm4_y_max && values[j - 5] > bclastm5_x_min && values[j - 5] < bclastm5_x_max && values[j - 3] > bclastm3_notLessThan300
+                                && values[j - 2] > bclastm2_maybe_greater10)
+                            {
+                                //hit 
+
+                                int by = (int)(values[j - 4] * (Main.maxTilesY - 20 - (int)worldSurface + 1)) + (int)worldSurface - 1;
+
+                                if (by > rngBorder)
+                                {
+                                    found++;
+                                    int bx = (int)(values[j - 5] * (Main.maxTilesX - 20) + 10);
+                                    if (bx >= xminMid + (by - yminMid) / reduceFac && bx <= xmaxMid - (by - yminMid) / reduceFac && by >= yminMid && by <= ymaxMid) foundNM++;
+                                    if (bx >= xminLJung && bx <= xmaxLJung && by >= yminLJung && by <= ymaxLJung && localDungeonSideLocal != 0) foundNLJ++;
+                                    if (addThem) addBulb(bx, by, counter[j - 4], false);
+                                }
+                            }
+                            if (values[j - 3] > bclastm4_y_min && values[j - 3] < bclastm4_y_max && values[j - 4] > bclastm5_x_min && values[j - 4] < bclastm5_x_max && values[j - 2] > bclastm3_notLessThan300)
+                            {
+                                //hit   
+                                int by = (int)(values[j - 3] * (Main.maxTilesY - 20 - (int)worldSurface + 1)) + (int)worldSurface - 1;
+                                if (by > rngBorder)
+                                {
+                                    found++;
+                                    int bx = (int)(values[j - 4] * (Main.maxTilesX - 20) + 10);
+                                    if (bx >= xminMid + (by - yminMid) / reduceFac && bx <= xmaxMid - (by - yminMid) / reduceFac && by >= yminMid && by <= ymaxMid) foundNM++;
+                                    if (bx >= xminLJung && bx <= xmaxLJung && by >= yminLJung && by <= ymaxLJung && localDungeonSideLocal != 0) foundNLJ++;
+                                    if (addThem) addBulb(bx, by, counter[j - 3], true);
+                                }
+                            }
+
+                            if (values[j - 3] > bclastm4_y_min && values[j - 3] < bclastm4_y_max && values[j - 4] > bclastm5_x_min && values[j - 4] < bclastm5_x_max
+                                && values[j - 2] > bclastm2_maybe_greater10)
+                            {
+                                //hit 
+                                int by = (int)(values[j - 3] * (Main.maxTilesY - 20 - (int)worldSurface + 1)) + (int)worldSurface - 1;
+                                if (by <= rngBorder)
+                                {
+                                    found++;
+                                    int bx = (int)(values[j - 4] * (Main.maxTilesX - 20) + 10);
+                                    if (bx >= xminMid + (by - yminMid) / reduceFac && bx <= xmaxMid - (by - yminMid) / reduceFac && by >= yminMid && by <= ymaxMid) foundNM++;
+                                    if (bx >= xminLJung && bx <= xmaxLJung && by >= yminLJung && by <= ymaxLJung && localDungeonSideLocal != 0) foundNLJ++;
+                                    if (addThem) addBulb(bx, by, counter[j - 3], true);
+                                }
+                            }
+                            if (values[j - 2] > bclastm4_y_min && values[j - 2] < bclastm4_y_max && values[j - 3] > bclastm5_x_min && values[j - 3] < bclastm5_x_max)
+                            {
+                                //hit   
+                                int by = (int)(values[j - 2] * (Main.maxTilesY - 20 - (int)worldSurface + 1)) + (int)worldSurface - 1;
+                                if (by <= rngBorder)
+                                {
+                                    found++;
+                                    int bx = (int)(values[j - 3] * (Main.maxTilesX - 20) + 10);
+                                    if (bx >= xminMid + (by - yminMid) / reduceFac && bx <= xmaxMid - (by - yminMid) / reduceFac && by >= yminMid && by <= ymaxMid) foundNM++;
+                                    if (bx >= xminLJung && bx <= xmaxLJung && by >= yminLJung && by <= ymaxLJung && localDungeonSideLocal != 0) foundNLJ++;
+                                    if (addThem) addBulb(bx, by, counter[j - 2], true);
+                                }
+                            }
+                        }
+                        if (values[j] < crystalShardLessThan110)
+                        {
+                            if (values[j] < chlOreLessThen300 && (byt = ((int)(values[j - 1] * (Main.maxTilesY - 20 - (int)worldSurface + 1)) + (int)worldSurface - 1)) > rngBorder && byt < ymax)
+                            {
+                                int bx = (int)(values[j - 2] * (Main.maxTilesX - 20) + 10);
+                                if (addThem)
+                                {
+                                    if (score.itemLocation.ContainsKey(ItemID.ChlorophyteOre))
+                                        score.itemLocation[ItemID.ChlorophyteOre].Add(new Tuple<int, int>(bx, byt));//-3
+                                    else
+                                        score.itemLocation.Add(ItemID.ChlorophyteOre, new List<Tuple<int, int>> { new Tuple<int, int>(bx, byt) });
+
+                                    bx += (int)((values[j + 1] * 21 - 10));
+                                    byt += (int)((values[j + 2] * 21 - 10));
+
+                                    if (score.itemLocation.ContainsKey(ItemID.MudBlock))
+                                        score.itemLocation[ItemID.MudBlock].Add(new Tuple<int, int>(bx, byt));//-3
+                                    else
+                                        score.itemLocation.Add(ItemID.MudBlock, new List<Tuple<int, int>> { new Tuple<int, int>(bx, byt) });
+                                }
+                                foundChlore++;
+                            }
+
+
+                            if (values[j] < crystalShardLessThan110 && (byt = ((int)(values[j - 1] * (Main.maxTilesY - 20 - (int)worldSurface + 1)) + (int)worldSurface - 1)) > rockLayer && byt<ymax)
+                            {
+                                if (addThem)
+                                {
+                                    int bx = (int)(values[j - 2] * (Main.maxTilesX - 20) + 10);
+                                    if (score.itemLocation.ContainsKey(ItemID.CrystalShard))
+                                        score.itemLocation[ItemID.CrystalShard].Add(new Tuple<int, int>(bx, byt));//-3
+                                    else
+                                        score.itemLocation.Add(ItemID.CrystalShard, new List<Tuple<int, int>> { new Tuple<int, int>(bx, byt) });
+                                }
+                                foundShard++;
+                            }
+                        }
+
+                    }
+
+                    
+                }
+
+            }
+            return new QuickCheckInfo(found,foundNLJ,foundNM,foundShard,foundChlore, foundTripple, snowMid, snowLeft,snowRight,snowApproxSurfL,snowApproxSurfR, hallowApproxSurfL, hallowApproxSurfR, firstEvilBiomePosPred, stopped);
+          
+        }
+
+       
+
         public void setHights(bool reduce)
         {
             boostHeightValueSeed = guessSpawnHight(reduce);
@@ -2319,6 +2821,8 @@ namespace TheTerrariaSeedProject
             if (boostRockLayerOffsetSeed < boostUGHeightValueSeed) boostCavernLayeroffsetSeed = (int)(((float)boostRockLayerOffsetSeed) /((float)boostUGHeightValueSeed)*100);
             else if (boostRockLayerOffsetSeed < boostUGHeightValueSeed+ boostHeightValueSeed) boostCavernLayeroffsetSeed = 100+(int)(((float)(boostRockLayerOffsetSeed- boostUGHeightValueSeed)) / ((float)boostHeightValueSeed) * 100);
             else boostCavernLayeroffsetSeed = 200 + (int)(((float)(boostRockLayerOffsetSeed - boostUGHeightValueSeed- boostHeightValueSeed)) / ((float)boostHeightValueSeed) * 100);
+
+            
 
         }
 
@@ -2378,7 +2882,7 @@ namespace TheTerrariaSeedProject
                             while (!ended && !searchForSeed) { clearWorld(stage); };
                             uiss.HideUnhideProgressBar();
                             isInCreation = false;
-
+                            progress.Message = "Searching2";
                             while (uiss.writeTextUpdating == true || uiss.rephrasing || uiss.detailsList.isUpdating || uiss.writeStats || uiss.writeText) { Thread.Sleep(10); };
 
                         }
@@ -2446,26 +2950,102 @@ namespace TheTerrariaSeedProject
                         tasks.Insert(terrind + 2, new PassLegacy("Continue or not ", delegate (GenerationProgress progress)
                         {
 
-                            if ((boostHeightValueMax != 300 && boostHeightValueSeed > boostHeightValueMax) ||
-                                (boostHeightValueMin != 0 && boostHeightValueSeed < boostHeightValueMin) ||
-                                (boostSurfHeightValueMin != 0 && boostSurfHeightValueSeed < boostSurfHeightValueMin) ||                                
-                                (boostSurfHeightValueMax != 100 && boostSurfHeightValueSeed > boostSurfHeightValueMax) ||                                
-                                (boostSurfHeightVarValueMin != 0 && boostSurfHeightVarValueSeed < boostSurfHeightVarValueMin) ||                                
-                                (boostSurfHeightVarValueMax != 400 && boostSurfHeightVarValueSeed > boostSurfHeightVarValueMax) ||                                
-                                (boostUGHeightValueMax != 1000 && boostUGHeightValueSeed > boostUGHeightValueMax) ||
-                                (boostUGHeightValueMin != 0 && boostUGHeightValueSeed < boostUGHeightValueMin) ||
-                                (boostCavernLayeroffsetMin != 0 && boostCavernLayeroffsetSeed < boostCavernLayeroffsetMin) ||
-                                (boostCavernLayeroffsetMax != 300 && boostCavernLayeroffsetSeed > boostCavernLayeroffsetMax) ||
-                                (boostRockLayerOffset != 0 && boostRockLayerOffsetSeed < boostRockLayerOffset) ||
-                                (boostSurfRockLayerOffset != 0 && boostSurfRockLayerOffsetSeed < boostSurfRockLayerOffset) ||
-                                (boostSpawnRockSeedOffsetMin != -1000 && boostSpawnRockSeedOffsetSeed < boostSpawnRockSeedOffsetMin) ||
-                                (boostSpawnRockSeedOffsetMax != 100 && boostSpawnRockSeedOffsetSeed > boostSpawnRockSeedOffsetMax)                                
-                                )
-                            {
-                                condsTrue = 0;
-                                ClearPasses(tasks, terrind + 3);
-                            }
+                        if ((boostHeightValueMax != 300 && boostHeightValueSeed > boostHeightValueMax) ||
+                            (boostHeightValueMin != 0 && boostHeightValueSeed < boostHeightValueMin) ||
+                            (boostSurfHeightValueMin != 0 && boostSurfHeightValueSeed < boostSurfHeightValueMin) ||
+                            (boostSurfHeightValueMax != 100 && boostSurfHeightValueSeed > boostSurfHeightValueMax) ||
+                            (boostSurfHeightVarValueMin != 0 && boostSurfHeightVarValueSeed < boostSurfHeightVarValueMin) ||
+                            (boostSurfHeightVarValueMax != 400 && boostSurfHeightVarValueSeed > boostSurfHeightVarValueMax) ||
+                            (boostUGHeightValueMax != 1000 && boostUGHeightValueSeed > boostUGHeightValueMax) ||
+                            (boostUGHeightValueMin != 0 && boostUGHeightValueSeed < boostUGHeightValueMin) ||
+                            (boostCavernLayeroffsetMin != 0 && boostCavernLayeroffsetSeed < boostCavernLayeroffsetMin) ||
+                            (boostCavernLayeroffsetMax != 300 && boostCavernLayeroffsetSeed > boostCavernLayeroffsetMax) ||
+                            (boostRockLayerOffset != 0 && boostRockLayerOffsetSeed < boostRockLayerOffset) ||
+                            (boostSurfRockLayerOffset != 0 && boostSurfRockLayerOffsetSeed < boostSurfRockLayerOffset) ||
+                            (boostSpawnRockSeedOffsetMin != -1000 && boostSpawnRockSeedOffsetSeed < boostSpawnRockSeedOffsetMin) ||
+                            (boostSpawnRockSeedOffsetMax != 100 && boostSpawnRockSeedOffsetSeed > boostSpawnRockSeedOffsetMax)
+                            )
+                        {
+                            condsTrue = 0;
+                            ClearPasses(tasks, terrind + 3);
+                        }
 
+                            if (condsTrue > 0)
+                            {
+                                QuickCheckInfo qci = CheckQuickBulbShardChloreSnow();
+                               
+
+                                
+                                int minSnowLeft = (int)(0.01f*(float)(localDungeonSide < 0 ? noSnowDungeon : noSnowJungle) * (float)Main.maxTilesX);
+                                int minSnowRight = (int)(0.01f* (float)(localDungeonSide > 0 ? noSnowDungeon : noSnowJungle) * (float)Main.maxTilesX);
+                                bool hallowLeft = qci.hallowApprSurfL < Main.maxTilesX / 2;
+                                int evilHallowOffsetBlock = ((((qci.firstEvilBiomePosPred >= qci.hallowApprSurfL && qci.firstEvilBiomePosPred <= qci.hallowApprSurfR) ?
+                                                    -Math.Abs(( hallowLeft ? qci.hallowApprSurfL : qci.hallowApprSurfR) - qci.firstEvilBiomePosPred) :
+                                                    ( (hallowLeft? (qci.firstEvilBiomePosPred>= qci.hallowApprSurfR) : (qci.firstEvilBiomePosPred <= qci.hallowApprSurfL) )?
+                                                    Math.Abs((hallowLeft ? qci.hallowApprSurfR : qci.hallowApprSurfL) - qci.firstEvilBiomePosPred):
+                                                    Main.maxTilesX
+                                                    )
+                                                    )
+                                                    ) );
+                                int evilHallowOffset =(int) ((1000.0 * evilHallowOffsetBlock) / (float)Main.maxTilesX + (evilHallowOffsetBlock<0?-0.5:0.5));
+                                bool hallowOk = evilHallowOffset>= hallow1stEvilOffMin && evilHallowOffset <= hallow1stEvilOffMax && qci.firstEvilBiomePosPred>0;
+                                if (hallowOk && evilHallowOffset == 0)
+                                {
+                                    bool oneOK = 1 >= hallow1stEvilOffMin && 1 <= hallow1stEvilOffMax;
+                                    bool moneOK = -1 >= hallow1stEvilOffMin && -1 <= hallow1stEvilOffMax;
+                                    if (oneOK != moneOK)
+                                    {
+                                        if (hallowLeft && (int)((1000.0*(qci.firstEvilBiomePosPred-qci.hallowApprSurfR))/Main.maxTilesX+0.5)==0 && moneOK)
+                                            hallowOk = false;
+                                        else if (hallowLeft && (int)((1000.0 * (qci.firstEvilBiomePosPred - qci.hallowApprSurfL)) / Main.maxTilesX + 0.5) == 0 && oneOK)
+                                            hallowOk = false; 
+                                        else if (!hallowLeft && (int)((1000.0 * (qci.firstEvilBiomePosPred - qci.hallowApprSurfL)) / Main.maxTilesX + 0.5) == 0 && moneOK)
+                                            hallowOk = false;
+                                        else if (!hallowLeft && (int)((1000.0 * (qci.firstEvilBiomePosPred - qci.hallowApprSurfR)) / Main.maxTilesX + 0.5) == 0 && oneOK)
+                                            hallowOk = false;
+
+                                    }
+
+                                    
+                                }
+
+                                int innerHallow = hallowLeft ? qci.hallowApprSurfR : qci.hallowApprSurfL;
+                                int outerSnow = localDungeonSide<0 ? qci.snowApprSurfL : qci.snowApprSurfR;
+                                int hallowSnowDistBlock = ((hallowLeft ? outerSnow - innerHallow: innerHallow- outerSnow));
+                                int hallowSnowDist = (int)((1000.0* hallowSnowDistBlock)/Main.maxTilesX + (hallowSnowDistBlock < 0 ? -0.5 : 0.5));
+                                bool snowHallowOk = hallowSnowDist<=hallowToSnowMax && hallowSnowDist >= hallowToSnowMin;
+                                
+
+                                //if (!qci.wasStopped) writeDebugFile(seed + " step2 " + qci.snowApprSurfL);
+                                //if (qci.wasStopped || (qci.snowApprSurfL > 2000 && qci.foundTripple == 0)) condsTrue = 0;
+                                /*writeDebugFile(seed + " " + (qci.wasStopped) + " " + (qci.foundQBulb ) + " " + (qci.foundQBulbNLJ ) + " " + (qci.foundQBulbNM ) + " " + (
+                                   qci.foundQShard ) + " " + (qci.foundQChlore ) + " " + (qci.foundTripple 
+                                   ) + " " + (qci.snowApprSurfL ) + " " + ((Main.maxTilesX - qci.snowApprSurfR)));
+
+                                writeDebugFile(seed + " " + (qci.wasStopped) + " " + ( quickBulb) + " " + ( quickBulbNJ) + " " + ( quickBulbNM) + " " + (
+                                    quickCrystal) + " " + ( quickChlore) + " " + (quickTripple
+                                   ) + " " + (minSnowLeft) + " " + (minSnowRight));
+
+                                writeDebugFile(seed + " " + (qci.wasStopped) + " "+ ( qci.foundQBulb < quickBulb )+" " +( qci.foundQBulbNLJ < quickBulbNJ )+" " +( qci.foundQBulbNM < quickBulbNM )+" " +(
+                                   qci.foundQShard < quickCrystal )+" " +( qci.foundQChlore < quickChlore )+" " +( qci.foundTripple < quickTripple
+                                   )+" " +( qci.snowApprSurfL < minSnowLeft )+" " +( (Main.maxTilesX - qci.snowApprSurfR) < minSnowRight));
+                                */
+
+                                if (qci.wasStopped || qci.foundQBulb < quickBulb || qci.foundQBulbNLJ < quickBulbNJ || qci.foundQBulbNM < quickBulbNM ||
+                                   qci.foundQShard < quickCrystal || qci.foundQChlore < quickChlore || qci.foundTripple < quickTripple 
+                                   || qci.snowApprSurfL < minSnowLeft || (Main.maxTilesX-qci.snowApprSurfR) < minSnowRight || !hallowOk || !snowHallowOk) condsTrue = 0;
+                                else
+                                {
+                                    /*writeDebugFile(seed + " h l " + qci.hallowApprSurfL + " h r " + qci.hallowApprSurfR + " " + qci.firstEvilBiomePosPred + " ofset " + evilHallowOffset
+                                        + " offsetbloc "+ evilHallowOffsetBlock 
+                                        + " inside " + (qci.firstEvilBiomePosPred >= qci.hallowApprSurfL && qci.firstEvilBiomePosPred <= qci.hallowApprSurfR) +
+                                        " valid " + (hallowLeft ? (qci.firstEvilBiomePosPred > qci.hallowApprSurfL) : (qci.firstEvilBiomePosPred < qci.hallowApprSurfR)) +
+                                        " hisLeft " + hallowLeft + " innerHallow " + innerHallow + " outerSnow " + outerSnow + " hsd " + hallowSnowDist + " snodisbl " + hallowSnowDistBlock);*/
+                                       
+                                    //writeDebugFile(seed + " " + Main.worldSurface + " " + qci.snowApprSurfL + " " + qci.snowApprSurfR + " " + qci.snowStartM + " " + qci.snowStartL + " " + qci.snowStartR);
+                                }
+                            }
+                            
                         }));
                     }
 
@@ -2548,10 +3128,13 @@ namespace TheTerrariaSeedProject
                             }
                             condsTrue = oreMoon ? 1 : 0;
 
+
+
                         }));
 
                         tasks.Insert(resetIndex + 3, new PassLegacy("Continue or not ", delegate (GenerationProgress progress)
                         {
+                            //progress.Message = "Searching";
                             if (condsTrue < 1)
                                 ClearPasses(tasks, resetIndex + 4);
 
@@ -3201,7 +3784,9 @@ namespace TheTerrariaSeedProject
             //TODo better inclusion
             localDungeonSide = Main.dungeonX < Main.maxTilesX / 2 ? -1 : 1; // changed from spawnx
             setDirectComputeValues();
-            
+
+            CheckQuickBulbShardChloreSnow(true);
+
             const int oceanBiomeSizeX = 380; //from vanilla
 
             hasOBjectOrParam.Add("Max open air pyramid surface", 0);
@@ -3742,7 +4327,29 @@ namespace TheTerrariaSeedProject
             hasOBjectOrParam.Add("Boost surfRock layer offset", boostSurfRockLayerOffsetSeed);
             hasOBjectOrParam.Add("Spawn rock layer offset (guess)", boostSpawnRockSeedOffsetSeed);
             hasOBjectOrParam.Add("neg. Spawn rock layer offset (guess)", boostSpawnRockSeedOffsetSeed);
+
+
+            hasOBjectOrParam.Add("BG tree mountain 0", Main.treeMntBG[0]);
+            hasOBjectOrParam.Add("BG tree mountain 1", Main.treeMntBG[1]);
+            hasOBjectOrParam.Add("BG tree 0", Main.treeBG[0]);
+            hasOBjectOrParam.Add("BG tree 1", Main.treeBG[1]);
+            hasOBjectOrParam.Add("BG tree 2", Main.treeBG[2]);
+            hasOBjectOrParam.Add("BG snow mountain 0", Main.snowMntBG[0]);
+            hasOBjectOrParam.Add("BG snow mountain 1", Main.snowMntBG[1]);
+            hasOBjectOrParam.Add("BG snow 0", Main.snowBG[0]);
+            hasOBjectOrParam.Add("BG snow 1", Main.snowBG[1]);
+            hasOBjectOrParam.Add("BG snow 2", Main.snowBG[2]);
+
+
+            hasOBjectOrParam.Add("BG jungle", Main.jungleBG[0]);
+            hasOBjectOrParam.Add("BG desert", Main.desertBG[0]);
+            hasOBjectOrParam.Add("BG corruption", Main.corruptBG[0]);
+            hasOBjectOrParam.Add("BG crimson", Main.crimsonBG[0]);
+            hasOBjectOrParam.Add("BG hallow", Main.hallowBG[0]);
+            hasOBjectOrParam.Add("BG ocean", Main.oceanBG);
             
+
+
             hasOBjectOrParam.Add("random value seed *10000", (int)(10000.0 * boostValueSeed));
             hasOBjectOrParam.Add("Boost random value seed", (int)(10.0/(1.0-boostValueSeed)));
             hasOBjectOrParam.Add("Boost pyramid value seed", boostPyramidValueSeed);
@@ -10625,6 +11232,7 @@ namespace TheTerrariaSeedProject
 
                 int phase3Count = 0;
                 int phase2Count = 0;
+                int phase1Count = 0;
                 int phaseStartingpoints = 0;
                 bool cPquerry = false;
 
@@ -10650,7 +11258,7 @@ namespace TheTerrariaSeedProject
                 {
                     if (cci.type == Configuration.ConfigItemType.SelectableText && cci.phase == 2)
                         phase2Count += 1;
-                    if (cci.type == Configuration.ConfigItemType.SelectableText && cci.phase == 3 && !cci.name.Equals(OptionsDict.Phase3.continueEvaluation))
+                    else if (cci.type == Configuration.ConfigItemType.SelectableText && cci.phase == 3 && !cci.name.Equals(OptionsDict.Phase3.continueEvaluation))
                         phase3Count += 1;
 
                     if (cci.phase <= step && cci.phase > 0)
@@ -10742,6 +11350,7 @@ namespace TheTerrariaSeedProject
                                     {
                                         points += hasOBjectOrParam[cci.name] >= value ? 1 : 0;
                                         conditionCheck += "in selectable cPquerry " + cPquerry + "  tested " + cci.name + ": " + hasOBjectOrParam[cci.name] + " >= " + value + "   , points:" + points + " stage " + cstep + Environment.NewLine;
+                                        phase1Count++;
                                     }
                                 }
 
@@ -10833,7 +11442,7 @@ namespace TheTerrariaSeedProject
 
                 if (pointsReseted)
                     points = Math.Max(pointsB4Reset, points);
-
+                if (phase1Count == 0) points++;
                 if (phase2Count == 0 && points > 0)
                     points++;
                 if (phase3Count == 0 && (step != 1 || phase2Count == 0) && points > 1)
@@ -11428,7 +12037,8 @@ namespace TheTerrariaSeedProject
                         && itemloclist.Key != ItemID.PaladinsHammer && itemloclist.Key != ItemID.Ectoplasm && itemloclist.Key != ItemID.ChaosFish
                         && itemloclist.Key != ItemID.Blinkroot
                         && itemloclist.Key != ItemID.CobaltBar && itemloclist.Key != ItemID.MythrilBar && itemloclist.Key != ItemID.PotionStatue
-                        && itemloclist.Key != ItemID.PlanteraMask && itemloclist.Key != ItemID.PlanteraTrophy )
+                        && itemloclist.Key != ItemID.PlanteraMask && itemloclist.Key != ItemID.PlanteraTrophy
+                        && itemloclist.Key != ItemID.MudBlock)
                         foreach (var itemloc in itemloclist.Value)
                         {                          
                             DrawItemImage(ref rgbValues, itemloclist.Key, itemloc, scale);                        
@@ -11513,6 +12123,71 @@ namespace TheTerrariaSeedProject
                         if (((-bulb.Item1) % 100) >= 60)
                             DrawCircle(ref rgbValues, new Tuple<int, int>(-bulb.Item1 / 10000, -(bulb.Item2 / 10000) - 1), scale, new Color(208, 57, 125), 5);
 
+                    }
+
+
+                if (score.itemLocation.ContainsKey(ItemID.CrystalShard))
+                    foreach (var shard in score.itemLocation[ItemID.CrystalShard])
+                    {
+                        for (int s = -3; s < 0; s++)
+                        {
+                            for (int lx = s+1; lx < -s; lx++)
+                            {
+                                int off = (shard.Item2 - s) * 4 * Main.maxTilesX + (shard.Item1 + lx) * 4 + 0;
+                                //if(lx == s || lx == -s - 1){
+                                rgbValues[off] = (byte)(((0.25 * (int)rgbValues[off]) + 128));
+                                rgbValues[off + 1] = (byte)(((0.25 * (int)rgbValues[off]) + 48));//g
+                                rgbValues[off + 2] = (byte)(((0.25 * (int)rgbValues[off]) + 64));
+                            }
+                        }
+                    }
+                if (score.itemLocation.ContainsKey(ItemID.ChlorophyteOre))
+                    foreach (var chlore in score.itemLocation[ItemID.ChlorophyteOre])
+                    {
+                        for (int s = -3; s < 0; s++)
+                        {
+                            for (int lx = s+1; lx < -s; lx++)
+                            {
+                                int off = (chlore.Item2 - s) * 4 * Main.maxTilesX + (chlore.Item1 + lx) * 4 + 0;
+                                //if(lx == s || lx == -s - 1){
+                                rgbValues[off] = (byte)(((0.25 * (int)rgbValues[off]) + 32));
+                                rgbValues[off + 1] = (byte)(((0.25 * (int)rgbValues[off]) + 48));//g
+                                rgbValues[off + 2] = (byte)(((0.25 * (int)rgbValues[off]) + 164));
+                            }
+                        }
+                    }
+                if (score.itemLocation.ContainsKey(ItemID.MudBlock))
+                    foreach (var mud in score.itemLocation[ItemID.MudBlock])
+                    {
+                        for (int s = -3; s < 0; s++)
+                        {
+                            for (int lx = s+1; lx < -s; lx++)
+                            {
+                                int off = (mud.Item2 - s) * 4 * Main.maxTilesX + (mud.Item1 + lx) * 4 + 0;
+                                //if(lx == s || lx == -s - 1){
+                                rgbValues[off] = (byte)(((0.25 * (int)rgbValues[off]) + 128));
+                                rgbValues[off + 1] = (byte)(((0.25 * (int)rgbValues[off]) + 48));//g
+                                rgbValues[off + 2] = (byte)(((0.25 * (int)rgbValues[off]) + 164));
+                            }
+                        }
+                    }
+
+                if (score.itemLocation.ContainsKey(ItemID.PlanteraBossBag))
+                    foreach (var bulb in score.itemLocation[ItemID.PlanteraBossBag])
+                    {
+                        for (int s = -3; s < 0; s++)
+                        {
+                            for (int lx = s; lx < -s; lx++)
+                            {
+                                int off = (bulb.Item2-s) * 4 * Main.maxTilesX + (bulb.Item1+lx) * 4 + 0;
+                                //if(lx == s || lx == -s - 1){
+                                    rgbValues[off] = (byte)(((0.25 * (int)rgbValues[off]) + 32));
+                                    rgbValues[off + 1] = (byte)(((0.25 * (int)rgbValues[off]) + 48));//g
+                                    rgbValues[off + 2] = (byte)(((0.25 * (int)rgbValues[off]) + 160));
+                               
+                                
+                            }                            
+                        }
                     }
 
             }
