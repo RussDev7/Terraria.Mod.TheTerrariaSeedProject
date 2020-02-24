@@ -36,6 +36,7 @@ If you found some bugs, have some ideas, want to help coding or found some nice 
 Good luck!
 
 Last Update(s):
+-snow distance boost, quick spawn shard, chlo ore, bulb
 -UG desert/sand blocks distance to mid, cliff count, cliff score
 -unicorn pathlength, distance quick bulb temple altar, fixed: typo
 -evil biome count (merged) and range, ruby/diamond/evil or near mid, edge snow biome, blocks below temple altar
